@@ -74,6 +74,12 @@
   .lever-item:last-child{border-bottom:none;}
   .lever-item .what{font-size:0.92rem;}
   .lever-item .where{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);white-space:nowrap;}
+  .amount{
+    font-family:var(--font-mono);font-size:0.72rem;color:var(--amber);
+    padding:4px 0 8px;margin-top:-4px;border-bottom:1px solid var(--surface-2);
+  }
+  .lever-item:last-of-type + .amount,.amount:last-child{border-bottom:none;}
+  .amount-label{color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-right:6px;}
 
   .note{
     margin-top:1px;border:1px solid var(--border);border-top:none;border-left:3px solid var(--amber);
@@ -92,9 +98,26 @@
     .choices.two{grid-template-columns:1fr;}
     .lever-item{grid-template-columns:1fr;gap:2px;}
   }
+
+  /* ---------- Topbar navigation (seitenübergreifend) ---------- */
+  .sg-topbar{position:sticky;top:0;z-index:50;background:rgba(10,14,19,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .sg-topbar-inner{max-width:720px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:26px;overflow-x:auto;}
+  .sg-topbar .brand{margin-right:auto;font-family:var(--font-display);font-weight:600;color:var(--text);font-size:1rem;text-decoration:none;white-space:nowrap;}
+  .sg-topbar a:not(.brand){font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;padding:8px 0;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s ease,border-color .15s ease;}
+  .sg-topbar a:not(.brand):hover{color:var(--text);}
+  .sg-topbar a.active{color:var(--teal) !important;border-color:var(--teal) !important;}
 </style>
 </head>
 <body>
+
+<header class="sg-topbar">
+  <div class="sg-topbar-inner">
+    <a class="brand" href="index.html">Christian Seitz</a>
+    <a href="index.html">Home</a>
+    <a href="setup-guide.html">Setup Guide</a>
+    <a href="setup-diagnose-tool.html" class="active">Diagnose-Tool</a>
+  </div>
+</header>
 
 <div class="wrap">
   <div class="eyebrow"><span class="dot"></span> Setup-Diagnose</div>
@@ -154,15 +177,16 @@ const DATA = {
       why: "Die Vorderachse hat unter Bremslast zu wenig relativen Grip gegenüber dem Heck, oder das Diff hält das Auto beim Lupfen/Bremsen zu sehr gerade.",
       groups: [
         { axle: "Front", items: [
-          ["Bremsbalance nach hinten verschieben", "Chassis → Front (Brakes)"],
-          ["Front-ARB weicher", "Chassis → Front"],
-          ["Front-Camber negativer", "Chassis → Front Corners"],
-          ["Front-Ride-Height leicht senken", "Chassis → Front"]
+          ["Bremsbalance nach hinten verschieben", "Chassis → Front (Brakes)", "0,3–0,5 %"],
+          ["Front-ARB weicher", "Chassis → Front", "1 Position"],
+          ["Front-Camber negativer", "Chassis → Front Corners", "0,2–0,3°"],
+          ["Front-Ride-Height leicht senken", "Chassis → Front", "0,2–0,3 mm"],
+          ["Front-LSC-Dämpfer niedriger", "Dampers", "1 Klick"]
         ]},
         { axle: "Heck / Diff", items: [
-          ["Heck-ARB härter", "Chassis → Rear"],
-          ["Heck-Toe leicht reduzieren", "Chassis → Rear Corners"],
-          ["Coast Ramp öffnen, falls vorhanden", "Gears / Differential"]
+          ["Heck-ARB härter", "Chassis → Rear", "1 Position"],
+          ["Heck-Toe leicht reduzieren", "Chassis → Rear Corners", "0,3 mm"],
+          ["Coast Ramp öffnen, falls vorhanden", "Gears / Differential", "5°"]
         ]}
       ],
       note: "Wird oft mit dem Diff verwechselt — bei Autos ohne separate Coast Ramp greift hier vor allem die Bremsbalance, nicht das Preload."
@@ -172,15 +196,16 @@ const DATA = {
       why: "Die Vorderachse hält zu gut, das Heck bricht relativ dazu unter Bremslast aus, oder das Diff lässt beim Lupfen/Bremsen zu viel Freilauf zu.",
       groups: [
         { axle: "Front", items: [
-          ["Bremsbalance nach vorne verschieben", "Chassis → Front (Brakes)"],
-          ["Front-ARB härter", "Chassis → Front"],
-          ["Front-Ride-Height leicht anheben", "Chassis → Front"],
-          ["Front-Toe Richtung neutral", "Chassis → Front Corners"]
+          ["Bremsbalance nach vorne verschieben", "Chassis → Front (Brakes)", "0,3–0,5 %"],
+          ["Front-ARB härter", "Chassis → Front", "1 Position"],
+          ["Front-Ride-Height leicht anheben", "Chassis → Front", "0,2–0,3 mm"],
+          ["Front-LSC-Dämpfer höher", "Dampers", "1 Klick"],
+          ["Front-Toe Richtung neutral", "Chassis → Front Corners", "0,3 mm"]
         ]},
         { axle: "Heck / Diff", items: [
-          ["Heck-ARB weicher", "Chassis → Rear"],
-          ["Heck-Toe-in erhöhen", "Chassis → Rear Corners"],
-          ["Coast Ramp schließen, falls vorhanden", "Gears / Differential"]
+          ["Heck-ARB weicher", "Chassis → Rear", "1 Position"],
+          ["Heck-Toe-in erhöhen", "Chassis → Rear Corners", "0,3 mm"],
+          ["Coast Ramp schließen, falls vorhanden", "Gears / Differential", "5°"]
         ]}
       ],
       note: "Bevor du am Diff drehst: prüfen, ob das Auto auch beim reinen Geradeausbremsen schon unruhig ist, oder erst beim Einlenken unter Bremse (Trail-Braking) — das zeigt, ob Bremsbalance oder Coast Ramp der richtige Hebel ist."
@@ -193,13 +218,13 @@ const DATA = {
       why: "Die Vorderachse trägt relativ zum Heck zu wenig von der Querlast — meist ARB- oder Ride-Height-Balance.",
       groups: [
         { axle: "Front", items: [
-          ["Front-ARB weicher", "Chassis → Front"],
-          ["Front-Feder weicher (später Hebel)", "Chassis → Front Corners"],
-          ["Front-Ride-Height leicht senken", "Chassis → Front"]
+          ["Front-ARB weicher", "Chassis → Front", "1 Position"],
+          ["Front-Feder weicher (später Hebel)", "Chassis → Front Corners", "10–20 N/mm"],
+          ["Front-Ride-Height leicht senken", "Chassis → Front", "0,2–0,3 mm"]
         ]},
         { axle: "Heck", items: [
-          ["Heck-ARB härter", "Chassis → Rear"],
-          ["Heck-Ride-Height leicht anheben", "Chassis → Rear"]
+          ["Heck-ARB härter", "Chassis → Rear", "1 Position"],
+          ["Heck-Ride-Height leicht anheben", "Chassis → Rear", "0,2–0,3 mm"]
         ]}
       ],
       note: "Reifendruck ist hier kein Hebel — in iRacing steht der bei GT3 ohnehin auf Minimum."
@@ -209,12 +234,13 @@ const DATA = {
       why: "Kein Gas, keine Bremse, und das Heck rotiert trotzdem von selbst — nach der Grundphilosophie ein Alarmsignal, das Setup ist zu drehfreudig eingestellt.",
       groups: [
         { axle: "Front", items: [
-          ["Front-ARB härter", "Chassis → Front"]
+          ["Front-ARB härter", "Chassis → Front", "1 Position"]
         ]},
         { axle: "Heck", items: [
-          ["Heck-ARB weicher", "Chassis → Rear"],
-          ["Heck-Camber weniger negativ", "Chassis → Rear Corners"],
-          ["Heck-Ride-Height leicht senken", "Chassis → Rear"]
+          ["Heck-ARB weicher", "Chassis → Rear", "1 Position"],
+          ["Heck-Camber weniger negativ", "Chassis → Rear Corners", "0,2–0,3°"],
+          ["Heck-Ride-Height leicht senken", "Chassis → Rear", "0,2–0,3 mm"],
+          ["Heck-LSC-Dämpfer niedriger", "Dampers", "1 Klick"]
         ]}
       ],
       note: "Das hier zuerst fixen, auch wenn Einlenken und Exit sich sonst gut anfühlen — ein Auto, das ohne Fahrereingabe dreht, verletzt die Grundphilosophie (Rotation nur über die Bremse)."
@@ -227,12 +253,13 @@ const DATA = {
       why: "Das Diff ist zu fest gesperrt und kämpft gegen den noch anliegenden Lenkwinkel, oder das Heck hat schlicht zu wenig Grip unter Last.",
       groups: [
         { axle: "Diff", items: [
-          ["Preload / Power Ramp öffnen", "Gears / Differential"],
-          ["Friction Faces reduzieren, falls vorhanden", "Gears / Differential"]
+          ["Preload / Power Ramp öffnen", "Gears / Differential", "10 Nm bzw. 5°"],
+          ["Friction Faces reduzieren, falls vorhanden", "Gears / Differential", "2er-Schritt"]
         ]},
         { axle: "Heck", items: [
-          ["Heck-Ride-Height leicht anheben", "Chassis → Rear"],
-          ["Heck-ARB weicher", "Chassis → Rear"]
+          ["Heck-Ride-Height leicht anheben", "Chassis → Rear", "0,2–0,3 mm"],
+          ["Heck-ARB weicher", "Chassis → Rear", "1 Position"],
+          ["Front-LSC-Dämpfer niedriger", "Dampers", "1 Klick"]
         ]}
       ],
       note: "Diff-Änderungen immer über mehrere Kurventypen gegenprüfen — eine Lockerung, die hier hilft, kann in einer anderen Kurve neues Power-Oversteer erzeugen."
@@ -242,14 +269,15 @@ const DATA = {
       why: "Das Diff sperrt zu wenig unter Gas, das kurveninnere Rad dreht durch und das Heck bricht weg. Häufigstes Exit-Problem in GT3.",
       groups: [
         { axle: "Diff", items: [
-          ["Preload / Power Ramp erhöhen — Haupt-Hebel", "Gears / Differential"],
-          ["Friction Faces erhöhen, falls vorhanden", "Gears / Differential"]
+          ["Preload / Power Ramp erhöhen — Haupt-Hebel", "Gears / Differential", "10 Nm bzw. 5°"],
+          ["Friction Faces erhöhen, falls vorhanden", "Gears / Differential", "2er-Schritt"]
         ]},
         { axle: "Heck", items: [
-          ["Heck-Toe-in leicht erhöhen", "Chassis → Rear Corners"],
-          ["Heck-Camber weniger negativ", "Chassis → Rear Corners"],
-          ["Heck-Ride-Height leicht senken, falls Diff allein nicht reicht", "Chassis → Rear"],
-          ["TC-Stufe prüfen, falls Reglement erlaubt", "In-Car Dials"]
+          ["Heck-Toe-in leicht erhöhen", "Chassis → Rear Corners", "0,3 mm"],
+          ["Heck-Camber weniger negativ", "Chassis → Rear Corners", "0,2–0,3°"],
+          ["Heck-LSC-Dämpfer höher", "Dampers", "1 Klick"],
+          ["Heck-Ride-Height leicht senken, falls Diff allein nicht reicht", "Chassis → Rear", "0,2–0,3 mm"],
+          ["TC-Stufe prüfen, falls Reglement erlaubt", "In-Car Dials", "1 Stufe"]
         ]}
       ],
       note: "Ein zu fest gesperrtes Diff kann in einer anderen Kurve Traktionsverlust oder sogar Einlenk-Probleme erzeugen — nicht isoliert an der einen Stelle testen, sondern über die ganze Runde."
@@ -303,6 +331,12 @@ function render(){
       row.appendChild(what);
       row.appendChild(where);
       g.appendChild(row);
+      if(item[2]){
+        const amt = document.createElement('div');
+        amt.className = 'amount';
+        amt.innerHTML = '<span class="amount-label">Schritt</span> ' + item[2];
+        g.appendChild(amt);
+      }
     });
     leverBlock.appendChild(g);
   });

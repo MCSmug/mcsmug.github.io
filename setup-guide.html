@@ -165,9 +165,26 @@
   @media (prefers-reduced-motion: reduce){
     .sg-trace path{animation:none !important;stroke-dashoffset:0 !important;}
   }
+
+  /* ---------- Topbar navigation (seitenübergreifend) ---------- */
+  .sg-topbar{position:sticky;top:0;z-index:50;background:rgba(10,14,19,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .sg-topbar-inner{max-width:880px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:26px;overflow-x:auto;}
+  .sg-topbar .brand{margin-right:auto;font-family:var(--font-display);font-weight:600;color:var(--text);font-size:1rem;text-decoration:none;white-space:nowrap;}
+  .sg-topbar a:not(.brand){font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;padding:8px 0;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s ease,border-color .15s ease;}
+  .sg-topbar a:not(.brand):hover{color:var(--text);}
+  .sg-topbar a.active{color:var(--teal) !important;border-color:var(--teal) !important;}
 </style>
 </head>
 <body>
+
+<header class="sg-topbar">
+  <div class="sg-topbar-inner">
+    <a class="brand" href="index.html">Christian Seitz</a>
+    <a href="index.html">Home</a>
+    <a href="setup-guide.html" class="active">Setup Guide</a>
+    <a href="setup-diagnose-tool.html">Diagnose-Tool</a>
+  </div>
+</header>
 
 <div class="sg-wrap sg-hero">
   <div class="sg-eyebrow"><span class="dot"></span> Setup Guide — allgemein, für jedes GT3-Fahrzeug</div>
@@ -229,35 +246,35 @@
     <div class="sg-levers">
       <div class="sg-lever-row">
         <div class="name">ARB (Stabi)<span class="loc">Chassis → Front / Rear</span></div>
-        <div class="desc">Steuert die Langsamkurven-Balance über die <em>Differenz</em> zwischen Front- und Heckwert, nicht über den Absolutwert einer Seite. Härter an einer Achse = weniger Grip an dieser Achse in Kurven mit Lastwechsel.</div>
+        <div class="desc">Steuert die Langsamkurven-Balance über die <em>Differenz</em> zwischen Front- und Heckwert, nicht über den Absolutwert einer Seite. Härter an einer Achse = weniger Grip an dieser Achse in Kurven mit Lastwechsel. <strong>Schrittgröße:</strong> 1 Position pro Test — ARBs sind meist als ganze Stufen (1, 2, 3…) einstellbar, es gibt kein Zwischenmaß.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Diff-Preload<span class="loc">Gears / Differential</span></div>
-        <div class="desc">Der stärkste Rotations-Hebel überhaupt. Viele iRacing-GT3-Autos trennen das in drei Werte: <strong>Preload</strong> (Grundsperrung, wirkt immer und glättet den Gas-an/aus-Übergang), <strong>Coast Ramp</strong> (Sperrung beim Bremsen/Lupfen → Einlenken) und <strong>Power Ramp</strong> (Sperrung unter Gas → Exit). Andere Autos (z.&nbsp;B. Porsche 911 GT3&nbsp;R) haben stattdessen nur Friction Faces + Preload in Nm, ohne separate Rampen. Mehr Sperrung = mehr Stabilität/Traktion, aber weniger Rotation in genau der Phase, die die jeweilige Rampe steuert; zu fest kämpft gegen den anliegenden Lenkwinkel.</div>
+        <div class="desc">Der stärkste Rotations-Hebel überhaupt. Viele iRacing-GT3-Autos trennen das in drei Werte: <strong>Preload</strong> (Grundsperrung, wirkt immer und glättet den Gas-an/aus-Übergang), <strong>Coast Ramp</strong> (Sperrung beim Bremsen/Lupfen → Einlenken) und <strong>Power Ramp</strong> (Sperrung unter Gas → Exit). Andere Autos (z.&nbsp;B. Porsche 911 GT3&nbsp;R) haben stattdessen nur Friction Faces + Preload in Nm, ohne separate Rampen. Mehr Sperrung = mehr Stabilität/Traktion, aber weniger Rotation in genau der Phase, die die jeweilige Rampe steuert; zu fest kämpft gegen den anliegenden Lenkwinkel. <strong>Schrittgröße:</strong> Preload in Nm meist nur in 10-Nm-Schritten wählbar (z.&nbsp;B. 100/110/120); Friction Faces nur in 2er-Schritten (z.&nbsp;B. 6/8/10); Ramp-Winkel meist in 5°-Schritten.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Bremsbalance<span class="loc">Chassis → Front (Brakes) / In-Car Dials</span></div>
-        <div class="desc">Steuert, wie viel Last unter Bremse auf welche Achse kommt. Zu weit vorne = Vorderachse kippt beim Trail-Braking über die Haftgrenze (Schieben). Zu weit hinten = Heck wird unter Bremse unruhig. In den meisten GT3-Autos auch live im Cockpit über die Wippen verstellbar (In-Car Dials zeigt die Zuordnung).</div>
+        <div class="desc">Steuert, wie viel Last unter Bremse auf welche Achse kommt. Zu weit vorne = Vorderachse kippt beim Trail-Braking über die Haftgrenze (Schieben). Zu weit hinten = Heck wird unter Bremse unruhig. In den meisten GT3-Autos auch live im Cockpit über die Wippen verstellbar (In-Car Dials zeigt die Zuordnung). <strong>Schrittgröße:</strong> 0,3–0,5 % pro Test — größere Sprünge machen den Effekt schwer einem einzelnen Fahrfehler zuzuordnen.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Ride Height / Rake<span class="loc">Chassis → Front / Rear, plus Tires &amp; Aero → Aero Balance Calculator</span></div>
-        <div class="desc">Front-Ride-Height liegt bei den meisten Autos am Splitter-Limit. Bestätigte Wirkrichtung in iRacing: Front-RH <strong>senken</strong> → mehr Rotation/Oversteer, Front-RH anheben → mehr Understeer. Heck-RH <strong>anheben</strong> → mehr Rotation/Oversteer, Heck-RH senken → mehr Understeer/Stabilität. Das Verhältnis Front zu Heck (Rake) steuert zusätzlich die Hochgeschwindigkeits-Balance über den Abtrieb — Wing und Rake gehören zusammen verstellt, dafür gibt's den Aero-Rechner direkt im Setup-Screen. Heck-Ride-Height ist keine isolierte Variable: sie zieht Heck-Toe und -Camber mit.</div>
+        <div class="desc">Front-Ride-Height liegt bei den meisten Autos am Splitter-Limit. Bestätigte Wirkrichtung in iRacing: Front-RH <strong>senken</strong> → mehr Rotation/Oversteer, Front-RH anheben → mehr Understeer. Heck-RH <strong>anheben</strong> → mehr Rotation/Oversteer, Heck-RH senken → mehr Understeer/Stabilität. Das Verhältnis Front zu Heck (Rake) steuert zusätzlich die Hochgeschwindigkeits-Balance über den Abtrieb — Wing und Rake gehören zusammen verstellt, dafür gibt's den Aero-Rechner direkt im Setup-Screen. Heck-Ride-Height ist keine isolierte Variable: sie zieht Heck-Toe und -Camber mit. <strong>Schrittgröße:</strong> 0,2–0,3&nbsp;mm für Feinjustage der Balance; 2–3&nbsp;mm, wenn es gezielt um mehr Rake/Abtrieb geht.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Federn<span class="loc">Chassis → Front Corners / Rear Corners</span></div>
-        <div class="desc">Wirkt ähnlich wie ARB, aber auch bei reiner Vertikalbewegung (nicht nur bei Wank). Später Hebel — erst anfassen, wenn ARB nicht reicht.</div>
+        <div class="desc">Wirkt ähnlich wie ARB, aber auch bei reiner Vertikalbewegung (nicht nur bei Wank). Später Hebel — erst anfassen, wenn ARB nicht reicht. <strong>Schrittgröße:</strong> 10–20&nbsp;N/mm pro Test.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Camber / Toe<span class="loc">Chassis → Front Corners / Rear Corners</span></div>
-        <div class="desc">Front-Toe ist ein kleinerer Hebel als oft angenommen — nicht die erste Iteration. Heck-Toe-in wirkt als Gierdämpfung: mehr = stabiler, aber weniger drehfreudig.</div>
+        <div class="desc">Front-Toe ist ein kleinerer Hebel als oft angenommen — nicht die erste Iteration. Heck-Toe-in wirkt als Gierdämpfung: mehr = stabiler, aber weniger drehfreudig. <strong>Schrittgröße:</strong> Camber 0,2–0,3° pro Test; Toe 0,3–0,6&nbsp;mm pro Test.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Bump Rubber Gap<span class="loc">Chassis → Front Corners / Rear Corners</span></div>
-        <div class="desc">Steuert das Aero-Fenster und das Curb-Verhalten — hochfrequente Dämpfung, kein Langsam-Balance-Thema. Bei Curb-Kontakt und darauffolgender Instabilität zuerst hier prüfen, bevor die Balance-Hebel angefasst werden.</div>
+        <div class="desc">Steuert das Aero-Fenster und das Curb-Verhalten — hochfrequente Dämpfung, kein Langsam-Balance-Thema. Bei Curb-Kontakt und darauffolgender Instabilität zuerst hier prüfen, bevor die Balance-Hebel angefasst werden. <strong>Schrittgröße:</strong> 1–2&nbsp;mm pro Test.</div>
       </div>
       <div class="sg-lever-row">
-        <div class="name">Dämpfer (Bump/Rebound)<span class="loc">Dampers</span></div>
-        <div class="desc">Low-Speed-Compression vorne erhöht Untersteuern unter Bremse/beim Einfedern; hinten beeinflusst die Traktion beim Lastwechsel. Eigener Tab, separat von den restlichen Chassis-Werten — letzter Hebel in der Reihenfolge.</div>
+        <div class="name">Dämpfer (Low Speed Compression)<span class="loc">Dampers</span></div>
+        <div class="desc">Reagiert auf Fahrereingaben (Bremsen, Gas, Lenken) — nicht auf Curbs, dafür ist High Speed zuständig. Bestätigte Wirkrichtung: <strong>Front-LSC höher</strong> → mehr Understeer, sowohl unter Bremse als auch unter Gas (die Front hält der Lastverlagerung mehr entgegen); <strong>Front-LSC niedriger</strong> → mehr Rotation/Oversteer in beiden Phasen. Heck-LSC folgt der gleichen Logik wie Heck-ARB: <strong>niedriger</strong> = Heck darf unter Last einfedern = mehr Grip/Stabilität; <strong>höher</strong> = weniger Heck-Grip = mehr Rotation. Skala meist 0–11 Klicks (je nach Auto unterschiedlich, im Setup-Screen ablesen). <strong>Schrittgröße:</strong> 1 Klick pro Test — die Wirkung ist pro Klick spürbar, mehrere auf einmal machen es unkontrollierbar.</div>
       </div>
       <div class="sg-lever-row">
         <div class="name">Reifendruck<span class="loc">Tires &amp; Aero → Tire Data / Tire Settings</span></div>
@@ -279,19 +296,19 @@
         <div class="sg-symptom-card deny">
           <h4>Auto schiebt, dreht nicht ein</h4>
           <div class="sg-axle"><span class="axle-label">Front</span>
-            <ul><li>Bremsbalance nach hinten verschieben (weniger Front-Anteil)</li><li>Front-ARB weicher</li><li>Front-Camber negativer</li><li>Front-Ride-Height leicht senken</li></ul>
+            <ul><li>Bremsbalance nach hinten verschieben (0,3–0,5 % pro Test)</li><li>Front-ARB weicher (1 Position)</li><li>Front-Camber negativer (0,2–0,3°)</li><li>Front-Ride-Height leicht senken (0,2–0,3 mm)</li><li>Front-LSC-Dämpfer niedriger (1 Klick)</li></ul>
           </div>
           <div class="sg-axle"><span class="axle-label">Heck / Diff</span>
-            <ul><li>Heck-ARB härter (weniger Heck-Grip = mehr Rotation)</li><li>Heck-Toe leicht reduzieren</li><li>Coast Ramp öffnen, falls vorhanden (mehr Freilauf beim Lupfen/Bremsen)</li></ul>
+            <ul><li>Heck-ARB härter (1 Position)</li><li>Heck-Toe leicht reduzieren (0,3 mm)</li><li>Coast Ramp öffnen, falls vorhanden (5° pro Test)</li></ul>
           </div>
         </div>
         <div class="sg-symptom-card affirm">
           <h4>Auto bricht aus / Gegenlenk-Schlag (Snap)</h4>
           <div class="sg-axle"><span class="axle-label">Front</span>
-            <ul><li>Bremsbalance nach vorne verschieben</li><li>Front-ARB härter</li><li>Front-Ride-Height leicht anheben</li><li>Front-Toe Richtung neutral/leichter Toe-in</li></ul>
+            <ul><li>Bremsbalance nach vorne verschieben (0,3–0,5 % pro Test)</li><li>Front-ARB härter (1 Position)</li><li>Front-Ride-Height leicht anheben (0,2–0,3 mm)</li><li>Front-LSC-Dämpfer höher (1 Klick)</li><li>Front-Toe Richtung neutral/leichter Toe-in (0,3 mm)</li></ul>
           </div>
           <div class="sg-axle"><span class="axle-label">Heck / Diff</span>
-            <ul><li>Heck-ARB weicher (mehr Heck-Grip = stabiler)</li><li>Heck-Toe-in erhöhen (Gierdämpfung)</li><li>Coast Ramp schließen, falls vorhanden (mehr Sperrung beim Bremsen)</li></ul>
+            <ul><li>Heck-ARB weicher (1 Position)</li><li>Heck-Toe-in erhöhen (0,3 mm)</li><li>Coast Ramp schließen, falls vorhanden (5° pro Test)</li></ul>
           </div>
         </div>
       </div>
@@ -305,19 +322,19 @@
         <div class="sg-symptom-card deny">
           <h4>Schiebt über die Vorderachse</h4>
           <div class="sg-axle"><span class="axle-label">Front</span>
-            <ul><li>Front-ARB weicher</li><li>Front-Feder weicher (später Hebel)</li><li>Front-Ride-Height leicht senken</li></ul>
+            <ul><li>Front-ARB weicher (1 Position)</li><li>Front-Feder weicher (10–20 N/mm, später Hebel)</li><li>Front-Ride-Height leicht senken (0,2–0,3 mm)</li></ul>
           </div>
           <div class="sg-axle"><span class="axle-label">Heck</span>
-            <ul><li>Heck-ARB härter</li><li>Heck-Ride-Height leicht anheben (verschiebt Balance zusätzlich Richtung Rotation)</li></ul>
+            <ul><li>Heck-ARB härter (1 Position)</li><li>Heck-Ride-Height leicht anheben (0,2–0,3 mm, verschiebt Balance zusätzlich Richtung Rotation)</li></ul>
           </div>
         </div>
         <div class="sg-symptom-card affirm">
           <h4>Heck bricht ohne Gas-/Bremseingabe aus</h4>
           <div class="sg-axle"><span class="axle-label">Front</span>
-            <ul><li>Front-ARB härter</li></ul>
+            <ul><li>Front-ARB härter (1 Position)</li></ul>
           </div>
           <div class="sg-axle"><span class="axle-label">Heck</span>
-            <ul><li>Heck-ARB weicher</li><li>Heck-Camber weniger negativ (mehr Kontaktfläche)</li><li>Heck-Ride-Height leicht senken</li></ul>
+            <ul><li>Heck-ARB weicher (1 Position)</li><li>Heck-Camber weniger negativ (0,2–0,3°)</li><li>Heck-Ride-Height leicht senken (0,2–0,3 mm)</li><li>Heck-LSC-Dämpfer niedriger (1 Klick, mehr Grip unter Lastwechsel)</li></ul>
           </div>
         </div>
       </div>
@@ -331,19 +348,19 @@
         <div class="sg-symptom-card deny">
           <h4>Keine Traktion, Auto läuft weit / dreht nicht zurück</h4>
           <div class="sg-axle"><span class="axle-label">Diff</span>
-            <ul><li>Preload / Power Ramp öffnen (bzw. Friction Faces reduzieren) — zu fest gesperrt kämpft gegen den Lenkwinkel</li></ul>
+            <ul><li>Preload / Power Ramp öffnen (10 Nm bzw. 5° pro Test) bzw. Friction Faces reduzieren (2er-Schritt) — zu fest gesperrt kämpft gegen den Lenkwinkel</li></ul>
           </div>
           <div class="sg-axle"><span class="axle-label">Heck</span>
-            <ul><li>Heck-Ride-Height leicht anheben (mehr Rotation/Grip laut Rake-Wirkung)</li><li>Heck-ARB weicher</li></ul>
+            <ul><li>Heck-Ride-Height leicht anheben (0,2–0,3 mm, mehr Rotation/Grip laut Rake-Wirkung)</li><li>Heck-ARB weicher (1 Position)</li><li>Front-LSC-Dämpfer niedriger (1 Klick, weniger Understeer unter Gas)</li></ul>
           </div>
         </div>
         <div class="sg-symptom-card affirm">
           <h4>Heck bricht beim Rausbeschleunigen weg (Power-Oversteer)</h4>
           <div class="sg-axle"><span class="axle-label">Diff</span>
-            <ul><li>Preload / Power Ramp erhöhen (bzw. Friction Faces erhöhen) — <strong>Haupt-Hebel</strong> für dieses Symptom</li></ul>
+            <ul><li>Preload / Power Ramp erhöhen (10 Nm bzw. 5° pro Test) bzw. Friction Faces erhöhen (2er-Schritt) — <strong>Haupt-Hebel</strong> für dieses Symptom</li></ul>
           </div>
           <div class="sg-axle"><span class="axle-label">Heck</span>
-            <ul><li>Heck-Toe-in leicht erhöhen</li><li>Heck-Camber weniger negativ</li><li>Heck-Ride-Height leicht senken, falls Diff-Änderung allein nicht reicht</li><li>TC-Stufe prüfen, falls Reglement es erlaubt</li></ul>
+            <ul><li>Heck-Toe-in leicht erhöhen (0,3 mm)</li><li>Heck-Camber weniger negativ (0,2–0,3°)</li><li>Heck-LSC-Dämpfer höher (1 Klick, weniger Grip = mehr Kontrolle über Rotation)</li><li>Heck-Ride-Height leicht senken (0,2–0,3 mm, falls Diff-Änderung allein nicht reicht)</li><li>TC-Stufe prüfen, falls Reglement es erlaubt</li></ul>
           </div>
         </div>
       </div>
@@ -351,7 +368,7 @@
     </div>
 
     <div class="sg-note" style="margin-top:44px;">
-      <strong>Kurzfassung "mehr Rotation hinten", unabhängig von der Phase:</strong> Heck-ARB weicher → Heck-Feder weicher → Heck-Toe-in reduzieren → Heck-Ride-Height anheben (mehr Rotation, bestätigte Wirkrichtung in iRacing) → Diff Power-/Coast-Ramp öffnen bzw. Preload senken, je nach Phase. Reifendruck bleibt hier außen vor — der steht in iRacing ohnehin auf Minimum und ist kein Balance-Hebel. Jeder dieser Schritte kostet an anderer Stelle Stabilität — siehe Phase 1 und 3 oben, bevor mehrere gleichzeitig angefasst werden.
+      <strong>Kurzfassung "mehr Rotation hinten", unabhängig von der Phase:</strong> Heck-ARB weicher (1 Position) → Heck-Feder weicher (10–20 N/mm) → Heck-Toe-in reduzieren (0,3 mm) → Heck-LSC-Dämpfer niedriger (1 Klick) → Heck-Ride-Height anheben (0,2–0,3 mm, bestätigte Wirkrichtung in iRacing) → Diff Power-/Coast-Ramp öffnen (5°) bzw. Preload senken (10 Nm), je nach Phase. Reifendruck bleibt hier außen vor — der steht in iRacing ohnehin auf Minimum und ist kein Balance-Hebel. Jeder dieser Schritte kostet an anderer Stelle Stabilität — siehe Phase 1 und 3 oben, bevor mehrere gleichzeitig angefasst werden.
     </div>
   </div>
 </section>
