@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Christian Seitz — iRacing Coaching</title>
+<meta name="description" content="iRacing Coaching von Christian Seitz, 7075 iRating. Für Fahrer bis 5000 iRating. Rig, Team und Streams — buche eine Session und fahr konstant schneller.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#080B16;
+  --carbon:#111629;
+  --carbon-2:#161C33;
+  --line:#232B47;
+  --paper:#EFEBE2;
+  --teal:#33E1C7;
+  --amber:#FFB114;
+  --rose:#FF4D6D;
+  --muted:#8A93B2;
+
+  --display:"Saira Condensed",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+
+  --wrap:1180px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--void);
+  color:#DDE3F2;
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 22px}
+.section{padding:96px 0;position:relative}
+.section--paper{background:var(--paper);color:#141726}
+.section--tight{padding:64px 0}
+
+/* ---------- Typo-Bausteine ---------- */
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin:0 0 18px;
+  display:flex;align-items:center;gap:12px;
+}
+.eyebrow::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}
+.section--paper .eyebrow{color:#0F7F70}
+.section--paper .eyebrow::after{background:linear-gradient(90deg,#C9C2B2,transparent)}
+
+h1,h2,h3{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:-.005em;margin:0}
+h2{font-size:clamp(34px,5.4vw,58px);line-height:.98}
+h3{font-size:22px;letter-spacing:.01em}
+p{margin:0 0 18px}
+.lead{font-size:19px;color:#B9C2DA;max-width:62ch}
+.section--paper .lead{color:#3E4358}
+
+/* ---------- Timing-Tower Navigation ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:rgba(8,11,22,.86);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.topbar__inner{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
+.brand__pos{
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  background:var(--teal);color:#04120F;
+  padding:3px 7px;border-radius:3px;
+}
+.brand__name{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:.04em;text-transform:uppercase}
+.nav{
+  margin-left:auto;display:flex;gap:4px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav a{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  padding:8px 11px;border-radius:4px;white-space:nowrap;
+  transition:color .18s,background .18s;
+}
+.nav a:hover,.nav a:focus-visible{color:#fff;background:var(--carbon-2)}
+
+/* ---------- Hero ---------- */
+.hero{
+  padding:74px 0 88px;
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(900px 420px at 78% 22%,rgba(51,225,199,.10),transparent 65%),
+    radial-gradient(700px 380px at 8% 90%,rgba(255,177,20,.07),transparent 60%);
+}
+.hero__grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{
+  font-size:clamp(46px,8.2vw,96px);
+  line-height:.9;
+  color:#fff;
+  margin:0 0 22px;
+}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero__meta{
+  display:flex;gap:26px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);
+  margin:30px 0 0;padding-top:22px;border-top:1px solid var(--line);
+}
+.hero__meta b{display:block;color:#fff;font-size:19px;font-weight:600;letter-spacing:0;margin-bottom:2px}
+
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  padding:14px 22px;border-radius:5px;text-decoration:none;border:1px solid transparent;
+  display:inline-block;cursor:pointer;
+  transition:transform .16s,background .16s,border-color .16s;
+}
+.btn--primary{background:var(--amber);color:#1A1200;border-color:var(--amber)}
+.btn--primary:hover{transform:translateY(-2px);background:#FFC246}
+.btn--ghost{border-color:var(--line);color:#DDE3F2;background:transparent}
+.btn--ghost:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+.btn--dark{background:#141726;color:#fff;border-color:#141726}
+.btn--dark:hover{transform:translateY(-2px);background:#252a42}
+
+/* ---------- Signature: Delta-Trace ---------- */
+.telemetry{
+  background:var(--carbon);
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+}
+.telemetry__head{
+  display:flex;align-items:baseline;gap:14px;
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.telemetry__head .dot{width:7px;height:7px;border-radius:50%;background:var(--rose);align-self:center}
+.telemetry__body{padding:8px 0 0}
+.telemetry svg{display:block;width:100%;height:210px}
+.trace{fill:none;stroke:var(--teal);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.trace--ghost{stroke:#2C3557;stroke-width:1.5;stroke-dasharray:4 5}
+.axis{stroke:var(--line);stroke-width:1}
+.playhead{stroke:var(--amber);stroke-width:1.5}
+.telemetry__read{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  padding:14px 18px 18px;border-top:1px solid var(--line);
+}
+.read__val{font-family:var(--mono);font-size:40px;font-weight:600;line-height:1;color:var(--teal)}
+.read__val.is-slow{color:var(--rose)}
+.read__lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.sectors{display:flex;gap:6px}
+.sector{width:34px;height:6px;border-radius:2px;background:#2C3557}
+.sector.is-purple{background:#B57BFF}
+.sector.is-green{background:var(--teal)}
+.sector.is-yellow{background:var(--amber)}
+
+/* ---------- Race Control / Announcements ---------- */
+.rc{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--carbon)}
+.rc__head{
+  display:flex;align-items:center;gap:10px;
+  background:var(--amber);color:#1A1200;
+  padding:11px 18px;
+  font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+}
+.rc__flag{width:14px;height:14px;border-radius:2px;background:#1A1200}
+.rc__item{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:20px 18px;border-top:1px solid var(--line)}
+.rc__item:first-of-type{border-top:none}
+.rc__date{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);padding-top:3px}
+.rc__title{font-family:var(--display);font-size:21px;font-weight:700;text-transform:uppercase;color:#fff;margin:0 0 6px;letter-spacing:.01em}
+.rc__text{margin:0;color:#AEB7D0;font-size:15.5px}
+
+/* ---------- Karten-Raster ---------- */
+.grid{display:grid;gap:20px}
+.grid--3{grid-template-columns:repeat(3,1fr)}
+.grid--2{grid-template-columns:repeat(2,1fr)}
+
+.card{
+  background:var(--carbon);border:1px solid var(--line);border-radius:10px;
+  padding:28px 24px;display:flex;flex-direction:column;
+  transition:border-color .2s,transform .2s;
+}
+.card:hover{border-color:#31406B;transform:translateY(-3px)}
+.card--featured{border-color:var(--teal);position:relative}
+.card__tag{
+  position:absolute;top:-11px;left:24px;
+  background:var(--teal);color:#04120F;
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  padding:4px 9px;border-radius:3px;
+}
+.card__dur{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.card h3{color:#fff;margin:10px 0 14px}
+.price{font-family:var(--mono);font-size:34px;font-weight:600;color:var(--amber);line-height:1;margin-bottom:20px}
+.price small{font-size:13px;color:var(--muted);font-weight:400;letter-spacing:.08em}
+.ticks{list-style:none;margin:0 0 24px;padding:0;font-size:15.5px;color:#AEB7D0;flex:1}
+.ticks li{position:relative;padding-left:24px;margin-bottom:10px}
+.ticks li::before{
+  content:"›";position:absolute;left:6px;top:-1px;
+  color:var(--teal);font-family:var(--mono);font-weight:600;
+}
+
+/* ---------- Über mich (Papier) ---------- */
+.about__grid{display:grid;grid-template-columns:1fr 1.25fr;gap:52px;align-items:start}
+.portrait{
+  aspect-ratio:4/5;border-radius:8px;overflow:hidden;
+  background:
+    repeating-linear-gradient(135deg,#DED8C8 0 12px,#D7D0BF 12px 24px);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8A836F;
+  text-align:center;padding:20px;
+}
+.palmares{list-style:none;margin:26px 0 0;padding:22px 0 0;border-top:1px solid #C9C2B2}
+.palmares li{
+  display:grid;grid-template-columns:96px 1fr;gap:18px;
+  padding:11px 0;border-bottom:1px solid #DCD6C7;
+  font-size:15.5px;
+}
+.palmares span{font-family:var(--mono);font-size:12.5px;color:#0F7F70;letter-spacing:.06em;padding-top:2px}
+
+/* ---------- Rig / Setup-Sheet ---------- */
+.spec{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--carbon)}
+.spec__head{
+  padding:12px 18px;border-bottom:1px solid var(--line);background:var(--carbon-2);
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+.spec__row{
+  display:grid;grid-template-columns:180px 1fr;gap:18px;
+  padding:13px 18px;border-top:1px solid #1B2138;
+  font-size:15.5px;
+  transition:background .16s;
+}
+.spec__row:first-of-type{border-top:none}
+.spec__row:hover{background:var(--carbon-2)}
+.spec__key{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.spec__val{color:#E4E9F6}
+
+/* ---------- Team & Partner ---------- */
+.team{
+  border:1px solid var(--line);border-radius:10px;background:var(--carbon);
+  padding:34px 30px;
+}
+.team__no{
+  font-family:var(--display);font-size:78px;font-weight:800;line-height:.85;
+  color:var(--amber);margin-bottom:14px;
+}
+.partners{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+.partner{
+  border:1px dashed var(--line);border-radius:8px;
+  aspect-ratio:16/7;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  text-align:center;padding:10px;text-decoration:none;
+  transition:border-color .2s,color .2s;
+}
+.partner:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ---------- Buchung ---------- */
+.book{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+.panel{background:var(--carbon);border:1px solid var(--line);border-radius:10px;padding:30px 26px}
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:7px;
+}
+.field input,.field select,.field textarea{
+  width:100%;background:#0C1020;border:1px solid var(--line);border-radius:6px;
+  color:#fff;font-family:var(--body);font-size:16px;padding:12px 13px;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:transparent}
+.field textarea{min-height:96px;resize:vertical}
+.pay{list-style:none;margin:0;padding:0}
+.pay li{
+  display:flex;align-items:center;gap:14px;
+  padding:15px 0;border-top:1px solid #1B2138;
+}
+.pay li:first-child{border-top:none}
+.pay__mark{
+  width:42px;height:42px;flex:none;border-radius:8px;background:var(--carbon-2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--teal);
+}
+.pay strong{display:block;color:#fff;font-size:15.5px;font-weight:600}
+.pay span{font-size:13.5px;color:var(--muted)}
+.note{
+  font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--muted);
+  border-left:2px solid var(--amber);padding-left:14px;margin-top:22px;
+}
+.confirm{
+  display:none;margin-top:20px;padding:18px;border-radius:8px;
+  background:rgba(51,225,199,.08);border:1px solid rgba(51,225,199,.35);
+  font-size:15px;color:#CFF6EE;
+}
+.confirm.is-open{display:block}
+.confirm a{color:var(--teal)}
+.confirm .btn{margin-top:14px}
+
+/* ---------- Hinweis-Box ---------- */
+.limit{
+  display:flex;gap:20px;align-items:flex-start;
+  border:1px solid var(--line);border-left:2px solid var(--amber);
+  border-radius:8px;background:var(--carbon);
+  padding:20px 22px;margin-bottom:40px;max-width:78ch;
+}
+.limit__mark{
+  flex:none;font-family:var(--mono);font-size:11px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
+  border:1px solid rgba(255,177,20,.35);border-radius:4px;
+  padding:6px 10px;margin-top:2px;
+}
+.limit p{margin:0;font-size:15.5px;color:#AEB7D0}
+@media(max-width:640px){.limit{flex-direction:column;gap:14px}}
+
+/* ---------- Feedback ---------- */
+.fb{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.fb__card{
+  background:var(--carbon);border:1px solid var(--line);border-radius:10px;
+  padding:26px 24px;display:flex;flex-direction:column;
+  transition:border-color .2s,transform .2s;
+}
+.fb__card:hover{border-color:#31406B;transform:translateY(-3px)}
+.fb__gain{
+  font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;
+  color:var(--teal);display:flex;align-items:baseline;gap:9px;
+  padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid #1B2138;
+}
+.fb__gain b{font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:.01em;line-height:.9}
+.fb__quote{margin:0 0 22px;font-size:16px;color:#C7CFE4;flex:1}
+.fb__who{display:flex;align-items:center;gap:12px}
+.fb__badge{
+  width:38px;height:38px;flex:none;border-radius:50%;
+  background:var(--carbon-2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:16px;font-weight:800;color:var(--amber);
+}
+.fb__who strong{display:block;color:#fff;font-size:15px;font-weight:600;line-height:1.3}
+.fb__who span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- Kalender-Einbettung ---------- */
+.calendar{
+  background:var(--carbon);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;min-height:220px;
+}
+.calendar iframe{display:block;width:100%;height:720px;border:0;background:#fff}
+.calendar__setup{padding:46px 30px;text-align:center;max-width:56ch;margin:0 auto}
+.calendar__icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:52px;height:52px;border-radius:10px;background:var(--carbon-2);
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--amber);
+  margin-bottom:16px;
+}
+.calendar__setup h3{color:#fff;margin-bottom:10px}
+.calendar__setup p{color:var(--muted);font-size:15px;margin:0}
+.calendar__setup code{
+  font-family:var(--mono);font-size:13px;color:var(--teal);
+  background:#0C1020;padding:2px 6px;border-radius:4px;
+}
+.hr-or{
+  display:flex;align-items:center;gap:18px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin:38px 0 26px;
+}
+.hr-or::before,.hr-or::after{content:"";height:1px;flex:1;background:var(--line)}
+
+/* ---------- Streams / Community ---------- */
+.social{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.social a{
+  display:block;text-decoration:none;border-radius:10px;padding:34px 30px;
+  border:1px solid var(--line);background:var(--carbon);
+  transition:transform .2s,border-color .2s,background .2s;
+}
+.social a:hover{transform:translateY(-4px)}
+.social__tw:hover{border-color:#9146FF;background:rgba(145,70,255,.09)}
+.social__dc:hover{border-color:#5865F2;background:rgba(88,101,242,.09)}
+.social h3{color:#fff;margin-bottom:8px;font-size:28px}
+.social p{margin:0;color:var(--muted);font-size:15px}
+.social__live{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#9146FF;
+}
+.social__live::before{content:"";width:8px;height:8px;border-radius:50%;background:#9146FF}
+.social__dc .social__live{color:#7A86FF}
+.social__dc .social__live::before{background:#7A86FF}
+
+/* ---------- Footer ---------- */
+.foot{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:13.5px}
+.foot__inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.foot a{color:var(--muted)}
+
+/* ---------- Reveal ---------- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.rv.is-in{opacity:1;transform:none}
+
+/* ---------- Responsive ---------- */
+@media(max-width:920px){
+  .hero__grid,.about__grid,.book{grid-template-columns:1fr;gap:36px}
+  .grid--3,.grid--2,.social,.fb{grid-template-columns:1fr}
+  .partners{grid-template-columns:repeat(2,1fr)}
+  .section{padding:70px 0}
+  .rc__item{grid-template-columns:1fr;gap:8px}
+  .spec__row{grid-template-columns:1fr;gap:4px}
+  .brand__name{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<header class="topbar">
+  <div class="wrap topbar__inner">
+    <a class="brand" href="#top">
+      <span class="brand__pos">P1</span>
+      <span class="brand__name">Christian Seitz</span>
+    </a>
+    <nav class="nav">
+      <a href="#news">Race Control</a>
+      <a href="#about">Wer ich bin</a>
+      <a href="#coaching">Coaching</a>
+      <a href="#feedback">Feedback</a>
+      <a href="#buchen">Buchen</a>
+      <a href="#rig">Rig</a>
+      <a href="#team">Team</a>
+      <a href="#connect">Stream</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap hero__grid">
+    <div>
+      <p class="eyebrow">iRacing · GT3 · Endurance Coaching</p>
+      <h1>Vier Zehntel<br>liegen in<br><em>Kurve 3</em>.</h1>
+      <p class="lead">Ich bin Christian, stehe aktuell bei 7075 iRating mit steigender Tendenz und zeige dir, wo deine Zeit wirklich liegt. Kein Raten, kein „fahr einfach mehr Runden“. Wir schauen uns deine Telemetrie an, finden die zwei Fehler, die dich Sekunden kosten, und arbeiten sie weg.</p>
+      <div class="btns">
+        <a class="btn btn--primary" href="#coaching">Coaching ansehen</a>
+        <a class="btn btn--ghost" href="#connect">Stream &amp; Discord</a>
+      </div>
+      <div class="hero__meta">
+        <div><b>340+</b>Coaching-Stunden</div>
+        <div><b>2.4s</b>Ø Verbesserung</div>
+        <div><b>7075 ↑</b>iRating, Tendenz steigend</div>
+        <div><b>bis 5000</b>iRating coache ich</div>
+      </div>
+    </div>
+
+    <!-- Signature-Element: animierter Delta-Vergleich -->
+    <div class="telemetry" aria-hidden="true">
+      <div class="telemetry__head">
+        <span class="dot"></span>
+        <span>Delta zur Bestzeit</span>
+        <span style="margin-left:auto">Spa · GT3</span>
+      </div>
+      <div class="telemetry__body">
+        <svg viewBox="0 0 600 210" preserveAspectRatio="none">
+          <line class="axis" x1="0" y1="105" x2="600" y2="105"></line>
+          <path id="ghost" class="trace trace--ghost"></path>
+          <path id="trace" class="trace"></path>
+          <line id="playhead" class="playhead" x1="0" y1="0" x2="0" y2="210"></line>
+        </svg>
+      </div>
+      <div class="telemetry__read">
+        <div>
+          <div class="read__val" id="delta">-0.000</div>
+          <div class="read__lbl">Sekunden nach Coaching</div>
+        </div>
+        <div>
+          <div class="sectors">
+            <span class="sector" id="s1"></span>
+            <span class="sector" id="s2"></span>
+            <span class="sector" id="s3"></span>
+          </div>
+          <div class="read__lbl" style="text-align:right">Sektoren</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANNOUNCEMENTS ============ -->
+<section class="section section--tight" id="news">
+  <div class="wrap">
+    <p class="eyebrow">Announcements</p>
+    <h2 style="color:#fff;margin-bottom:28px">Race Control</h2>
+    <div class="rc rv">
+      <div class="rc__head"><span class="rc__flag"></span> Aktuelle Meldungen</div>
+
+      <!-- Meldung kopieren und oben einfügen für Neues -->
+      <div class="rc__item">
+        <div class="rc__date">12. Aug 2026</div>
+        <div>
+          <h3 class="rc__title">Neue Coaching-Slots im September</h3>
+          <p class="rc__text">Ab dem 1. September sind wieder Termine unter der Woche abends frei. Wer auf der Warteliste steht, bekommt zuerst Bescheid — meldet euch über das Buchungsformular.</p>
+        </div>
+      </div>
+
+      <div class="rc__item">
+        <div class="rc__date">04. Aug 2026</div>
+        <div>
+          <h3 class="rc__title">Neu im Kader von GermanSimRacing</h3>
+          <p class="rc__text">Seit diesem Jahr fahre ich für GermanSimRacing. Die nächsten Langstreckenrennen streame ich wie gewohnt auf Twitch.</p>
+        </div>
+      </div>
+
+      <div class="rc__item">
+        <div class="rc__date">28. Jul 2026</div>
+        <div>
+          <h3 class="rc__title">Setup-Guide Spa im Discord</h3>
+          <p class="rc__text">Mein aktuelles GT3-Setup für Spa liegt inklusive Erklärung im Discord unter #setups. Frei für alle Mitglieder.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÜBER MICH ============ -->
+<section class="section section--paper" id="about">
+  <div class="wrap about__grid">
+    <div class="portrait rv">Foto von Christian<br>hier einfügen<br>(4:5)</div>
+    <div class="rv">
+      <p class="eyebrow">Wer ich bin</p>
+      <h2 style="margin-bottom:22px">Vom Rookie-Split<br>bis 7075 iRating —<br>den Weg kenne ich.</h2>
+      <p class="lead">Ich bin Christian Seitz. Meinen iRacing-Account habe ich 2019 angelegt, aber erst 2021 richtig angefangen zu fahren. Heute stehe ich im Top-Split. Ich habe jede Stufe dazwischen selbst durchlaufen: die Rennen, in denen man in Kurve 1 rausgeschossen wird, die Wochen, in denen das iRating nur fällt, und den Punkt, an dem es plötzlich klickt.</p>
+      <p class="lead">Deshalb coache ich ausschließlich iRacing. Ich kenne das Rating-System, die Splits, die Setups und die Eigenheiten der Serien — und ich fahre nicht vor und sage „mach's so“, sondern schaue mir an, wie du fährst, und übersetze es in zwei, drei Dinge, die du im nächsten Rennen umsetzen kannst.</p>
+      <ul class="palmares">
+        <li><span>7075</span> iRating · aktueller Stand, Tendenz steigend</li>
+        <li><span>Top-Split</span> Regelmäßig im höchsten Split unterwegs</li>
+        <li><span>2026</span> Fahrer bei GermanSimRacing</li>
+        <li><span>2021</span> Erstes volles Jahr — ab hier ernsthaft</li>
+        <li><span>2019</span> Account erstellt, erste Rookie-Rennen</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COACHING ============ -->
+<section class="section" id="coaching">
+  <div class="wrap">
+    <p class="eyebrow">Coaching</p>
+    <h2 style="color:#fff;margin-bottom:16px">Pakete</h2>
+    <p class="lead" style="margin-bottom:26px">Ausschließlich iRacing. Alle Sessions laufen über Discord mit Screenshare und Telemetrie — du brauchst nur dein Rig und eine Aufnahme oder Replay-Datei deiner letzten Runden.</p>
+
+    <div class="limit rv">
+      <span class="limit__mark">bis 5000 iR</span>
+      <p>Ich coache Fahrer bis etwa 5000 iRating. Darüber ist so viel Feinarbeit schon von allein da, dass ein Coaching kaum noch echten Mehrwert bringt — dann geht es eher um Setup und Renndetails als um Fahrtechnik. Wenn du drüber liegst und trotzdem an etwas Konkretem arbeiten willst, schreib mir einfach, dann schauen wir ehrlich, ob ich dir helfen kann.</p>
+    </div>
+
+    <div class="grid grid--2">
+      <div class="card rv">
+        <div class="card__dur">60 Minuten · Einzelsession</div>
+        <h3>Eine Stunde</h3>
+        <div class="price">49 €<small> / Session</small></div>
+        <ul class="ticks">
+          <li>Eine Strecke, ein klares Thema</li>
+          <li>Analyse deiner aktuellen Fahrweise</li>
+          <li>Live-Feedback, während du fährst</li>
+          <li>Notizen zum Nacharbeiten danach</li>
+        </ul>
+        <a class="btn btn--ghost book-btn" href="#buchen" data-paket="1 Stunde" data-preis="49">60 Minuten buchen</a>
+      </div>
+
+      <div class="card card--featured rv">
+        <span class="card__tag">Bestes Verhältnis</span>
+        <div class="card__dur">120 Minuten · Einzelsession</div>
+        <h3>Zwei Stunden</h3>
+        <div class="price">79 €<small> / Session · 19 € gespart</small></div>
+        <ul class="ticks">
+          <li>Alles aus der 60-Minuten-Session</li>
+          <li>Zeit für Telemetrie-Vergleich Runde für Runde</li>
+          <li>Setup-Grundlagen für deine Klasse</li>
+          <li>Renn- und Qualifying-Strategie</li>
+          <li>Genug Luft, das Gelernte direkt zu fahren</li>
+        </ul>
+        <a class="btn btn--primary book-btn" href="#buchen" data-paket="2 Stunden" data-preis="79">120 Minuten buchen</a>
+      </div>
+    </div>
+
+    <p class="note" style="max-width:62ch">Team-Sessions für bis zu sechs Fahrer gibt es auf Anfrage — schreib mir kurz, wie viele ihr seid.</p>
+  </div>
+</section>
+
+<!-- ============ FEEDBACK ============ -->
+<section class="section section--tight" id="feedback">
+  <div class="wrap">
+    <p class="eyebrow">Feedback</p>
+    <h2 style="color:#fff;margin-bottom:16px">Was danach passiert ist</h2>
+    <p class="lead" style="margin-bottom:38px">Rückmeldungen von Fahrern, mit denen ich gearbeitet habe. Die Zahl links ist die iRating-Entwicklung in den Wochen nach der Session.</p>
+
+    <div class="fb">
+      <!-- Karte kopieren für weiteres Feedback -->
+      <div class="fb__card rv">
+        <div class="fb__gain"><b>+480</b> iRating in 6 Wochen</div>
+        <p class="fb__quote">„Ich bin monatelang bei 1400 festgehangen und dachte, mir fehlt Talent. Nach einer Stunde war klar, dass ich einfach viel zu früh vom Bremspedal gehe. Zwei Wochen später der erste Sieg im Split.“</p>
+        <div class="fb__who">
+          <span class="fb__badge">M</span>
+          <span><strong>Marcel K.</strong><span>GT3 · C-Lizenz</span></span>
+        </div>
+      </div>
+
+      <div class="fb__card rv">
+        <div class="fb__gain"><b>+1120</b> iRating in 3 Monaten</div>
+        <p class="fb__quote">„Die zwei Stunden waren jeden Cent wert. Wir haben meine Telemetrie neben seine gelegt, und ich habe zum ersten Mal wirklich gesehen, wo die Zeit hingeht. Kein Rätselraten mehr.“</p>
+        <div class="fb__who">
+          <span class="fb__badge">S</span>
+          <span><strong>Sarah B.</strong><span>LMP2 · B-Lizenz</span></span>
+        </div>
+      </div>
+
+      <div class="fb__card rv">
+        <div class="fb__gain"><b>+260</b> iRating · 0 Incidents</div>
+        <p class="fb__quote">„Mir ging es gar nicht ums Tempo, sondern darum, die dummen Dreher loszuwerden. Genau daran haben wir gearbeitet. Seitdem fahre ich Rennen konstant sauber zu Ende.“</p>
+        <div class="fb__who">
+          <span class="fb__badge">T</span>
+          <span><strong>Tobias R.</strong><span>MX-5 · D-Lizenz</span></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="note" style="max-width:62ch">PLATZHALTER — vor dem Livegang gegen echte Rückmeldungen tauschen.<br>Du warst bei mir im Coaching? Schreib mir gern eine kurze Rückmeldung im Discord.</p>
+  </div>
+</section>
+
+<!-- ============ BUCHUNG & BEZAHLUNG ============ -->
+<section class="section section--tight" id="buchen">
+  <div class="wrap">
+    <p class="eyebrow">Buchen &amp; bezahlen</p>
+    <h2 style="color:#fff;margin-bottom:16px">Session sichern</h2>
+    <p class="lead" style="margin-bottom:34px">Such dir direkt einen freien Slot aus. Der Termin landet automatisch in meinem Kalender und du bekommst die Bestätigung samt Discord-Link per Mail.</p>
+
+    <!-- Kalender-Widget: wird aus CONFIG.bookingUrl geladen -->
+    <div class="calendar rv" id="calendar">
+      <div class="calendar__setup" id="calendar-setup">
+        <span class="calendar__icon">CAL</span>
+        <h3>Kalender noch nicht verbunden</h3>
+        <p>Trage deine Buchungsseite unten im Code bei <code>CONFIG.bookingUrl</code> ein — dann erscheint hier die Terminauswahl mit deinen echten freien Zeiten aus Outlook.</p>
+      </div>
+    </div>
+
+    <p class="hr-or" id="or-line"><span>Oder schreib mir direkt</span></p>
+
+    <div class="book">
+      <!-- Formular -->
+      <div class="panel rv">
+        <div class="field">
+          <label for="f-name">Name</label>
+          <input id="f-name" type="text" placeholder="Wie soll ich dich nennen?">
+        </div>
+        <div class="field">
+          <label for="f-mail">E-Mail</label>
+          <input id="f-mail" type="email" placeholder="du@beispiel.de">
+        </div>
+        <div class="field">
+          <label for="f-discord">Discord-Name</label>
+          <input id="f-discord" type="text" placeholder="dein_discord">
+        </div>
+        <div class="field">
+          <label for="f-paket">Paket</label>
+          <select id="f-paket">
+            <option value="1 Stunde|49|60">Coaching 1 Stunde — 49 €</option>
+            <option value="2 Stunden|79|120" selected>Coaching 2 Stunden — 79 €</option>
+            <option value="Team-Session|0|120">Team-Session — Preis auf Anfrage</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-sim">Dein iRating &amp; Lizenz</label>
+          <input id="f-sim" type="text" placeholder="z. B. 1450 iRating, C-Lizenz, GT3">
+          <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin:8px 0 0">Coaching bis ca. 5000 iRating</p>
+        </div>
+        <div class="field">
+          <label for="f-zeit">Wunschtermin</label>
+          <input id="f-zeit" type="datetime-local">
+        </div>
+        <div class="field">
+          <label for="f-ziel">Woran willst du arbeiten?</label>
+          <textarea id="f-ziel" placeholder="Beschreib kurz, wo du gerade stehst und was dich am meisten nervt."></textarea>
+        </div>
+        <button class="btn btn--primary" id="send" type="button">Anfrage abschicken</button>
+
+        <div class="confirm" id="confirm"></div>
+      </div>
+
+      <!-- Bezahlung -->
+      <div class="panel rv">
+        <h3 style="color:#fff;margin-bottom:8px">Bezahlung</h3>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:22px">Zuerst bestätige ich dir den Termin, danach bezahlst du über den Weg, der dir am liebsten ist.</p>
+        <ul class="pay">
+          <li>
+            <span class="pay__mark">PP</span>
+            <span>
+              <strong>PayPal</strong>
+              <span>Direkt über <a href="#" id="pp-link" style="color:var(--teal)">paypal.me/DEINHANDLE</a></span>
+            </span>
+          </li>
+          <li>
+            <span class="pay__mark">CARD</span>
+            <span>
+              <strong>Kredit- &amp; Debitkarte</strong>
+              <span>Zahlungslink per Mail (Stripe)</span>
+            </span>
+          </li>
+          <li>
+            <span class="pay__mark">SEPA</span>
+            <span>
+              <strong>Überweisung</strong>
+              <span>IBAN kommt mit der Bestätigung</span>
+            </span>
+          </li>
+          <li>
+            <span class="pay__mark">KOFI</span>
+            <span>
+              <strong>Ko-fi</strong>
+              <span>Für Trinkgeld und Einzelsessions</span>
+            </span>
+          </li>
+        </ul>
+        <p class="note">Stornierung bis 24 Stunden vor der Session kostenlos.<br>Rechnung auf Wunsch, auch für Teams.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RIG ============ -->
+<section class="section" id="rig">
+  <div class="wrap">
+    <p class="eyebrow">Mein Rig</p>
+    <h2 style="color:#fff;margin-bottom:16px">Equipment</h2>
+    <p class="lead" style="margin-bottom:36px">Gewachsen über Jahre, nicht an einem Wochenende gekauft. Wenn du überlegst, wo dein nächstes Upgrade den größten Unterschied macht: frag mich einfach im Discord.</p>
+
+    <div class="grid grid--2">
+      <div class="spec rv">
+        <div class="spec__head">Cockpit &amp; Eingabe</div>
+        <div class="spec__row"><span class="spec__key">Rig</span><span class="spec__val">[Marke Modell] Aluprofil-Rig</span></div>
+        <div class="spec__row"><span class="spec__key">Base</span><span class="spec__val">[Marke] Direct Drive, 12 Nm</span></div>
+        <div class="spec__row"><span class="spec__key">Lenkrad</span><span class="spec__val">[Marke] GT-Rim, Carbon</span></div>
+        <div class="spec__row"><span class="spec__key">Pedale</span><span class="spec__val">[Marke], Load-Cell-Bremse</span></div>
+        <div class="spec__row"><span class="spec__key">Schaltung</span><span class="spec__val">[Marke] Sequenziell + H-Pattern</span></div>
+        <div class="spec__row"><span class="spec__key">Handbremse</span><span class="spec__val">[Marke]</span></div>
+        <div class="spec__row"><span class="spec__key">Sitz</span><span class="spec__val">[Marke] Schalensitz</span></div>
+      </div>
+
+      <div class="spec rv">
+        <div class="spec__head">Rechner, Bild &amp; Ton</div>
+        <div class="spec__row"><span class="spec__key">CPU</span><span class="spec__val">[Prozessor]</span></div>
+        <div class="spec__row"><span class="spec__key">GPU</span><span class="spec__val">[Grafikkarte]</span></div>
+        <div class="spec__row"><span class="spec__key">RAM</span><span class="spec__val">32 GB DDR5</span></div>
+        <div class="spec__row"><span class="spec__key">Bild</span><span class="spec__val">3 × 27" 1440p @ 165 Hz</span></div>
+        <div class="spec__row"><span class="spec__key">VR</span><span class="spec__val">[Headset]</span></div>
+        <div class="spec__row"><span class="spec__key">Audio</span><span class="spec__val">[Headset] + Bassshaker</span></div>
+        <div class="spec__row"><span class="spec__key">Stream</span><span class="spec__val">[Mikrofon], [Kamera], OBS</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEAM & PARTNER ============ -->
+<section class="section section--tight" id="team">
+  <div class="wrap">
+    <p class="eyebrow">Team &amp; Partner</p>
+    <h2 style="color:#fff;margin-bottom:30px">Mit wem ich fahre</h2>
+
+    <div class="grid grid--2" style="margin-bottom:44px">
+      <div class="team rv">
+        <div class="team__no">GSR</div>
+        <h3 style="color:#fff;margin-bottom:12px">GermanSimRacing</h3>
+        <p style="color:#AEB7D0;margin:0 0 20px">Seit diesem Jahr fahre ich für GermanSimRacing. Gemeinsam bestreiten wir die großen Langstreckenrennen auf iRacing — mit festem Kader, Strategie-Crew und dem Anspruch, am Sonntagmorgen noch auf der Strecke zu sein.</p>
+        <a class="btn btn--ghost" href="https://TEAM-WEBSITE.de" target="_blank" rel="noopener">Zum Team</a>
+      </div>
+
+      <div class="team rv">
+        <div class="team__no" style="color:var(--teal)">08</div>
+        <h3 style="color:#fff;margin-bottom:12px">Partner</h3>
+        <p style="color:#AEB7D0;margin:0">Marken, mit denen ich tatsächlich fahre — keine Logos, die ich nur aufhänge. Rabattcodes gibt's im Discord.</p>
+        <div class="partners">
+          <a class="partner" href="#">Partner 1</a>
+          <a class="partner" href="#">Partner 2</a>
+          <a class="partner" href="#">Partner 3</a>
+          <a class="partner" href="#">Partner 4</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TWITCH & DISCORD ============ -->
+<section class="section" id="connect">
+  <div class="wrap">
+    <p class="eyebrow">Stream &amp; Community</p>
+    <h2 style="color:#fff;margin-bottom:30px">Komm vorbei</h2>
+    <div class="social">
+      <a class="social__tw rv" id="tw-link" href="https://twitch.tv/chrisseitz" target="_blank" rel="noopener">
+        <span class="social__live">Twitch · Di · Do · So ab 20 Uhr</span>
+        <h3>Live fahren</h3>
+        <p>Ligarennen, Hotlap-Jagden und offene Fragerunden. Stell deine Frage im Chat, ich beantworte sie zwischen den Stints.</p>
+      </a>
+      <a class="social__dc rv" id="dc-link" href="https://discord.gg/d78YsMkaKp" target="_blank" rel="noopener">
+        <span class="social__live">Discord · Server beitreten</span>
+        <h3>Community</h3>
+        <p>Setups, Telemetrie-Threads und Fahrersuche fürs nächste Endurance-Rennen. Coaching-Kunden bekommen einen eigenen Kanal.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <span>© 2026 Christian Seitz · iRacing Coaching</span>
+    <span><a href="#impressum">Impressum</a> · <a href="#datenschutz">Datenschutz</a> · <a href="mailto:mail@deinedomain.de">mail@deinedomain.de</a></span>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   HIER ANPASSEN — alles andere läuft von allein
+   ========================================================= */
+const CONFIG = {
+  email:      "mail@deinedomain.de",   // deine Kontakt-Mail
+  paypal:     "DEINHANDLE",            // dein paypal.me Name (paypal.me/DEINHANDLE)
+  twitch:     "chrisseitz",            // twitch.tv/chrisseitz
+  discord:    "d78YsMkaKp",            // discord.gg/d78YsMkaKp
+
+  /* Buchungsseite, die mit deinem Outlook-Kalender verbunden ist.
+     Leer lassen = nur das Anfrageformular unten wird angezeigt.
+     Beispiele:
+       Microsoft Bookings: "https://outlook.office365.com/owa/calendar/DEINEBUCHUNGSSEITE/bookings/"
+       Cal.com:            "https://cal.com/deinname"
+       Calendly:           "https://calendly.com/deinname"                             */
+  bookingUrl: ""
+};
+
+/* Kalender einbetten, sobald eine Buchungsseite hinterlegt ist */
+(function(){
+  if(!CONFIG.bookingUrl) return;
+  const frame = document.createElement("iframe");
+  frame.src = CONFIG.bookingUrl;
+  frame.title = "Termin auswählen";
+  frame.loading = "lazy";
+  frame.allow = "payment";
+  document.getElementById("calendar-setup").remove();
+  document.getElementById("calendar").appendChild(frame);
+  document.getElementById("or-line").innerHTML = "<span>Oder schreib mir direkt</span>";
+})();
+
+/* Links setzen */
+document.getElementById("pp-link").href = "https://paypal.me/" + CONFIG.paypal;
+document.getElementById("pp-link").textContent = "paypal.me/" + CONFIG.paypal;
+document.getElementById("tw-link").href = "https://twitch.tv/" + CONFIG.twitch;
+document.getElementById("dc-link").href = "https://discord.gg/" + CONFIG.discord;
+
+/* Paket-Vorauswahl aus den Coaching-Karten */
+document.querySelectorAll(".book-btn").forEach(function(b){
+  b.addEventListener("click", function(){
+    const sel = document.getElementById("f-paket");
+    const wanted = b.dataset.paket;
+    [...sel.options].forEach(function(o){ if(o.value.startsWith(wanted)) sel.value = o.value; });
+  });
+});
+
+/* Anfrage: baut eine fertige E-Mail und zeigt den Bezahl-Link */
+document.getElementById("send").addEventListener("click", function(){
+  const v = function(id){ return document.getElementById(id).value.trim(); };
+  const box = document.getElementById("confirm");
+
+  if(!v("f-name") || !v("f-mail")){
+    box.className = "confirm is-open";
+    box.innerHTML = "Name und E-Mail fehlen noch — ohne die kann ich dir nicht antworten.";
+    return;
+  }
+
+  const parts  = document.getElementById("f-paket").value.split("|");
+  const paket  = parts[0];
+  const preis  = parts[1];
+  const dauer  = parseInt(parts[2], 10);   // Minuten
+  const wunsch = v("f-zeit");
+
+  const zeitText = wunsch
+    ? new Date(wunsch).toLocaleString("de-DE",{dateStyle:"full",timeStyle:"short"})
+    : "noch offen";
+
+  const body =
+    "Coaching-Anfrage\n\n" +
+    "Name: " + v("f-name") + "\n" +
+    "E-Mail: " + v("f-mail") + "\n" +
+    "Discord: " + v("f-discord") + "\n" +
+    "Paket: " + paket + (preis !== "0" ? " (" + preis + " EUR)" : " (Preis auf Anfrage)") + "\n" +
+    "Dauer: " + dauer + " Minuten\n" +
+    "iRating/Lizenz: " + v("f-sim") + "\n" +
+    "Wunschtermin: " + zeitText + "\n\n" +
+    "Ziel:\n" + v("f-ziel") + "\n";
+
+  window.location.href = "mailto:" + CONFIG.email +
+    "?subject=" + encodeURIComponent("Coaching-Anfrage: " + paket + " — " + zeitText) +
+    "&body=" + encodeURIComponent(body);
+
+  let html = "Deine Mail ist vorbereitet — nur noch abschicken. Ich bestätige dir den Termin innerhalb von 24 Stunden.";
+
+  if(preis !== "0"){
+    html += "<br><br>Bezahlen kannst du nach der Bestätigung hier: " +
+      "<a href='https://paypal.me/" + CONFIG.paypal + "/" + preis + "EUR' target='_blank' rel='noopener'>" +
+      preis + " € über PayPal</a> — oder du wählst einen anderen Weg aus der Liste.";
+  }
+
+  box.className = "confirm is-open";
+  box.innerHTML = html;
+
+  /* Wunschtermin als Kalendereintrag zum Vormerken (Outlook, Apple, Google) */
+  if(wunsch){
+    const pad = function(n){ return String(n).padStart(2,"0"); };
+    const fmt = function(d){
+      return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate()) + "T" +
+             pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
+    };
+    const start = new Date(wunsch);
+    const end   = new Date(start.getTime() + dauer*60000);
+
+    const ics = [
+      "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Sim Racing Coaching//DE","METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:" + Date.now() + "@coaching",
+      "DTSTAMP:" + fmt(new Date()),
+      "DTSTART:" + fmt(start),
+      "DTEND:" + fmt(end),
+      "SUMMARY:Sim Racing Coaching — " + paket,
+      "DESCRIPTION:Angefragt über die Website. Der Termin gilt erst nach Bestätigung per Mail.",
+      "LOCATION:Discord",
+      "END:VEVENT","END:VCALENDAR"
+    ].join("\r\n");
+
+    const url = URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
+    const a = document.createElement("a");
+    a.className = "btn btn--ghost";
+    a.href = url;
+    a.download = "coaching-termin.ics";
+    a.textContent = "Termin vormerken";
+    box.appendChild(document.createElement("br"));
+    box.appendChild(a);
+  }
+});
+
+/* ---- Signature: Delta-Trace ---- */
+(function(){
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const W = 600, H = 210, MID = 105, N = 120;
+
+  const seed = [0,-.05,-.12,-.2,-.18,-.05,.08,.14,.09,-.02,-.15,-.3,-.42,-.5,-.55,-.5,-.38,-.3,-.35,-.48,-.6,-.72,-.8,-.85,-.78,-.66,-.6,-.68,-.8,-.95,-1.05,-1.0,-.9,-.85,-.92,-1.05,-1.2,-1.3,-1.25,-1.15,-1.2,-1.35,-1.5,-1.6,-1.55,-1.45,-1.5,-1.62,-1.75,-1.85,-1.9,-1.82,-1.75,-1.8,-1.95,-2.1,-2.2,-2.15,-2.05,-2.1,-2.25,-2.4,-2.45,-2.38,-2.3,-2.35,-2.42,-2.4];
+  const data = [];
+  for(let i=0;i<N;i++){
+    const t = i/(N-1)*(seed.length-1);
+    const a = seed[Math.floor(t)], b = seed[Math.min(seed.length-1,Math.ceil(t))];
+    data.push(a + (b-a)*(t-Math.floor(t)));
+  }
+
+  const scale = function(d){ return MID - (d/-2.6)*72; };
+  const path = data.map(function(d,i){
+    return (i?"L":"M") + (i/(N-1)*W).toFixed(1) + " " + scale(d).toFixed(1);
+  }).join(" ");
+
+  const trace = document.getElementById("trace");
+  const ghost = document.getElementById("ghost");
+  trace.setAttribute("d", path);
+  ghost.setAttribute("d", "M0 " + MID + " L" + W + " " + MID);
+
+  const readout = document.getElementById("delta");
+  const head = document.getElementById("playhead");
+  const sect = [document.getElementById("s1"),document.getElementById("s2"),document.getElementById("s3")];
+
+  if(reduce){
+    readout.textContent = "-2.400";
+    head.setAttribute("x1", W); head.setAttribute("x2", W);
+    sect[0].className = "sector is-green";
+    sect[1].className = "sector is-green";
+    sect[2].className = "sector is-purple";
+    return;
+  }
+
+  const len = trace.getTotalLength();
+  trace.style.strokeDasharray = len;
+  trace.style.strokeDashoffset = len;
+
+  let start = null;
+  const DUR = 5200, HOLD = 2600;
+
+  function frame(ts){
+    if(start === null) start = ts;
+    const cycle = (ts - start) % (DUR + HOLD);
+    const p = Math.min(1, cycle / DUR);
+    const eased = p < 1 ? 1 - Math.pow(1-p, 2) : 1;
+
+    trace.style.strokeDashoffset = len * (1 - eased);
+    head.setAttribute("x1", (eased*W).toFixed(1));
+    head.setAttribute("x2", (eased*W).toFixed(1));
+    head.style.opacity = p < 1 ? .9 : 0;
+
+    const val = data[Math.min(N-1, Math.round(eased*(N-1)))];
+    readout.textContent = (val<=0?"-":"+") + Math.abs(val).toFixed(3);
+    readout.className = "read__val" + (val>0 ? " is-slow" : "");
+
+    sect[0].className = "sector" + (eased>.33 ? " is-green" : "");
+    sect[1].className = "sector" + (eased>.66 ? " is-green" : "");
+    sect[2].className = "sector" + (eased>=1 ? " is-purple" : "");
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---- Sanftes Einblenden beim Scrollen ---- */
+(function(){
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); }
+    });
+  }, {threshold:.12});
+  document.querySelectorAll(".rv").forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>
