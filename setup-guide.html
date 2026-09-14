@@ -1,0 +1,434 @@
+<!-- ============================================================
+  Setup Guide — Christian Seitz
+  Allgemeines, fahrzeugunabhängiges Diagnose-Nachschlagewerk.
+  Passform zur Coaching-Site: Saira Condensed / IBM Plex Sans / IBM Plex Mono,
+  dunkle Timing-Tower-Ästhetik, teal/amber/rose Telemetrie-Akzente.
+  Konfiguration unten im CONFIG-Objekt (gleiches Muster wie auf der Coaching-Site).
+============================================================= -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Guide — Christian Seitz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E13;
+    --surface:#121821;
+    --surface-2:#1A2430;
+    --border:#26323F;
+    --text:#E7ECF1;
+    --text-muted:#8FA0AF;
+    --teal:#23D2B5;
+    --amber:#EFA23B;
+    --rose:#F26E82;
+    --font-display:'Saira Condensed', sans-serif;
+    --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sg-wrap{max-width:880px;margin:0 auto;padding:0 24px;}
+  a{color:var(--teal);}
+  :focus-visible{outline:2px solid var(--teal);outline-offset:3px;}
+
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:0.01em;margin:0;}
+  .sg-eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    color:var(--text-muted);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .sg-eyebrow .dot{width:6px;height:6px;background:var(--teal);border-radius:50%;flex:none;}
+
+  /* ---------- Hero ---------- */
+  .sg-hero{padding:88px 0 56px;border-bottom:1px solid var(--border);}
+  .sg-hero h1{font-size:clamp(2.4rem,5vw,3.6rem);line-height:1.05;max-width:15ch;}
+  .sg-hero .accent{color:var(--teal);}
+  .sg-hero p{
+    font-size:1.08rem;color:var(--text-muted);max-width:58ch;margin-top:20px;
+  }
+  .sg-trace{margin-top:48px;border:1px solid var(--border);background:var(--surface);padding:20px 20px 14px;}
+  .sg-trace-label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;
+    flex-wrap:wrap;gap:6px;
+  }
+  .sg-trace-label span:last-child{color:var(--text);}
+  .sg-trace svg{display:block;width:100%;height:auto;}
+  .sg-trace-legend{display:flex;gap:22px;margin-top:10px;font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);flex-wrap:wrap;}
+  .sg-trace-legend .sw{display:inline-block;width:14px;height:2px;margin-right:6px;vertical-align:middle;}
+
+  /* ---------- Generic section ---------- */
+  section{padding:64px 0;border-bottom:1px solid var(--border);}
+  section h2{font-size:clamp(1.6rem,3vw,2.1rem);max-width:24ch;}
+  section > .sg-wrap > p.sg-lead{color:var(--text-muted);max-width:62ch;margin-top:14px;font-size:1rem;}
+
+  /* ---------- Philosophy grid ---------- */
+  .sg-principles{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);margin-top:36px;border:1px solid var(--border);}
+  .sg-principle{background:var(--surface);padding:26px 24px;}
+  .sg-principle h3{font-size:1.15rem;color:var(--text);margin-bottom:10px;font-weight:600;}
+  .sg-principle p{font-family:var(--font-body);font-size:0.94rem;color:var(--text-muted);margin:0;}
+  .sg-principle.deny{border-left:3px solid var(--rose);}
+  .sg-principle.affirm{border-left:3px solid var(--teal);}
+
+  /* ---------- Lever reference ---------- */
+  .sg-levers{margin-top:36px;border:1px solid var(--border);}
+  .sg-lever-row{
+    display:grid;grid-template-columns:180px 1fr;gap:20px;padding:18px 20px;border-bottom:1px solid var(--border);
+  }
+  .sg-lever-row:last-child{border-bottom:none;}
+  .sg-lever-row .name{font-family:var(--font-mono);font-size:0.85rem;color:var(--amber);}
+  .sg-lever-row .loc{display:block;font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);margin-top:5px;font-weight:400;}
+  .sg-lever-row .loc::before{content:"→ ";color:var(--teal);}
+  .sg-lever-row .desc{font-size:0.92rem;color:var(--text-muted);}
+
+  /* ---------- Diagnostic matrix ---------- */
+  .sg-phase{margin-top:44px;}
+  .sg-phase-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;}
+  .sg-phase-head .idx{font-family:var(--font-mono);font-size:0.78rem;color:var(--text-muted);}
+  .sg-phase-head h3{font-size:1.3rem;}
+  .sg-matrix{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);}
+  .sg-symptom-card{background:var(--surface);padding:22px 22px 24px;}
+  .sg-symptom-card.deny{border-top:3px solid var(--rose);}
+  .sg-symptom-card.affirm{border-top:3px solid var(--teal);}
+  .sg-symptom-card h4{font-size:1.05rem;margin-bottom:14px;}
+  .sg-axle{margin-bottom:14px;}
+  .sg-axle:last-child{margin-bottom:0;}
+  .sg-axle .axle-label{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);text-transform:none;margin-bottom:6px;display:block;}
+  .sg-axle ul{margin:0;padding-left:18px;}
+  .sg-axle li{font-size:0.88rem;color:var(--text);margin-bottom:5px;}
+  .sg-axle li:last-child{margin-bottom:0;}
+
+  .sg-note{
+    margin-top:22px;border:1px solid var(--border);border-left:3px solid var(--amber);
+    background:var(--surface);padding:18px 22px;font-size:0.92rem;color:var(--text-muted);
+  }
+  .sg-note strong{color:var(--text);}
+
+  /* ---------- Priority order (legit sequence) ---------- */
+  .sg-priority{margin-top:36px;display:flex;flex-direction:column;}
+  .sg-priority-row{
+    display:grid;grid-template-columns:44px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--border);
+  }
+  .sg-priority-row:last-child{border-bottom:1px solid var(--border);}
+  .sg-priority-num{font-family:var(--font-mono);color:var(--text-muted);font-size:0.85rem;padding-top:2px;}
+  .sg-priority-row h4{font-family:var(--font-display);font-weight:600;font-size:1.15rem;margin:0 0 4px;}
+  .sg-priority-row p{margin:0;color:var(--text-muted);font-size:0.92rem;}
+  .sg-priority-row.dim{opacity:0.65;}
+
+  /* ---------- Telemetry workflow ---------- */
+  .sg-flow{display:flex;flex-wrap:wrap;gap:1px;background:var(--border);margin-top:32px;border:1px solid var(--border);}
+  .sg-flow-step{flex:1 1 140px;background:var(--surface);padding:20px;}
+  .sg-flow-step .k{font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);}
+  .sg-flow-step .v{font-family:var(--font-display);font-size:1.15rem;font-weight:600;margin-top:4px;}
+  .sg-channels{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;}
+  .sg-chip{
+    font-family:var(--font-mono);font-size:0.74rem;color:var(--text-muted);
+    border:1px solid var(--border);padding:5px 10px;
+  }
+
+  /* ---------- Footer / CTA ---------- */
+  footer{padding:64px 0 88px;}
+  .sg-cta{
+    border:1px solid var(--border);background:var(--surface-2);padding:40px 32px;
+    display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+  }
+  .sg-cta h3{font-size:1.5rem;max-width:22ch;}
+  .sg-cta p{color:var(--text-muted);margin:8px 0 0;max-width:44ch;font-size:0.92rem;}
+  .sg-btn{
+    font-family:var(--font-mono);font-size:0.85rem;color:var(--bg);background:var(--teal);
+    padding:13px 22px;text-decoration:none;white-space:nowrap;font-weight:500;
+    border:1px solid var(--teal);transition:background 0.15s ease, color 0.15s ease;
+  }
+  .sg-btn:hover{background:transparent;color:var(--teal);}
+
+  @media (max-width:640px){
+    .sg-principles{grid-template-columns:1fr;}
+    .sg-matrix{grid-template-columns:1fr;}
+    .sg-lever-row{grid-template-columns:1fr;}
+    .sg-cta{flex-direction:column;align-items:flex-start;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sg-trace path{animation:none !important;stroke-dashoffset:0 !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sg-wrap sg-hero">
+  <div class="sg-eyebrow"><span class="dot"></span> Setup Guide — allgemein, für jedes GT3-Fahrzeug</div>
+  <h1>Rotation kommt von der Bremse — <span class="accent">nicht vom Zufall.</span></h1>
+  <p>Egal welches Auto, egal welche Strecke: Über- und Untersteuern haben immer eine Phase (Einlenken, Kurvenmitte, Kurvenausgang) und eine Achse. Sobald beides klar ist, ist der richtige Hebel meist eindeutig. Dieser Guide ist die Referenz, die ich selbst benutze, bevor ich an einem Setup drehe.</p>
+
+  <div class="sg-trace">
+    <div class="sg-trace-label">
+      <span>Steering Angle · Beispiel-Diagnose</span>
+      <span>vor Korrektur → nach Korrektur</span>
+    </div>
+    <svg viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lenkwinkel-Verlauf: vorher unruhig mit Gegenlenkschlag, nachher glatt">
+      <line x1="0" y1="80" x2="760" y2="80" stroke="#26323F" stroke-width="1"/>
+      <path d="M0,80 C40,78 70,60 100,55 C130,50 150,20 175,18 C195,16 205,95 220,110 C232,122 245,60 260,58 C280,56 300,80 330,82 C360,84 390,80 420,80 C460,80 500,80 540,80 C600,80 680,80 760,80"
+            fill="none" stroke="#F26E82" stroke-width="2" stroke-dasharray="900" stroke-dashoffset="900">
+        <animate attributeName="stroke-dashoffset" from="900" to="0" dur="1.6s" begin="0.1s" fill="freeze"/>
+      </path>
+      <path d="M0,80 C60,79 110,68 160,64 C210,60 250,66 300,74 C340,80 380,83 420,82 C470,81 520,80 570,80 C630,80 690,80 760,80"
+            fill="none" stroke="#23D2B5" stroke-width="2.5" stroke-dasharray="900" stroke-dashoffset="900">
+        <animate attributeName="stroke-dashoffset" from="900" to="0" dur="1.6s" begin="0.5s" fill="freeze"/>
+      </path>
+    </svg>
+    <div class="sg-trace-legend">
+      <span><span class="sw" style="background:#F26E82"></span>vorher — Gegenlenkschlag (Snap)</span>
+      <span><span class="sw" style="background:#23D2B5"></span>nachher — geglättet, kein Ausbrechen</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="sg-wrap">
+    <h2>Die Grundphilosophie</h2>
+    <p class="sg-lead">Nicht verhandelbar, egal welches Auto oder welche Strecke. Jede Setup-Änderung wird an diesen Punkten gespiegelt, bevor sie in die nächste Session geht.</p>
+    <div class="sg-principles">
+      <div class="sg-principle affirm">
+        <h3>Rotation nur über die Bremse</h3>
+        <p>Drehmoment kommt ausschließlich aus Trail-Braking und Bremseingabe — nicht aus Gaslupfen, erneutem Gasstoß oder aggressivem Vorderachs-Toe-out.</p>
+      </div>
+      <div class="sg-principle affirm">
+        <h3>Stabil unter Bremse, ruhig unter Gas</h3>
+        <p>Das Auto darf unter Bremsbelastung rotieren — es darf sich aber niemals von selbst drehen, wenn nur Gas oder Lastwechsel im Spiel sind, ohne Bremseingabe.</p>
+      </div>
+      <div class="sg-principle deny">
+        <h3>Toe-out wird kritisch geprüft</h3>
+        <p>Nur akzeptabel, wenn es bremsinduzierte Rotation unterstützt — nicht, wenn es Instabilität beim Gasübergang erzeugt.</p>
+      </div>
+      <div class="sg-principle deny">
+        <h3>Eine Variable pro Test</h3>
+        <p>Immer nur eine Änderung (oder ein zusammenhängendes Paket) pro Session — sonst lässt sich der Effekt in den Daten nicht sauber zuordnen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sg-wrap">
+    <h2>Was jeder Hebel tut</h2>
+    <p class="sg-lead">Bevor die Matrix unten Sinn ergibt, kurz die Wirkweise der wichtigsten Stellschrauben — fahrzeugunabhängig. Die Tab-Struktur im Setup-Screen ist bei praktisch allen GT3-Autos in iRacing identisch aufgebaut (<strong>Tires &amp; Aero</strong> · <strong>Chassis</strong> mit Front/Rear-Unterseiten · <strong>Gears/Differential</strong> · <strong>Dampers</strong>) — die Reiter-Namen unten gelten daher für jedes Auto, auch wenn einzelne Werte (z.&nbsp;B. Diff-System) je nach Modell unterschiedlich sind.</p>
+    <div class="sg-levers">
+      <div class="sg-lever-row">
+        <div class="name">ARB (Stabi)<span class="loc">Chassis → Front / Rear</span></div>
+        <div class="desc">Steuert die Langsamkurven-Balance über die <em>Differenz</em> zwischen Front- und Heckwert, nicht über den Absolutwert einer Seite. Härter an einer Achse = weniger Grip an dieser Achse in Kurven mit Lastwechsel.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Diff-Preload<span class="loc">Gears / Differential</span></div>
+        <div class="desc">Der stärkste Rotations-Hebel überhaupt. Viele iRacing-GT3-Autos trennen das in drei Werte: <strong>Preload</strong> (Grundsperrung, wirkt immer und glättet den Gas-an/aus-Übergang), <strong>Coast Ramp</strong> (Sperrung beim Bremsen/Lupfen → Einlenken) und <strong>Power Ramp</strong> (Sperrung unter Gas → Exit). Andere Autos (z.&nbsp;B. Porsche 911 GT3&nbsp;R) haben stattdessen nur Friction Faces + Preload in Nm, ohne separate Rampen. Mehr Sperrung = mehr Stabilität/Traktion, aber weniger Rotation in genau der Phase, die die jeweilige Rampe steuert; zu fest kämpft gegen den anliegenden Lenkwinkel.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Bremsbalance<span class="loc">Chassis → Front (Brakes) / In-Car Dials</span></div>
+        <div class="desc">Steuert, wie viel Last unter Bremse auf welche Achse kommt. Zu weit vorne = Vorderachse kippt beim Trail-Braking über die Haftgrenze (Schieben). Zu weit hinten = Heck wird unter Bremse unruhig. In den meisten GT3-Autos auch live im Cockpit über die Wippen verstellbar (In-Car Dials zeigt die Zuordnung).</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Ride Height / Rake<span class="loc">Chassis → Front / Rear, plus Tires &amp; Aero → Aero Balance Calculator</span></div>
+        <div class="desc">Front-Ride-Height liegt bei den meisten Autos am Splitter-Limit. Bestätigte Wirkrichtung in iRacing: Front-RH <strong>senken</strong> → mehr Rotation/Oversteer, Front-RH anheben → mehr Understeer. Heck-RH <strong>anheben</strong> → mehr Rotation/Oversteer, Heck-RH senken → mehr Understeer/Stabilität. Das Verhältnis Front zu Heck (Rake) steuert zusätzlich die Hochgeschwindigkeits-Balance über den Abtrieb — Wing und Rake gehören zusammen verstellt, dafür gibt's den Aero-Rechner direkt im Setup-Screen. Heck-Ride-Height ist keine isolierte Variable: sie zieht Heck-Toe und -Camber mit.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Federn<span class="loc">Chassis → Front Corners / Rear Corners</span></div>
+        <div class="desc">Wirkt ähnlich wie ARB, aber auch bei reiner Vertikalbewegung (nicht nur bei Wank). Später Hebel — erst anfassen, wenn ARB nicht reicht.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Camber / Toe<span class="loc">Chassis → Front Corners / Rear Corners</span></div>
+        <div class="desc">Front-Toe ist ein kleinerer Hebel als oft angenommen — nicht die erste Iteration. Heck-Toe-in wirkt als Gierdämpfung: mehr = stabiler, aber weniger drehfreudig.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Bump Rubber Gap<span class="loc">Chassis → Front Corners / Rear Corners</span></div>
+        <div class="desc">Steuert das Aero-Fenster und das Curb-Verhalten — hochfrequente Dämpfung, kein Langsam-Balance-Thema. Bei Curb-Kontakt und darauffolgender Instabilität zuerst hier prüfen, bevor die Balance-Hebel angefasst werden.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Dämpfer (Bump/Rebound)<span class="loc">Dampers</span></div>
+        <div class="desc">Low-Speed-Compression vorne erhöht Untersteuern unter Bremse/beim Einfedern; hinten beeinflusst die Traktion beim Lastwechsel. Eigener Tab, separat von den restlichen Chassis-Werten — letzter Hebel in der Reihenfolge.</div>
+      </div>
+      <div class="sg-lever-row">
+        <div class="name">Reifendruck<span class="loc">Tires &amp; Aero → Tire Data / Tire Settings</span></div>
+        <div class="desc">In iRacing bei GT3 kein Balance-Hebel: der Kaltdruck wird praktisch immer aufs Minimum gesetzt, weil das über die gesamte Stint-Länge den größten Kontaktfleck und damit den meisten mechanischen Grip liefert. Einziger Grund zum Erhöhen: der Warmdruck steigt über das optimale Fenster (Telemetrie/Druck-Anzeige prüfen). Balance wird über ARB, Federn, Diff und Ride Height gemacht — nicht über Druck-Unterschiede zwischen den Achsen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sg-wrap">
+    <h2>Diagnose nach Phase</h2>
+    <p class="sg-lead">Über- und Untersteuern sind keine festen Eigenschaften eines Autos — sie treten in einer bestimmten Phase auf. Die Phase bestimmt, welcher Hebel überhaupt greift. Immer zuerst fragen: <strong>wo genau im Kurvenverlauf passiert es?</strong></p>
+
+    <!-- Einlenken -->
+    <div class="sg-phase">
+      <div class="sg-phase-head"><span class="idx">Phase 1</span><h3>Einlenken / unter Bremse</h3></div>
+      <div class="sg-matrix">
+        <div class="sg-symptom-card deny">
+          <h4>Auto schiebt, dreht nicht ein</h4>
+          <div class="sg-axle"><span class="axle-label">Front</span>
+            <ul><li>Bremsbalance nach hinten verschieben (weniger Front-Anteil)</li><li>Front-ARB weicher</li><li>Front-Camber negativer</li><li>Front-Ride-Height leicht senken</li></ul>
+          </div>
+          <div class="sg-axle"><span class="axle-label">Heck / Diff</span>
+            <ul><li>Heck-ARB härter (weniger Heck-Grip = mehr Rotation)</li><li>Heck-Toe leicht reduzieren</li><li>Coast Ramp öffnen, falls vorhanden (mehr Freilauf beim Lupfen/Bremsen)</li></ul>
+          </div>
+        </div>
+        <div class="sg-symptom-card affirm">
+          <h4>Auto bricht aus / Gegenlenk-Schlag (Snap)</h4>
+          <div class="sg-axle"><span class="axle-label">Front</span>
+            <ul><li>Bremsbalance nach vorne verschieben</li><li>Front-ARB härter</li><li>Front-Ride-Height leicht anheben</li><li>Front-Toe Richtung neutral/leichter Toe-in</li></ul>
+          </div>
+          <div class="sg-axle"><span class="axle-label">Heck / Diff</span>
+            <ul><li>Heck-ARB weicher (mehr Heck-Grip = stabiler)</li><li>Heck-Toe-in erhöhen (Gierdämpfung)</li><li>Coast Ramp schließen, falls vorhanden (mehr Sperrung beim Bremsen)</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="sg-note"><strong>Wichtig:</strong> Dieses Symptom wird am häufigsten mit dem Diff verwechselt. Bei Autos ohne separate Coast Ramp greift hier vor allem die Bremsbalance, nicht das Preload — das wirkt primär unter Gas.</div>
+    </div>
+
+    <!-- Kurvenmitte -->
+    <div class="sg-phase">
+      <div class="sg-phase-head"><span class="idx">Phase 2</span><h3>Kurvenmitte (neutrale Last, kein Gas/Bremse)</h3></div>
+      <div class="sg-matrix">
+        <div class="sg-symptom-card deny">
+          <h4>Schiebt über die Vorderachse</h4>
+          <div class="sg-axle"><span class="axle-label">Front</span>
+            <ul><li>Front-ARB weicher</li><li>Front-Feder weicher (später Hebel)</li><li>Front-Ride-Height leicht senken</li></ul>
+          </div>
+          <div class="sg-axle"><span class="axle-label">Heck</span>
+            <ul><li>Heck-ARB härter</li><li>Heck-Ride-Height leicht anheben (verschiebt Balance zusätzlich Richtung Rotation)</li></ul>
+          </div>
+        </div>
+        <div class="sg-symptom-card affirm">
+          <h4>Heck bricht ohne Gas-/Bremseingabe aus</h4>
+          <div class="sg-axle"><span class="axle-label">Front</span>
+            <ul><li>Front-ARB härter</li></ul>
+          </div>
+          <div class="sg-axle"><span class="axle-label">Heck</span>
+            <ul><li>Heck-ARB weicher</li><li>Heck-Camber weniger negativ (mehr Kontaktfläche)</li><li>Heck-Ride-Height leicht senken</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="sg-note"><strong>Kern-Prinzip:</strong> Bricht das Heck aus, obwohl kein Gas und keine Bremse anliegt, ist das nach der Grundphilosophie ein Alarmsignal — das Setup rotiert von selbst und braucht mehr Heck-Stabilität, unabhängig davon, wie gut Einlenken und Exit sich sonst anfühlen.</div>
+    </div>
+
+    <!-- Kurvenausgang -->
+    <div class="sg-phase">
+      <div class="sg-phase-head"><span class="idx">Phase 3</span><h3>Kurvenausgang / unter Gas</h3></div>
+      <div class="sg-matrix">
+        <div class="sg-symptom-card deny">
+          <h4>Keine Traktion, Auto läuft weit / dreht nicht zurück</h4>
+          <div class="sg-axle"><span class="axle-label">Diff</span>
+            <ul><li>Preload / Power Ramp öffnen (bzw. Friction Faces reduzieren) — zu fest gesperrt kämpft gegen den Lenkwinkel</li></ul>
+          </div>
+          <div class="sg-axle"><span class="axle-label">Heck</span>
+            <ul><li>Heck-Ride-Height leicht anheben (mehr Rotation/Grip laut Rake-Wirkung)</li><li>Heck-ARB weicher</li></ul>
+          </div>
+        </div>
+        <div class="sg-symptom-card affirm">
+          <h4>Heck bricht beim Rausbeschleunigen weg (Power-Oversteer)</h4>
+          <div class="sg-axle"><span class="axle-label">Diff</span>
+            <ul><li>Preload / Power Ramp erhöhen (bzw. Friction Faces erhöhen) — <strong>Haupt-Hebel</strong> für dieses Symptom</li></ul>
+          </div>
+          <div class="sg-axle"><span class="axle-label">Heck</span>
+            <ul><li>Heck-Toe-in leicht erhöhen</li><li>Heck-Camber weniger negativ</li><li>Heck-Ride-Height leicht senken, falls Diff-Änderung allein nicht reicht</li><li>TC-Stufe prüfen, falls Reglement es erlaubt</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="sg-note"><strong>Nebenwirkung im Blick behalten:</strong> Ein zu fest gesperrtes Diff, das den Exit-Snap in einer Kurve löst, kann in einer anderen Kurve genau dort Traktionsverlust oder sogar Einlenk-Probleme erzeugen (anliegender Lenkwinkel + Sperre). Bei Autos mit getrennten Power-/Coast-Ramps lässt sich das gezielter vermeiden als bei Autos mit nur einem Preload-Wert für beides. Diff-Änderungen immer über mehrere Kurventypen gegenprüfen, nicht nur an der Stelle testen, die das Problem gezeigt hat.</div>
+    </div>
+
+    <div class="sg-note" style="margin-top:44px;">
+      <strong>Kurzfassung "mehr Rotation hinten", unabhängig von der Phase:</strong> Heck-ARB weicher → Heck-Feder weicher → Heck-Toe-in reduzieren → Heck-Ride-Height anheben (mehr Rotation, bestätigte Wirkrichtung in iRacing) → Diff Power-/Coast-Ramp öffnen bzw. Preload senken, je nach Phase. Reifendruck bleibt hier außen vor — der steht in iRacing ohnehin auf Minimum und ist kein Balance-Hebel. Jeder dieser Schritte kostet an anderer Stelle Stabilität — siehe Phase 1 und 3 oben, bevor mehrere gleichzeitig angefasst werden.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sg-wrap">
+    <h2>Reihenfolge der Stellschrauben</h2>
+    <p class="sg-lead">Nicht jeder Hebel hat das gleiche Gewicht. Diese Reihenfolge hat sich als verlässlich erwiesen, wenn ein Setup grundsätzlich überarbeitet wird.</p>
+    <div class="sg-priority">
+      <div class="sg-priority-row">
+        <div class="sg-priority-num">01</div>
+        <div><h4>Ride Height &amp; ABS</h4><p>Fundament zuerst — bevor mechanische Balance überhaupt sauber beurteilbar ist.</p></div>
+      </div>
+      <div class="sg-priority-row">
+        <div class="sg-priority-num">02</div>
+        <div><h4>Diff-Preload</h4><p>Der stärkste Rotations-Hebel überhaupt. Entsprechend vorsichtig dosieren — kleine Schritte haben große Wirkung.</p></div>
+      </div>
+      <div class="sg-priority-row">
+        <div class="sg-priority-num">03</div>
+        <div><h4>ARBs</h4><p>Steuern die Langsamkurven-Balance über die Differenz zwischen Front- und Heckwert — nicht über den Absolutwert einer einzelnen Seite.</p></div>
+      </div>
+      <div class="sg-priority-row dim">
+        <div class="sg-priority-num">04</div>
+        <div><h4>Federn</h4><p>Erst anfassen, wenn ARB (und ggf. Ride Height/Toe) die gewünschte Rotation nicht liefern.</p></div>
+      </div>
+      <div class="sg-priority-row dim">
+        <div class="sg-priority-num">05</div>
+        <div><h4>Dämpfer</h4><p>Letzter Hebel — Bump-Rubber-Gaps steuern das Aero-Fenster und Curb-Verhalten, nicht die Grund-Balance.</p></div>
+      </div>
+    </div>
+    <div class="sg-note"><strong>Testmethodik:</strong> pro Test nur eine Änderung (oder ein zusammenhängendes Paket), gleiche Bedingungen (Reifenzustand, Sprit), mindestens 2–3 saubere Runden pro Test. Ergebnisse dokumentieren, sonst geht die Historie verloren und Fehler wiederholen sich.</div>
+  </div>
+</section>
+
+<section style="border-bottom:none;">
+  <div class="sg-wrap">
+    <h2>Wie ich Daten statt Bauchgefühl nutze</h2>
+    <p class="sg-lead">Jede Setup-Behauptung wird gegen Telemetrie geprüft — MoTeC i2 Pro (kostenlos) plus dem Konverter "Mu" für iRacings .ibt-Dateien.</p>
+    <div class="sg-flow">
+      <div class="sg-flow-step"><div class="k">Schritt 1</div><div class="v">Aufzeichnen</div></div>
+      <div class="sg-flow-step"><div class="k">Schritt 2</div><div class="v">Vorher/Nachher laden</div></div>
+      <div class="sg-flow-step"><div class="k">Schritt 3</div><div class="v">Überlagern</div></div>
+      <div class="sg-flow-step"><div class="k">Schritt 4</div><div class="v">An der Stelle vergleichen</div></div>
+    </div>
+    <p style="margin-top:20px;color:var(--text-muted);font-size:0.94rem;">Beide Sessions (altes und neues Setup) werden gemeinsam geladen und farblich überlagert dargestellt, mit Track-Map und Distanz-Cursor exakt an der kritischen Stelle — nicht "fühlt sich besser an", sondern sichtbar: kleinerer Lenkwinkel-Ausschlag, glattere Querbeschleunigung, keine Differenz mehr zwischen vorderer und hinterer Radgeschwindigkeit an der Stelle, wo vorher das Heck rutschte.</p>
+    <div class="sg-channels">
+      <span class="sg-chip">Steering Angle</span>
+      <span class="sg-chip">G Force Lat</span>
+      <span class="sg-chip">Wheel Speed LF/RF/LR/RR</span>
+      <span class="sg-chip">Ride Height</span>
+      <span class="sg-chip">Brake Pres</span>
+      <span class="sg-chip">G Force Long</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="sg-wrap">
+    <div class="sg-cta">
+      <div>
+        <h3>Dein Setup, meine Methodik.</h3>
+        <p>Kein fertiges Setup von der Stange — Diagnose an deinem Fahrstil und deiner Telemetrie, nach genau dem Schema oben.</p>
+      </div>
+      <a class="sg-btn" id="sg-cta-link" href="#">Setup-Check anfragen</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Gleiches Konfigurationsmuster wie auf der Coaching-Site: hier den
+  // Buchungs-/Kontaktlink zentral eintragen, sobald final.
+  const CONFIG = {
+    ctaUrl: "" // z.B. CONFIG.bookingUrl der Coaching-Site oder mailto:
+  };
+  const ctaLink = document.getElementById('sg-cta-link');
+  if (CONFIG.ctaUrl) { ctaLink.href = CONFIG.ctaUrl; }
+</script>
+
+</body>
+</html>
