@@ -1,0 +1,458 @@
+/* =================================================================
+   Gartenbau Brandmeier · Stylesheet
+   -----------------------------------------------------------------
+   HIER ANPASSEN: Farben, Schriften und Abstände der ganzen Seite.
+   Alle Farben kommen nur aus diesem Block. Farbe ändern heißt:
+   Wert hinter dem Doppelpunkt austauschen (z. B. #2E6B33).
+   ================================================================= */
+:root {
+  /* Papier und Untergrund */
+  --papier: #FDFDFB;            /* das Formularblatt */
+  --untergrund: #E3E9E1;        /* Fläche hinter dem Blatt (nur auf großen Bildschirmen sichtbar) */
+  --band: #E5F1E1;              /* hell grün: feine Trennlinien und Schraffur der Kopfbänder */
+  --schraffur: repeating-linear-gradient(135deg, var(--band) 0 2px, var(--papier) 2px 7px); /* Kopfbänder wie auf einem Vordruck */
+
+  /* Vordruck (grün gedruckte Linien, Beschriftungen, Überschriften) */
+  --vordruck: #2E6B33;
+  --vordruck-linie: #2E6B33;
+  --marke: #5CB249;             /* Markengrün von der alten Seite: Knöpfe und Flächen, nicht für Text auf Weiß */
+  --ziffer: #3A8A38;            /* große Ziffern im Ablauf (helleres Grün, groß genug für 3:1) */
+
+  /* Text und Einträge */
+  --text: #17231A;
+  --text-leise: #4A5A4D;
+  --tinte: #2440A0;             /* Kugelschreiber-Blau: Haken und handschriftliche Einträge */
+  --stempel: #B04A12;           /* Stempelfarbe „Neu“, sparsam */
+
+  /* Weiß der Fotoabzüge */
+  --auf-dunkel: #FFFFFF;
+
+
+  /* Kleinere Töne */
+  --marke-hover: #6CC259;       /* Knopf beim Darüberfahren */
+  --klammer: #8E9A90;           /* Büroklammer an den Fotos */
+  --feld-aktiv: #F3F8F1;        /* Formularfeld, in dem gerade geschrieben wird */
+  --fehler: #A3271F;            /* Fehlermeldungen im Formular */
+  --fehler-flaeche: #FBEDEB;
+  --platzhalter-text: #5F6E62;  /* graue Beispieltexte in Formularfeldern */
+  --stern-leer: #C9D3C7;
+  --hinweis-flaeche: #FDF3EC;   /* Hinweiskasten in Impressum und Datenschutz */
+
+  /* Schriften */
+  --schrift-titel: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --schrift-text: "Barlow", "Segoe UI", Arial, sans-serif;
+  --schrift-hand: "Kalam", "Comic Sans MS", cursive;
+
+  /* Abstände und Maße (im Regler-Panel verschiebbar) */
+  --blatt-breite: 78rem;         /* maximale Breite des Formularblatts */
+  --rand: clamp(1rem, 3vw, 2.5rem);   /* Innenabstand links und rechts im Blatt */
+  --abschnitt: clamp(3.5rem, 7vw, 6rem); /* Abstand oben und unten in Abschnitten */
+  --linie: 1.5px;               /* Stärke der Vordrucklinien */
+  --h1-groesse: clamp(2.6rem, 5.6vw, 4.9rem);
+  --h2-groesse: clamp(2rem, 4vw, 3.4rem);
+  --hero-foto-drehung: -2.5deg;
+  --radius: 3px;
+}
+
+/* ===== Ab hier nur ändern, wenn du weißt, was du tust ===== */
+
+@font-face { font-family: "Barlow Condensed"; src: url("../fonts/barlow-condensed-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Barlow Condensed"; src: url("../fonts/barlow-condensed-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("../fonts/barlow-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("../fonts/barlow-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("../fonts/barlow-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Kalam"; src: url("../fonts/kalam-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: light; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+body {
+  margin: 0;
+  background: var(--untergrund);
+  color: var(--text);
+  font-family: var(--schrift-text);
+  font-size: clamp(1.0625rem, 0.25vw + 1rem, 1.1875rem);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--vordruck); text-decoration-thickness: 1px; text-underline-offset: 0.22em; }
+a:hover { color: var(--text); }
+::selection { background: var(--marke); color: var(--text); }
+:focus-visible { outline: 3px solid var(--tinte); outline-offset: 3px; }
+input, textarea, select, button { font: inherit; color: inherit; }
+input, textarea { caret-color: var(--tinte); }
+
+h1, h2, h3 { font-family: var(--schrift-titel); font-weight: 700; line-height: 1.02; letter-spacing: -0.01em; margin: 0; text-wrap: balance; hyphens: manual; }
+h1 { font-size: var(--h1-groesse); }
+h2 { font-size: var(--h2-groesse); color: var(--vordruck); }
+h3 { font-size: clamp(1.35rem, 1.8vw, 1.6rem); font-weight: 600; letter-spacing: 0; }
+p { margin: 0 0 1em; max-width: 66ch; }
+
+.symbole { position: absolute; width: 0; height: 0; overflow: hidden; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.springen { position: absolute; left: -999px; top: 0.5rem; z-index: 100; background: var(--text); color: var(--papier); padding: 0.6rem 1rem; }
+.springen:focus { left: 0.5rem; }
+.springen:hover { color: var(--papier); }
+
+/* ---------- Das Blatt ---------- */
+.blatt {
+  max-width: var(--blatt-breite);
+  margin: 0 auto;
+  background: var(--papier);
+  box-shadow: 0 1px 2px rgba(23, 35, 26, 0.08), 0 18px 48px rgba(23, 35, 26, 0.10);
+}
+@media (min-width: 1300px) { .blatt { margin-block: 1.5rem 0; } }
+.innen { padding-inline: var(--rand); }
+
+/* Feldbeschriftung wie auf einem Vordruck */
+.feldname {
+  display: block;
+  font-family: var(--schrift-titel);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--vordruck);
+  line-height: 1.3;
+}
+.eintrag { font-family: var(--schrift-hand); color: var(--tinte); font-size: 1.25em; line-height: 1.25; }
+
+/* ---------- Knöpfe ---------- */
+.knopf {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  min-height: 3.25rem; padding: 0.7rem 1.4rem;
+  font-family: var(--schrift-titel); font-weight: 700; font-size: 1.25rem; letter-spacing: 0.01em; line-height: 1.1;
+  text-decoration: none; cursor: pointer;
+  background: var(--marke); color: var(--text);
+  border: var(--linie) solid var(--vordruck); border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(23, 35, 26, 0.12), 0 4px 10px rgba(23, 35, 26, 0.10);
+  transition: transform 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+.knopf:hover { color: var(--text); background: var(--marke-hover); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(23, 35, 26, 0.14), 0 8px 18px rgba(23, 35, 26, 0.12); }
+.knopf:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(23, 35, 26, 0.12); }
+.knopf--rand { background: var(--papier); color: var(--vordruck); }
+.knopf--rand:hover { background: var(--papier); color: var(--text); }
+.knopf svg { width: 1.25em; height: 1.25em; flex: none; }
+.knopf[disabled] { opacity: 0.6; cursor: wait; transform: none; }
+.knopf-reihe { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* ---------- Briefkopf ---------- */
+.briefkopf {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--papier);
+  border-bottom: var(--linie) solid var(--vordruck-linie);
+}
+.briefkopf .innen { display: flex; align-items: center; gap: 1.25rem; min-height: 4.75rem; }
+.firma { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; color: var(--text); margin-right: auto; }
+.firma:hover { color: var(--text); }
+.firma .kopfstempel { width: 3.6rem; height: 3.6rem; flex: none; transform: rotate(-8deg); }
+.firma-name { font-family: var(--schrift-titel); font-weight: 700; font-size: 1.45rem; line-height: 1; }
+.firma-zeile { display: block; font-family: var(--schrift-titel); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--vordruck); margin-top: 0.25rem; line-height: 1.3; }
+.navi ul { list-style: none; display: flex; gap: 1.4rem; margin: 0; padding: 0; }
+.navi a { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.08rem; color: var(--text); text-decoration: none; padding-block: 0.4rem; border-bottom: 2px solid transparent; }
+.navi a:hover { border-bottom-color: var(--marke); }
+.briefkopf .knopf { min-height: 2.75rem; padding: 0.45rem 1rem; font-size: 1.1rem; }
+.menue-knopf { display: none; align-items: center; gap: 0.45rem; background: none; border: var(--linie) solid var(--vordruck); border-radius: var(--radius); padding: 0.5rem 0.75rem; font-family: var(--schrift-titel); font-weight: 600; font-size: 1.05rem; color: var(--vordruck); cursor: pointer; }
+.menue-knopf svg { width: 1.2rem; height: 1.2rem; }
+.menue-knopf .zu, .menue-knopf[aria-expanded="true"] .auf-text { display: none; }
+.menue-knopf[aria-expanded="true"] .zu { display: inline; }
+.menue-knopf[aria-expanded="true"] svg.zu { display: block; }
+
+@media (max-width: 1060px) {
+  .menue-knopf { display: inline-flex; }
+  .briefkopf .knopf--kopf { display: none; }
+  .navi { position: absolute; left: 0; right: 0; top: 100%; display: none; background: var(--papier); border-bottom: var(--linie) solid var(--vordruck); box-shadow: 0 16px 30px rgba(23, 35, 26, 0.12); }
+  .navi.offen { display: block; }
+  .navi ul { flex-direction: column; gap: 0; padding: 0.25rem var(--rand) 1rem; }
+  .navi li + li { border-top: 1px solid var(--band); }
+  .navi a { display: block; padding: 0.85rem 0; font-size: 1.25rem; border: 0; }
+}
+@media (max-width: 480px) {
+  .firma .kopfstempel { width: 3rem; height: 3rem; }
+  .firma-name { font-size: 1.25rem; }
+  .firma-zeile { font-size: 0.72rem; }
+}
+
+/* ---------- Kopfzeile des Zettels (Ort, Landkreis, Telefon) ---------- */
+.zettelkopf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: var(--linie) solid var(--vordruck-linie); }
+.zettelkopf > div { padding: 0.6rem var(--rand) 0.7rem; }
+.zettelkopf > div + div { border-left: var(--linie) solid var(--vordruck-linie); }
+.zettelkopf .eintrag { display: block; margin-top: 0.15rem; font-size: 1.3rem; }
+.zettelkopf a.eintrag { text-decoration: none; }
+@media (max-width: 640px) {
+  .zettelkopf { grid-template-columns: 1fr 1fr; }
+  .zettelkopf > div:nth-child(3) { display: none; }
+}
+
+/* ---------- Einstieg ---------- */
+.einstieg { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); border-bottom: var(--linie) solid var(--vordruck-linie); }
+.einstieg-text { padding: clamp(1.75rem, 4vw, 3.25rem) var(--rand) clamp(2rem, 4vw, 3rem); }
+.einstieg h1 { max-width: 13ch; }
+.einstieg-text > p { font-size: 1.15em; color: var(--text-leise); margin-top: 1.1rem; max-width: 48ch; }
+.einstieg-fotos { position: relative; border-left: var(--linie) solid var(--vordruck-linie); background: var(--papier); padding: clamp(2rem, 4vw, 3rem) var(--rand); min-height: 32rem; overflow: hidden; }
+.slogan { font-family: var(--schrift-hand); color: var(--tinte); font-size: 1.35rem; margin: 1.1rem 0 0; }
+
+@media (max-width: 900px) {
+  .einstieg { grid-template-columns: 1fr; }
+  .einstieg-fotos { border-left: 0; border-top: var(--linie) solid var(--vordruck-linie); min-height: 0; }
+}
+
+/* Ankreuzfeld „Was soll gemacht werden?“ */
+.ankreuzen { margin: 1.75rem 0 1.5rem; padding: 0; min-width: 0; border: var(--linie) solid var(--vordruck-linie); }
+.ankreuzen > .feldname { padding: 0.55rem 0.9rem; border-bottom: var(--linie) solid var(--vordruck-linie); background: var(--schraffur); }
+.ankreuz-liste { display: grid; grid-template-columns: 1fr 1fr; margin: 0; padding: 0; list-style: none; }
+.ankreuz-liste li { border-bottom: 1px solid var(--band); }
+.ankreuz-liste li:nth-child(odd) { border-right: 1px solid var(--band); }
+.ankreuz-liste li:nth-last-child(-n+2) { border-bottom: 0; }
+@media (max-width: 520px) {
+  .ankreuz-liste { grid-template-columns: 1fr; }
+  .ankreuz-liste li:nth-child(odd) { border-right: 0; }
+  .ankreuz-liste li:nth-last-child(2) { border-bottom: 1px solid var(--band); }
+}
+
+/* Das Kästchen selbst: echtes Kontrollkästchen, gezeichneter Haken */
+.kreuz { position: relative; display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.9rem; cursor: pointer; min-height: 2.9rem; line-height: 1.3; font-weight: 500; }
+.kreuz input { position: absolute; opacity: 0; width: 1.6rem; height: 1.6rem; margin: 0; cursor: pointer; }
+.kasten { flex: none; position: relative; width: 1.6rem; height: 1.6rem; border: 2px solid var(--vordruck); background: var(--papier); }
+.kasten svg { position: absolute; left: -0.15rem; top: -0.45rem; width: 2.1rem; height: 2.1rem; overflow: visible; }
+.kasten svg { fill: none; stroke: var(--tinte); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; transition: stroke-dashoffset 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.kreuz input:checked + .kasten svg { stroke-dashoffset: 0; }
+.kreuz input:focus-visible + .kasten { outline: 3px solid var(--tinte); outline-offset: 2px; }
+.kreuz:hover .kasten { background: var(--band); }
+.kreuz-hinweis { font-size: 0.95rem; color: var(--text-leise); margin: 0.75rem 0 0; }
+
+/* Fotoabzüge mit Büroklammer */
+.abzug { position: relative; margin: 0; background: var(--auf-dunkel); padding: 0.6rem 0.6rem 0.4rem; box-shadow: 0 2px 4px rgba(23, 35, 26, 0.12), 0 14px 30px rgba(23, 35, 26, 0.16); }
+.abzug img { width: 100%; }
+.abzug figcaption { font-family: var(--schrift-hand); color: var(--tinte); font-size: 1.15rem; line-height: 1.25; padding: 0.45rem 0.15rem 0.15rem; }
+.klammer { position: absolute; top: -1.6rem; left: 1.4rem; width: 1.3rem; height: 3.6rem; z-index: 2; }
+.klammer { fill: none; stroke: var(--klammer); stroke-width: 2.2; stroke-linecap: round; }
+.einstieg-fotos .abzug--gross { transform: rotate(var(--hero-foto-drehung)); width: 92%; margin-left: 4%; }
+.einstieg-fotos .abzug--klein { transform: rotate(3deg); width: 52%; margin: 0.9rem 0 0 auto; }
+.einstieg-fotos .abzug--klein .klammer { left: auto; right: 1.6rem; }
+@media (max-width: 900px) {
+  .einstieg-fotos { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1rem; align-items: start; }
+  .einstieg-fotos .abzug--gross { width: auto; margin: 0.6rem 0 0; }
+  .einstieg-fotos .abzug--klein { width: auto; margin: 2.2rem 0 0; }
+}
+@media (max-width: 520px) {
+  .einstieg-fotos { grid-template-columns: 1fr; }
+  .einstieg-fotos .abzug--klein { width: 74%; margin: -1.5rem 0 0 auto; }
+}
+
+/* ---------- Abschnitte allgemein ---------- */
+.abschnitt { padding-block: var(--abschnitt); border-bottom: var(--linie) solid var(--vordruck-linie); }
+.abschnitt--band { background: var(--papier); }
+.kopf { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem 3rem; align-items: end; margin-bottom: clamp(1.75rem, 3vw, 2.75rem); }
+.kopf p { margin: 0; color: var(--text-leise); font-size: 1.1em; }
+@media (max-width: 800px) { .kopf { grid-template-columns: 1fr; } }
+
+/* ---------- Leistungen als Positionsliste ---------- */
+.positionen { border-top: var(--linie) solid var(--vordruck-linie); }
+.position { display: grid; grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 1.4fr) 8.5rem; gap: 0.5rem 2rem; align-items: center; padding: 1.15rem 0; border-bottom: 1px solid var(--vordruck-linie); }
+.position-titel { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.position p { margin: 0; color: var(--text-leise); }
+.position p a { white-space: nowrap; }
+.position .kreuz { padding: 0.3rem 0; min-height: 0; font-family: var(--schrift-titel); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vordruck); }
+.position--neu { background: var(--schraffur); margin-inline: calc(var(--rand) * -1); padding-inline: var(--rand); }
+.stempel {
+  display: inline-block; transform: rotate(-6deg);
+  font-family: var(--schrift-titel); font-weight: 700; font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--stempel); border: 2px solid var(--stempel); border-radius: 4px; padding: 0.05rem 0.45rem; line-height: 1.3;
+}
+@media (max-width: 760px) {
+  .position { grid-template-columns: 1fr 7rem; }
+  .position p { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* ---------- Fugenversiegelung (Beiblatt) ---------- */
+.beiblatt { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+.beiblatt h2 { max-width: 14ch; margin-bottom: 1.25rem; }
+.pruefliste { border: var(--linie) solid var(--vordruck-linie); background: var(--papier); margin: 1.6rem 0 1.75rem; }
+.pruefliste > .feldname { padding: 0.55rem 0.9rem; border-bottom: var(--linie) solid var(--vordruck-linie); background: var(--schraffur); }
+.pruefliste ul { list-style: none; margin: 0; padding: 0; }
+.pruefliste li { display: flex; gap: 0.85rem; align-items: flex-start; padding: 0.8rem 0.9rem; }
+.pruefliste li + li { border-top: 1px solid var(--band); }
+.pruefliste .kasten { margin-top: 0.1rem; }
+.pruefliste .kasten svg { stroke-dashoffset: 40; }
+.pruefliste.ist-sichtbar .kasten svg { stroke-dashoffset: 0; }
+.pruefliste li:nth-child(2) .kasten svg { transition-delay: 0.18s; }
+.pruefliste li:nth-child(3) .kasten svg { transition-delay: 0.36s; }
+.beiblatt-fotos { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; padding-top: 1.5rem; }
+.beiblatt-fotos .abzug:first-child { transform: rotate(-2deg); }
+.beiblatt-fotos .abzug:last-child { transform: rotate(2.5deg); margin-top: 2.5rem; }
+@media (max-width: 860px) { .beiblatt { grid-template-columns: 1fr; } }
+
+/* ---------- Ablauf ---------- */
+.ablauf-rahmen { position: relative; }
+.ablauf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; counter-reset: schritt; border: var(--linie) solid var(--vordruck-linie); }
+.ablauf li { position: relative; padding: 1.25rem 1.25rem 1.5rem; }
+.ablauf li + li { border-left: var(--linie) solid var(--vordruck-linie); }
+.ablauf .nr { display: block; font-family: var(--schrift-titel); font-weight: 700; font-size: clamp(3rem, 5vw, 4.25rem); line-height: 0.9; color: var(--ziffer); margin-bottom: 0.75rem; }
+.ablauf h3 { margin-bottom: 0.45rem; }
+.ablauf p { margin: 0; color: var(--text-leise); font-size: 0.98em; }
+.ablauf-strich { position: absolute; left: 0; right: 0; top: -1px; height: 3px; background: var(--vordruck); transform-origin: left center; transform: scaleX(1); transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.js .ablauf-rahmen:not(.ist-sichtbar) .ablauf-strich { transform: scaleX(0.02); }
+@media (max-width: 860px) {
+  .ablauf { grid-template-columns: 1fr 1fr; }
+  .ablauf li:nth-child(3) { border-left: 0; }
+  .ablauf li:nth-child(n+3) { border-top: var(--linie) solid var(--vordruck-linie); }
+}
+@media (max-width: 520px) {
+  .ablauf { grid-template-columns: 1fr; }
+  .ablauf li + li { border-left: 0; border-top: var(--linie) solid var(--vordruck-linie); }
+  .ablauf li { display: grid; grid-template-columns: 3.5rem 1fr; column-gap: 0.75rem; }
+  .ablauf .nr { grid-row: span 2; font-size: 3rem; }
+}
+
+/* ---------- Projekte (Anlagen mit Fotoabzügen) ---------- */
+.anlagen-blatt .abzug { box-shadow: 0 2px 4px rgba(23, 35, 26, 0.12), 0 10px 22px rgba(23, 35, 26, 0.14); border: 1px solid var(--untergrund); }
+.anlagen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2.25rem, 4vw, 3.25rem) clamp(1rem, 2.5vw, 2rem); margin: 0; padding: 2rem 0 0; list-style: none; }
+.anlagen .abzug { padding: 0.55rem 0.55rem 0.35rem; }
+.anlagen .abzug img { aspect-ratio: 4 / 5; object-fit: cover; }
+.anlagen li:nth-child(3n+1) .abzug { transform: rotate(-1.6deg); }
+.anlagen li:nth-child(3n+2) .abzug { transform: rotate(1.2deg) translateY(1rem); }
+.anlagen li:nth-child(3n) .abzug { transform: rotate(-0.6deg); }
+.anlagen .abzug figcaption { color: var(--tinte); }
+@media (max-width: 760px) { .anlagen { grid-template-columns: 1fr 1fr; } .anlagen li:nth-child(n) .abzug { transform: rotate(0); } .anlagen li:nth-child(even) .abzug { transform: rotate(1.2deg); } .anlagen li:nth-child(odd) .abzug { transform: rotate(-1.2deg); } }
+@media (max-width: 420px) { .anlagen .abzug figcaption { font-size: 1rem; } }
+
+/* ---------- Über uns ---------- */
+.ausfuehrung { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+.ausfuehrung-fotos { display: grid; gap: 1.5rem; }
+.ausfuehrung-fotos .abzug:first-child { transform: rotate(-2deg); width: 82%; }
+.ausfuehrung-fotos .abzug:last-child { transform: rotate(1.5deg); }
+.ausfuehrung h2 { margin-bottom: 1.25rem; }
+.felder { display: grid; grid-template-columns: 1fr 1fr; border: var(--linie) solid var(--vordruck-linie); margin: 1.75rem 0 0; }
+.felder > div { padding: 0.65rem 0.9rem 0.75rem; }
+.felder > div:nth-child(odd) { border-right: var(--linie) solid var(--vordruck-linie); }
+.felder > div:nth-child(n+3) { border-top: var(--linie) solid var(--vordruck-linie); }
+.felder dt { margin: 0; }
+.felder dd { margin: 0.2rem 0 0; font-weight: 500; }
+.felder-stempel { position: relative; padding-bottom: 1rem; }
+.unterschrift { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) 8.5rem; align-items: end; gap: 1rem; border: var(--linie) solid var(--vordruck-linie); border-top: 0; padding: 0.65rem 0.9rem 0.75rem; min-height: 7.5rem; }
+.unterschrift dd { margin: 0.2rem 0 0; font-weight: 500; }
+.stempel-feld { justify-self: end; }
+.firmenstempel { display: block; width: 8rem; transform: rotate(-12deg); opacity: 0.9; margin: -1.5rem -0.4rem -0.6rem 0; }
+@media (max-width: 860px) {
+  .ausfuehrung { grid-template-columns: 1fr; }
+  .ausfuehrung-fotos { grid-template-columns: 1fr 1fr; align-items: center; }
+  .ausfuehrung-fotos .abzug:first-child { width: auto; }
+}
+@media (max-width: 520px) {
+  .felder { grid-template-columns: 1fr; }
+  .felder > div:nth-child(odd) { border-right: 0; }
+  .felder > div + div { border-top: var(--linie) solid var(--vordruck-linie); }
+  .unterschrift { grid-template-columns: minmax(0, 1fr) 6rem; }
+  .firmenstempel { width: 6rem; }
+}
+
+/* ---------- Bewertungen (nur sichtbar mit Place-ID) ---------- */
+.bewertungen-laden { border: var(--linie) dashed var(--vordruck-linie); background: var(--papier); padding: 1.25rem; max-width: 46rem; }
+.bewertungen-laden p { font-size: 0.98rem; color: var(--text-leise); }
+.bewertungen-status:empty { display: none; }
+.bewertungen-links { margin-top: 1.5rem; }
+.bewertungs-karten { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+.bewertung { background: var(--papier); border: var(--linie) solid var(--vordruck-linie); padding: 1.1rem 1.2rem; }
+.bewertung blockquote { margin: 0.6rem 0 0.9rem; }
+.bewertung footer { font-size: 0.92rem; color: var(--text-leise); border-top: 1px solid var(--band); padding-top: 0.6rem; }
+.sterne { display: inline-flex; gap: 0.1rem; }
+.sterne svg { width: 1.1rem; height: 1.1rem; color: var(--stern-leer); }
+.sterne svg.an { color: var(--stempel); }
+
+/* ---------- Häufige Fragen ---------- */
+.fragen { border-top: var(--linie) solid var(--vordruck-linie); max-width: 54rem; }
+.fragen details { border-bottom: 1px solid var(--vordruck-linie); }
+.fragen summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 0; cursor: pointer; list-style: none; font-family: var(--schrift-titel); font-weight: 600; font-size: clamp(1.25rem, 1.8vw, 1.5rem); line-height: 1.2; }
+.fragen summary::-webkit-details-marker { display: none; }
+.fragen summary .auf { flex: none; position: relative; width: 1.25rem; height: 1.25rem; }
+.fragen summary .auf::before, .fragen summary .auf::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: var(--vordruck); transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+.fragen summary .auf::after { transform: rotate(90deg); }
+.fragen details[open] summary .auf::after { transform: rotate(0deg); }
+.fragen details p { color: var(--text-leise); padding-bottom: 1.1rem; }
+
+/* ---------- Kontakt und Formular ---------- */
+.kontakt { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+.kontakt h2 { margin-bottom: 1rem; }
+.kontakt-daten { border: var(--linie) solid var(--vordruck-linie); background: var(--papier); margin: 1.75rem 0 0; }
+.kontakt-daten > div { padding: 0.65rem 0.9rem 0.75rem; }
+.kontakt-daten > div + div { border-top: var(--linie) solid var(--vordruck-linie); }
+.kontakt-daten dd { margin: 0.2rem 0 0; font-weight: 500; font-size: 1.1rem; }
+.kontakt-daten dd a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--marke); }
+.kontakt-daten dd a:hover { color: var(--vordruck); }
+.kontakt-daten .klein { font-size: 0.95rem; font-weight: 400; }
+@media (max-width: 860px) { .kontakt { grid-template-columns: 1fr; } }
+
+.formular { background: var(--papier); border: var(--linie) solid var(--vordruck-linie); }
+.formular-titel { padding: 0.8rem 1rem; border-bottom: var(--linie) solid var(--vordruck-linie); background: var(--schraffur); font-family: var(--schrift-titel); font-weight: 700; font-size: 1.6rem; color: var(--vordruck); }
+.formular form { display: grid; grid-template-columns: 1fr 1fr; }
+.field { position: relative; padding: 0.6rem 1rem 0.7rem; border-bottom: 1px solid var(--vordruck-linie); }
+.field--breit { grid-column: 1 / -1; }
+.field:nth-child(odd):not(.field--breit) { border-right: 1px solid var(--vordruck-linie); }
+.field label.feldname { margin-bottom: 0.15rem; }
+.field input[type="text"], .field input[type="email"], .field input[type="tel"], .field textarea {
+  display: block; width: 100%; border: 0; border-bottom: 1px dashed transparent; background: transparent; padding: 0.25rem 0;
+  font-family: var(--schrift-hand); font-size: 1.35rem; line-height: 1.35; color: var(--tinte);
+}
+.field textarea { min-height: 6.5rem; resize: vertical; }
+.field input::placeholder, .field textarea::placeholder { font-family: var(--schrift-text); font-size: 1rem; color: var(--platzhalter-text); }
+.field input:focus, .field textarea:focus { outline: none; border-bottom-color: var(--tinte); }
+.field:focus-within { background: var(--feld-aktiv); }
+.optional { font-weight: 600; text-transform: none; letter-spacing: 0.02em; color: var(--text-leise); }
+.field--gruppe { margin: 0; min-width: 0; border-width: 0 0 1px; border-style: solid; border-color: var(--vordruck-linie); }
+.field--gruppe legend { float: left; width: 100%; padding: 0; }
+.field select { width: 100%; border: 0; background: transparent; padding: 0.35rem 0; font-size: 1.05rem; color: var(--text); }
+.field select:focus { outline: none; }
+.field .ankreuz-liste { margin-top: 0.3rem; clear: both; }
+.field .ankreuz-liste li { border: 0 !important; }
+.field .kreuz { padding: 0.35rem 0; min-height: 2.6rem; font-size: 1rem; }
+.field-error { display: none; margin: 0.3rem 0 0; font-size: 0.92rem; font-weight: 600; color: var(--fehler); }
+.field.has-error .field-error { display: block; }
+.field.has-error { background: var(--fehler-flaeche); }
+.einwilligung { font-size: 0.95rem; align-items: flex-start; }
+.einwilligung .kasten { margin-top: 0.1rem; }
+.absenden { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem; }
+.form-status { margin: 0; font-size: 0.95rem; }
+.form-status.is-error { color: var(--fehler); font-weight: 600; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+#form-wrap.is-sent form { display: none; }
+.form-erfolg { padding: 1.5rem 1rem 1.75rem; }
+.form-erfolg h3 { color: var(--vordruck); margin-bottom: 0.5rem; }
+@media (max-width: 600px) {
+  .formular form { grid-template-columns: 1fr; }
+  .field:nth-child(odd):not(.field--breit) { border-right: 0; }
+}
+
+/* ---------- Fußzeile ---------- */
+.fuss { padding: 2.25rem 0 2rem; font-size: 0.98rem; position: relative; }
+.fuss::before { content: ""; position: absolute; left: 0; right: 0; top: 0; border-top: 2px dashed var(--vordruck); opacity: 0.55; }
+.fuss .innen { display: grid; grid-template-columns: auto 1fr auto; gap: 1.5rem 2.5rem; align-items: start; }
+.fuss img { width: 3.6rem; }
+.fuss p { margin: 0 0 0.3rem; }
+.fuss ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.25rem; }
+.fuss-unten { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; color: var(--text-leise); font-size: 0.92rem; border-top: 1px solid var(--band); padding-top: 1rem; }
+@media (max-width: 700px) { .fuss .innen { grid-template-columns: auto 1fr; } .fuss ul { grid-column: 1 / -1; } }
+
+/* ---------- Anrufleiste auf dem Handy ---------- */
+.anrufleiste { display: none; }
+@media (max-width: 700px) {
+  .anrufleiste { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: 1fr 1fr; border-top: var(--linie) solid var(--vordruck); background: var(--papier); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .anrufleiste a { display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.5rem; font-family: var(--schrift-titel); font-weight: 700; font-size: 1.2rem; text-decoration: none; color: var(--text); }
+  .anrufleiste a:first-child { background: var(--marke); border-right: var(--linie) solid var(--vordruck); }
+  .anrufleiste svg { width: 1.3rem; height: 1.3rem; }
+  body { padding-bottom: 3.6rem; }
+}
+
+/* ---------- Rechtstexte ---------- */
+.rechtstext { padding-block: var(--abschnitt); }
+.rechtstext > * { max-width: 46rem; }
+.rechtstext h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); margin-bottom: 1.5rem; }
+.rechtstext h2 { font-size: 1.6rem; margin: 2.25rem 0 0.6rem; }
+.rechtstext h3 { font-size: 1.25rem; margin: 1.5rem 0 0.4rem; }
+.hinweis { border: var(--linie) solid var(--stempel); background: var(--hinweis-flaeche); padding: 1rem 1.15rem; margin-bottom: 2rem; }
+.hinweis p:last-child { margin-bottom: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
