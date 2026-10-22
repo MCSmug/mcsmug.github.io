@@ -38,6 +38,15 @@
   --stern-leer: #C9D3C7;
   --hinweis-flaeche: #FDF3EC;   /* Hinweiskasten in Impressum und Datenschutz */
 
+  /* Schatten (Blatt, Fotoabzüge, Knöpfe) */
+  --schatten-blatt: 0 1px 2px rgba(23, 35, 26, 0.08), 0 18px 48px rgba(23, 35, 26, 0.10);
+  --schatten-foto: 0 2px 4px rgba(23, 35, 26, 0.12), 0 14px 30px rgba(23, 35, 26, 0.16);
+  --schatten-foto-klein: 0 2px 4px rgba(23, 35, 26, 0.12), 0 10px 22px rgba(23, 35, 26, 0.14);
+  --schatten-knopf: 0 1px 2px rgba(23, 35, 26, 0.12), 0 4px 10px rgba(23, 35, 26, 0.10);
+  --schatten-knopf-hover: 0 2px 4px rgba(23, 35, 26, 0.14), 0 8px 18px rgba(23, 35, 26, 0.12);
+  --schatten-knopf-gedrueckt: 0 1px 2px rgba(23, 35, 26, 0.12);
+  --schatten-menue: 0 16px 30px rgba(23, 35, 26, 0.12);
+
   /* Schriften */
   --schrift-titel: "Barlow Condensed", "Arial Narrow", sans-serif;
   --schrift-text: "Barlow", "Segoe UI", Arial, sans-serif;
@@ -75,6 +84,7 @@ body {
   overflow-x: hidden;
 }
 img { max-width: 100%; height: auto; display: block; }
+p, li, dd, figcaption { hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 10 4 4; }
 a { color: var(--vordruck); text-decoration-thickness: 1px; text-underline-offset: 0.22em; }
 a:hover { color: var(--text); }
 ::selection { background: var(--marke); color: var(--text); }
@@ -99,7 +109,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
   max-width: var(--blatt-breite);
   margin: 0 auto;
   background: var(--papier);
-  box-shadow: 0 1px 2px rgba(23, 35, 26, 0.08), 0 18px 48px rgba(23, 35, 26, 0.10);
+  box-shadow: var(--schatten-blatt);
 }
 @media (min-width: 1300px) { .blatt { margin-block: 1.5rem 0; } }
 .innen { padding-inline: var(--rand); }
@@ -109,8 +119,8 @@ p { margin: 0 0 1em; max-width: 66ch; }
   display: block;
   font-family: var(--schrift-titel);
   font-weight: 600;
-  font-size: 0.8125rem;
-  letter-spacing: 0.09em;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--vordruck);
   line-height: 1.3;
@@ -125,11 +135,11 @@ p { margin: 0 0 1em; max-width: 66ch; }
   text-decoration: none; cursor: pointer;
   background: var(--marke); color: var(--text);
   border: var(--linie) solid var(--vordruck); border-radius: var(--radius);
-  box-shadow: 0 1px 2px rgba(23, 35, 26, 0.12), 0 4px 10px rgba(23, 35, 26, 0.10);
+  box-shadow: var(--schatten-knopf);
   transition: transform 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out;
 }
-.knopf:hover { color: var(--text); background: var(--marke-hover); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(23, 35, 26, 0.14), 0 8px 18px rgba(23, 35, 26, 0.12); }
-.knopf:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(23, 35, 26, 0.12); }
+.knopf:hover { color: var(--text); background: var(--marke-hover); transform: translateY(-1px); box-shadow: var(--schatten-knopf-hover); }
+.knopf:active { transform: translateY(0); box-shadow: var(--schatten-knopf-gedrueckt); }
 .knopf--rand { background: var(--papier); color: var(--vordruck); }
 .knopf--rand:hover { background: var(--papier); color: var(--text); }
 .knopf svg { width: 1.25em; height: 1.25em; flex: none; }
@@ -149,7 +159,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .firma-name { font-family: var(--schrift-titel); font-weight: 700; font-size: 1.45rem; line-height: 1; }
 .firma-zeile { display: block; font-family: var(--schrift-titel); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--vordruck); margin-top: 0.25rem; line-height: 1.3; }
 .navi ul { list-style: none; display: flex; gap: 1.4rem; margin: 0; padding: 0; }
-.navi a { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.08rem; color: var(--text); text-decoration: none; padding-block: 0.4rem; border-bottom: 2px solid transparent; }
+.navi a { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.08rem; color: var(--text); text-decoration: none; display: inline-block; padding-block: 0.6rem; border-bottom: 2px solid transparent; }
 .navi a:hover { border-bottom-color: var(--marke); }
 .briefkopf .knopf { min-height: 2.75rem; padding: 0.45rem 1rem; font-size: 1.1rem; }
 .menue-knopf { display: none; align-items: center; gap: 0.45rem; background: none; border: var(--linie) solid var(--vordruck); border-radius: var(--radius); padding: 0.5rem 0.75rem; font-family: var(--schrift-titel); font-weight: 600; font-size: 1.05rem; color: var(--vordruck); cursor: pointer; }
@@ -161,7 +171,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 @media (max-width: 1060px) {
   .menue-knopf { display: inline-flex; }
   .briefkopf .knopf--kopf { display: none; }
-  .navi { position: absolute; left: 0; right: 0; top: 100%; display: none; background: var(--papier); border-bottom: var(--linie) solid var(--vordruck); box-shadow: 0 16px 30px rgba(23, 35, 26, 0.12); }
+  .navi { position: absolute; left: 0; right: 0; top: 100%; display: none; background: var(--papier); border-bottom: var(--linie) solid var(--vordruck); box-shadow: var(--schatten-menue); }
   .navi.offen { display: block; }
   .navi ul { flex-direction: column; gap: 0; padding: 0.25rem var(--rand) 1rem; }
   .navi li + li { border-top: 1px solid var(--band); }
@@ -170,7 +180,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 @media (max-width: 480px) {
   .firma .kopfstempel { width: 3rem; height: 3rem; }
   .firma-name { font-size: 1.25rem; }
-  .firma-zeile { font-size: 0.72rem; }
+  .firma-zeile { font-size: 0.78rem; }
 }
 
 /* ---------- Kopfzeile des Zettels (Ort, Landkreis, Telefon) ---------- */
@@ -219,10 +229,10 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .kreuz input:checked + .kasten svg { stroke-dashoffset: 0; }
 .kreuz input:focus-visible + .kasten { outline: 3px solid var(--tinte); outline-offset: 2px; }
 .kreuz:hover .kasten { background: var(--band); }
-.kreuz-hinweis { font-size: 0.95rem; color: var(--text-leise); margin: 0.75rem 0 0; }
+.kreuz-hinweis { font-size: 1rem; color: var(--text-leise); margin: 0.75rem 0 0; }
 
 /* Fotoabzüge mit Büroklammer */
-.abzug { position: relative; margin: 0; background: var(--auf-dunkel); padding: 0.6rem 0.6rem 0.4rem; box-shadow: 0 2px 4px rgba(23, 35, 26, 0.12), 0 14px 30px rgba(23, 35, 26, 0.16); }
+.abzug { position: relative; margin: 0; background: var(--auf-dunkel); padding: 0.6rem 0.6rem 0.4rem; box-shadow: var(--schatten-foto); }
 .abzug img { width: 100%; }
 .abzug figcaption { font-family: var(--schrift-hand); color: var(--tinte); font-size: 1.15rem; line-height: 1.25; padding: 0.45rem 0.15rem 0.15rem; }
 .klammer { position: absolute; top: -1.6rem; left: 1.4rem; width: 1.3rem; height: 3.6rem; z-index: 2; }
@@ -253,7 +263,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .position-titel { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 .position p { margin: 0; color: var(--text-leise); }
 .position p a { white-space: nowrap; }
-.position .kreuz { padding: 0.3rem 0; min-height: 0; font-family: var(--schrift-titel); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vordruck); }
+.position .kreuz { padding: 0.3rem 0; min-height: 2.75rem; font-family: var(--schrift-titel); font-weight: 600; font-size: 1.1rem; color: var(--vordruck); }
 .position--neu { background: var(--schraffur); margin-inline: calc(var(--rand) * -1); padding-inline: var(--rand); }
 .stempel {
   display: inline-block; transform: rotate(-6deg);
@@ -306,7 +316,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 }
 
 /* ---------- Projekte (Anlagen mit Fotoabzügen) ---------- */
-.anlagen-blatt .abzug { box-shadow: 0 2px 4px rgba(23, 35, 26, 0.12), 0 10px 22px rgba(23, 35, 26, 0.14); border: 1px solid var(--untergrund); }
+.anlagen-blatt .abzug { box-shadow: var(--schatten-foto-klein); border: 1px solid var(--untergrund); }
 .anlagen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2.25rem, 4vw, 3.25rem) clamp(1rem, 2.5vw, 2rem); margin: 0; padding: 2rem 0 0; list-style: none; }
 .anlagen .abzug { padding: 0.55rem 0.55rem 0.35rem; }
 .anlagen .abzug img { aspect-ratio: 4 / 5; object-fit: cover; }
@@ -315,6 +325,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .anlagen li:nth-child(3n) .abzug { transform: rotate(-0.6deg); }
 .anlagen .abzug figcaption { color: var(--tinte); }
 @media (max-width: 760px) { .anlagen { grid-template-columns: 1fr 1fr; } .anlagen li:nth-child(n) .abzug { transform: rotate(0); } .anlagen li:nth-child(even) .abzug { transform: rotate(1.2deg); } .anlagen li:nth-child(odd) .abzug { transform: rotate(-1.2deg); } }
+@media (max-width: 760px) { .anlagen li:last-child:nth-child(odd) { grid-column: 1 / -1; width: 60%; justify-self: center; } }
 @media (max-width: 420px) { .anlagen .abzug figcaption { font-size: 1rem; } }
 
 /* ---------- Über uns ---------- */
@@ -333,7 +344,7 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .unterschrift { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) 8.5rem; align-items: end; gap: 1rem; border: var(--linie) solid var(--vordruck-linie); border-top: 0; padding: 0.65rem 0.9rem 0.75rem; min-height: 7.5rem; }
 .unterschrift dd { margin: 0.2rem 0 0; font-weight: 500; }
 .stempel-feld { justify-self: end; }
-.firmenstempel { display: block; width: 8rem; transform: rotate(-12deg); opacity: 0.9; margin: -1.5rem -0.4rem -0.6rem 0; }
+.firmenstempel { color: var(--vordruck); display: block; width: 8rem; transform: rotate(-12deg); opacity: 0.9; margin: -1.5rem -0.4rem -0.6rem 0; }
 @media (max-width: 860px) {
   .ausfuehrung { grid-template-columns: 1fr; }
   .ausfuehrung-fotos { grid-template-columns: 1fr 1fr; align-items: center; }
@@ -378,9 +389,9 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .kontakt-daten > div { padding: 0.65rem 0.9rem 0.75rem; }
 .kontakt-daten > div + div { border-top: var(--linie) solid var(--vordruck-linie); }
 .kontakt-daten dd { margin: 0.2rem 0 0; font-weight: 500; font-size: 1.1rem; }
-.kontakt-daten dd a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--marke); }
+.kontakt-daten dd a { display: inline-block; padding-block: 0.6rem; margin-block: -0.45rem; color: var(--text); text-decoration: underline; text-decoration-color: var(--marke); }
 .kontakt-daten dd a:hover { color: var(--vordruck); }
-.kontakt-daten .klein { font-size: 0.95rem; font-weight: 400; }
+.kontakt-daten .klein { font-size: 1rem; font-weight: 400; }
 @media (max-width: 860px) { .kontakt { grid-template-columns: 1fr; } }
 
 .formular { background: var(--papier); border: var(--linie) solid var(--vordruck-linie); }
@@ -392,27 +403,26 @@ p { margin: 0 0 1em; max-width: 66ch; }
 .field label.feldname { margin-bottom: 0.15rem; }
 .field input[type="text"], .field input[type="email"], .field input[type="tel"], .field textarea {
   display: block; width: 100%; border: 0; border-bottom: 1px dashed transparent; background: transparent; padding: 0.25rem 0;
-  font-family: var(--schrift-hand); font-size: 1.35rem; line-height: 1.35; color: var(--tinte);
+  font-family: var(--schrift-hand); font-size: 1.35rem; line-height: 1.35; color: var(--tinte); min-height: 2.75rem;
 }
 .field textarea { min-height: 6.5rem; resize: vertical; }
 .field input::placeholder, .field textarea::placeholder { font-family: var(--schrift-text); font-size: 1rem; color: var(--platzhalter-text); }
 .field input:focus, .field textarea:focus { outline: none; border-bottom-color: var(--tinte); }
-.field:focus-within { background: var(--feld-aktiv); }
+.field:focus-within { background: var(--feld-aktiv); box-shadow: inset 4px 0 0 var(--tinte); }
 .optional { font-weight: 600; text-transform: none; letter-spacing: 0.02em; color: var(--text-leise); }
 .field--gruppe { margin: 0; min-width: 0; border-width: 0 0 1px; border-style: solid; border-color: var(--vordruck-linie); }
 .field--gruppe legend { float: left; width: 100%; padding: 0; }
-.field select { width: 100%; border: 0; background: transparent; padding: 0.35rem 0; font-size: 1.05rem; color: var(--text); }
-.field select:focus { outline: none; }
+.field select { width: 100%; min-height: 2.75rem; border: 0; background: transparent; padding: 0.35rem 0; font-size: 1.05rem; color: var(--text); }
 .field .ankreuz-liste { margin-top: 0.3rem; clear: both; }
 .field .ankreuz-liste li { border: 0 !important; }
-.field .kreuz { padding: 0.35rem 0; min-height: 2.6rem; font-size: 1rem; }
+.field .kreuz { padding: 0.35rem 0; min-height: 2.75rem; font-size: 1rem; }
 .field-error { display: none; margin: 0.3rem 0 0; font-size: 0.92rem; font-weight: 600; color: var(--fehler); }
 .field.has-error .field-error { display: block; }
 .field.has-error { background: var(--fehler-flaeche); }
-.einwilligung { font-size: 0.95rem; align-items: flex-start; }
+.einwilligung { font-size: 1rem; align-items: flex-start; }
 .einwilligung .kasten { margin-top: 0.1rem; }
 .absenden { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem; }
-.form-status { margin: 0; font-size: 0.95rem; }
+.form-status { margin: 0; font-size: 1rem; }
 .form-status.is-error { color: var(--fehler); font-weight: 600; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
 #form-wrap.is-sent form { display: none; }
@@ -424,13 +434,14 @@ p { margin: 0 0 1em; max-width: 66ch; }
 }
 
 /* ---------- Fußzeile ---------- */
-.fuss { padding: 2.25rem 0 2rem; font-size: 0.98rem; position: relative; }
+.fuss { padding: 2.25rem 0 2rem; font-size: 1rem; position: relative; }
 .fuss::before { content: ""; position: absolute; left: 0; right: 0; top: 0; border-top: 2px dashed var(--vordruck); opacity: 0.55; }
 .fuss .innen { display: grid; grid-template-columns: auto 1fr auto; gap: 1.5rem 2.5rem; align-items: start; }
 .fuss img { width: 3.6rem; }
 .fuss p { margin: 0 0 0.3rem; }
 .fuss ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.25rem; }
-.fuss-unten { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; color: var(--text-leise); font-size: 0.92rem; border-top: 1px solid var(--band); padding-top: 1rem; }
+.fuss ul a { display: inline-block; padding-block: 0.65rem; margin-block: -0.65rem; }
+.fuss-unten { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; color: var(--text-leise); font-size: 0.95rem; border-top: 1px solid var(--band); padding-top: 1rem; }
 @media (max-width: 700px) { .fuss .innen { grid-template-columns: auto 1fr; } .fuss ul { grid-column: 1 / -1; } }
 
 /* ---------- Anrufleiste auf dem Handy ---------- */
