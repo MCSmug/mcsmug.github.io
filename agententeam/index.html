@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>ServiceNow Agententeam</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: Kopfzeile, Regel-Schalter, Harness-Band, 5 Bereichs-Spalten (auf dem Handy aufklappbar), Wissensbasis-Leiste */
+:root{
+  --bg:#f7f5f0; --surface:#ffffff; --ink:#14211c; --muted:#5b6862; --line:#dcd8cf;
+  --deep:#12261f; --deep-ink:#f4f1ea; --deep-muted:#9db3a9;
+  --accent:#e8651a; --accent-ink:#ffffff;
+  --ok:#2f8a57;
+  --font-display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --font-body:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1512; --surface:#16231e; --ink:#eee9df; --muted:#9db0a6; --line:#27382f;
+  --deep:#08100d; --deep-ink:#f1ede3; --deep-muted:#8fa79b;
+  --accent:#ff7a2e; --accent-ink:#111; --ok:#4cc48a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1512; --surface:#16231e; --ink:#eee9df; --muted:#9db0a6; --line:#27382f;
+  --deep:#08100d; --deep-ink:#f1ede3; --deep-muted:#8fa79b;
+  --accent:#ff7a2e; --accent-ink:#111; --ok:#4cc48a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.45;
+  padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+header h1{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,7vw,56px);line-height:1;letter-spacing:-.035em;margin:0;text-wrap:balance}
+header h1 span{color:var(--accent)}
+header .sub{margin-top:10px;color:var(--muted)}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar input[type=search]{flex:1 1 200px;min-width:0;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.harness{background:var(--deep);color:var(--deep-ink);border-radius:12px;padding:18px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.harness h2{margin:2px 0 0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.harness .mono{color:var(--accent)}
+.flow{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+.step{border:1px solid #2f4a3f;border-radius:8px;padding:12px 14px;min-width:0}
+.step b{display:block;font-size:15px}
+.step small{color:var(--deep-muted)}
+.step.hot{border-color:var(--accent)}
+.step.hot b{color:var(--accent)}
+.arrow{color:var(--accent);font-family:var(--font-mono);text-align:center;line-height:1}
+.harness button.copy{align-self:start}
+@media(min-width:820px){
+  .harness{grid-template-columns:200px minmax(0,1fr)}
+  .flow{grid-template-columns:1fr auto 1fr auto 1fr;align-items:center}
+  .arrow{transform:none}
+}
+
+.areas{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:760px){.areas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1100px){.areas{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.area{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.area>summary{list-style:none;cursor:pointer;background:var(--deep);color:var(--deep-ink);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.area>summary::-webkit-details-marker{display:none}
+.area>summary .mono{color:var(--accent);display:block;margin-bottom:2px}
+.area>summary h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.area>summary::after{content:"+";font-family:var(--font-mono);font-size:20px;color:var(--accent)}
+.area[open]>summary::after{content:"–"}
+@media(min-width:1100px){.area>summary{cursor:default;pointer-events:none}.area>summary::after{content:""}}
+
+.agent{padding:14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;min-width:0}
+.agent:first-of-type{border-top:0}
+.agent h4{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.agent h4::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.agent p{margin:0;color:var(--muted);font-size:13.5px}
+.agent .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+button{font:inherit;cursor:pointer}
+button.copy{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;min-height:40px}
+button.copy.done{background:var(--ok);color:#fff}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;min-height:40px}
+pre.prompt{margin:6px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-family:var(--font-mono);font-size:11.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto}
+.agent[hidden]{display:none}
+
+.kb{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.kb h2{margin:2px 0 6px;font-size:26px;font-weight:800;letter-spacing:-.025em}
+.kb .mono{color:var(--accent)}
+.kb p{margin:0;color:var(--muted);font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:7px 10px;background:var(--bg);display:flex;gap:7px;align-items:center}
+.chip i{font-style:normal;color:var(--accent);font-size:10px}
+@media(min-width:820px){.kb{grid-template-columns:260px minmax(0,1fr)}}
+.note{font-size:12.5px;color:var(--muted)}
+.empty{padding:14px 16px;color:var(--muted);font-size:13px}
+@media(prefers-reduced-motion:no-preference){button{transition:background .15s}}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mono" style="color:var(--muted);margin-bottom:10px">Als ServiceNow Solution Architect</div>
+    <h1>Mein ServiceNow-Agententeam<span>.</span></h1>
+    <div class="sub">Ich führe. Die Agenten arbeiten. Prompt kopieren, in Claude einfügen, Ergebnis prüfen.</div>
+  </header>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="Agent suchen, z. B. ACL, Handover, Fit-Gap" aria-label="Agent suchen">
+    <label class="toggle" for="rules"><input type="checkbox" id="rules" checked> Regelblock voranstellen</label>
+  </div>
+
+  <section class="harness" aria-label="KI prüft KI">
+    <div>
+      <div class="mono">Harness</div>
+      <h2>KI prüft KI.</h2>
+    </div>
+    <div style="display:grid;gap:12px;min-width:0">
+      <div class="flow">
+        <div class="step"><b>1 · Claude erstellt</b><small>Erstentwurf aus Agent-Prompt</small></div>
+        <div class="arrow">→</div>
+        <div class="step"><b>2 · Review-Agent prüft</b><small>Neuer Chat, eigene Checkliste</small></div>
+        <div class="arrow">→</div>
+        <div class="step hot"><b>3 · Ich gebe frei</b><small>Erst dann zum Kunden</small></div>
+      </div>
+      <div><button class="copy" data-id="review">Review-Prompt kopieren</button></div>
+    </div>
+  </section>
+
+  <div class="areas" id="areas"></div>
+
+  <section class="kb" aria-label="Wissensbasis">
+    <div>
+      <div class="mono">Markdown · Projektdateien</div>
+      <h2>Wissensbasis</h2>
+      <p>Mein eigenes Wissen, sauber strukturiert. Keine Kundendaten, nur anonymisierte Inhalte.</p>
+    </div>
+    <div class="chips" id="chips"></div>
+  </section>
+  <p class="note">Das Dashboard hat keine Verbindung zu ServiceNow oder Kundensystemen. Es enthält nur Prompts und Struktur.</p>
+</div>
+
+<script>
+const RULES = "Rahmenbedingungen:\n- Ich gebe dir nur anonymisierte Inhalte. Keine Kundennamen, Zugangsdaten oder personenbezogene Daten.\n- Keine direkte Anbindung an die Instanz: Du arbeitest nur mit dem, was ich dir einfüge.\n- Antworte auf Deutsch. Namen, Titel, Beschreibungen und Code-Kommentare für die ServiceNow-Instanz auf Englisch.\n- Ordne ServiceNow-Fachbegriffe kurz ein.\n- Trenne klar zwischen gesichertem Wissen und Annahmen und frag nach, wenn eine Angabe fehlt.\n\n";
+
+const AREAS = [
+ {k:"Analyse & Design", agents:[
+  {n:"Fit-Gap-Agent", d:"Anforderung gegen OOTB prüfen: passt, Lücke oder Eigenbau.",
+   p:"Du bist mein Fit-Gap-Agent für ServiceNow.\nAufgabe: Prüfe die folgenden Anforderungen gegen den OOTB-Funktionsumfang.\nAusgabe als Tabelle: Anforderung | OOTB abgedeckt (ja/teilweise/nein) | Konfiguration oder Custom | Aufwand grob (S/M/L) | Risiko.\nAm Ende: die 3 Anforderungen, die am meisten Rückfragen brauchen.\n\nAnforderungen:\n[HIER EINFÜGEN]"},
+  {n:"Solution-Design-Agent", d:"Aus Workshop-Notizen ein Lösungsdesign mit Komponenten ableiten.",
+   p:"Du bist mein Solution-Design-Agent für ServiceNow.\nAus den Notizen unten: Leite ein Lösungsdesign ab mit\n1. Ziel und Scope\n2. Komponenten-Mapping (Tabellen, Flows, Business Rules, Catalog Items, ACLs)\n3. Datenmodell-Auswirkungen (CMDB/CSDM)\n4. Offene Fragen an den Kunden\nHalte dich an OOTB vor Custom.\n\nNotizen:\n[HIER EINFÜGEN]"},
+  {n:"Optionen-Agent", d:"2–3 Lösungswege mit Empfehlung und Trade-offs vergleichen.",
+   p:"Du bist mein Optionen-Agent.\nEntwickle für das folgende Problem 2–3 Lösungsoptionen in ServiceNow.\nJe Option: Beschreibung, Vorteile, Nachteile, Aufwand, Wartbarkeit, Upgrade-Risiko.\nGib danach eine klare Empfehlung mit Begründung in maximal 5 Sätzen.\n\nProblem:\n[HIER EINFÜGEN]"},
+  {n:"Risiko-Agent", d:"Risiken, Annahmen und Abhängigkeiten eines Designs aufdecken.",
+   p:"Du bist mein Risiko-Agent. Lies das Design unten kritisch.\nListe Risiken nach Eintrittswahrscheinlichkeit und Auswirkung, versteckte Annahmen, Abhängigkeiten zu anderen Teams oder Plugins und Punkte, die in der Umsetzung teuer werden könnten.\nSchlage je Risiko eine Gegenmaßnahme vor.\n\nDesign:\n[HIER EINFÜGEN]"}
+ ]},
+ {k:"Umsetzung", agents:[
+  {n:"Script-Review-Agent", d:"Business Rules, Client Scripts, Script Includes, ACLs prüfen.",
+   p:"Du bist mein Script-Review-Agent für ServiceNow.\nPrüfe das Skript auf: Performance (GlideRecord in Schleifen, fehlende Limits), Security (ACL-Umgehung, Injection), Best Practices (Scoped Apps, gs.info statt gs.log, keine hardcodierten sys_ids), Lesbarkeit.\nAusgabe: Findings nach Schweregrad (hoch/mittel/niedrig) mit konkretem Fix. Danach die verbesserte Version mit englischen Kommentaren.\n\nSkript und Kontext (Tabelle, Trigger):\n[HIER EINFÜGEN]"},
+  {n:"Build-Agent", d:"Aus einer Spezifikation Code und Konfiguration bauen.",
+   p:"Du bist mein Build-Agent für ServiceNow.\nSetze die Spezifikation um. Liefere den Code und erkläre, was die einzelnen Teile machen. Gib an, wo es konfiguriert wird (Tabelle, Typ, Reihenfolge, Condition). Alle Namen und Kommentare auf Englisch.\nAm Ende: eine kurze Testanleitung mit 3 Testfällen.\n\nSpezifikation:\n[HIER EINFÜGEN]"},
+  {n:"Debug-Agent", d:"Fehler, Logs und unerwartetes Verhalten systematisch eingrenzen.",
+   p:"Du bist mein Debug-Agent für ServiceNow.\nAnalysiere das Problem. Nenne die 3 wahrscheinlichsten Ursachen mit je einem schnellen Test, um sie zu bestätigen oder auszuschließen (z. B. Script Debugger, Session Log, Flow-Kontext, ACL-Debugging). Beginne mit dem billigsten Test.\n\nSymptom, Logauszug, Konfiguration:\n[HIER EINFÜGEN]"},
+  {n:"Update-Set-Prüfer", d:"Transport vorab prüfen: Reihenfolge, Abhängigkeiten, Kollisionen.",
+   p:"Du bist mein Update-Set-Prüfer.\nPrüfe die Liste der Änderungen unten vor dem Transport: Abhängigkeiten, die vorher übertragen werden müssen, mögliche Kollisionen, instanzspezifische Werte (sys_ids, URLs, Properties), fehlende Daten (z. B. Choices, Roles) und die empfohlene Transportreihenfolge.\nAusgabe als Checkliste.\n\nÄnderungen:\n[HIER EINFÜGEN]"}
+ ]},
+ {k:"Now Assist & KI", agents:[
+  {n:"Architekt: Skill oder Agent?", d:"OOTB-Check und Wahl: Skill, NASK, AI Agent, Agentic Workflow.",
+   p:"Du bist mein Now-Assist-Architekt.\nBewerte den Use Case: 1. Gibt es OOTB etwas Passendes? 2. Reicht ein einzelner Skill (OOTB oder NASK) oder braucht es einen AI Agent bzw. Agentic Workflow? 3. Welche Tools und Datenquellen sind nötig? 4. Guardrails und Risiken. 5. Grobe Aufwandsschätzung mit Annahmen.\nBegründe die Empfehlung knapp.\n\nUse Case:\n[HIER EINFÜGEN]"},
+  {n:"Prompt-Tuning-Agent", d:"Skill-Prompts verbessern, wenn Output kippt oder zu lang ist.",
+   p:"Du bist mein Prompt-Tuning-Agent für Now Assist.\nHier ist der aktuelle Prompt und ein schlechtes Beispiel-Ergebnis (anonymisiert). Finde die Ursache, schlage einen verbesserten Prompt vor (klare Rolle, Format, Grenzen, Few-Shot falls nötig) und nenne 3 Testeingaben, mit denen ich die Verbesserung prüfe.\n\nPrompt:\n[HIER EINFÜGEN]\n\nSchlechtes Ergebnis:\n[HIER EINFÜGEN]"},
+  {n:"Testmatrix-Agent", d:"Testfälle für Skills und Agents, inklusive Randfälle.",
+   p:"Du bist mein Testmatrix-Agent für Now Assist.\nErstelle eine Testmatrix für die Lösung unten: Normalfälle, Randfälle, leere oder widersprüchliche Eingaben, Prompt-Injection-Versuche, mehrsprachige Eingaben.\nSpalten: ID | Eingabe | Erwartetes Verhalten | Prüfpunkt | Priorität.\n\nLösung:\n[HIER EINFÜGEN]"},
+  {n:"Guardrail-Agent", d:"Grenzen, Datenschutz und Fehlverhalten einer KI-Lösung absichern.",
+   p:"Du bist mein Guardrail-Agent.\nPrüfe die KI-Lösung unten auf: Datenabfluss, Zugriff über ACLs, Halluzinationsrisiko, Eskalationspfade zum Menschen, Protokollierung. Schlage konkrete Guardrails vor, die sich in ServiceNow umsetzen lassen, und markiere, was beim Kunden entschieden werden muss.\n\nLösung:\n[HIER EINFÜGEN]"}
+ ]},
+ {k:"Doku & Handover", agents:[
+  {n:"Handover-Agent", d:"Übergabedokument aus Projektnotizen strukturieren.",
+   p:"Du bist mein Handover-Agent.\nErstelle aus den Notizen ein Übergabedokument: Überblick, Architektur, Konfiguration je Bereich, Integrationen, Betrieb und Monitoring, bekannte Einschränkungen, Scope-Ausschlüsse, offene Punkte.\nSchreibe sachlich und so, dass ein Betriebsteam ohne Rückfragen arbeiten kann.\n\nNotizen:\n[HIER EINFÜGEN]"},
+  {n:"Konzept-Agent", d:"Technisches Konzept oder Solution-Design-Dokument schreiben.",
+   p:"Du bist mein Konzept-Agent.\nSchreibe aus der Vorlage unten ein technisches Konzept mit: Ausgangslage, Zielbild, Lösungsarchitektur, Komponenten, Datenmodell, Sicherheit, Migration und Betrieb, Risiken, Entscheidungen mit Begründung.\nKennzeichne Lücken als [OFFEN], statt sie zu erfinden.\n\nInput:\n[HIER EINFÜGEN]"},
+  {n:"UAT-Testfall-Agent", d:"Abnahme-Testfälle aus Anforderungen ableiten.",
+   p:"Du bist mein UAT-Testfall-Agent.\nLeite aus den Anforderungen Abnahmetests ab. Je Testfall: ID, Vorbedingung, Schritte, erwartetes Ergebnis, Rolle des Testers. Schreibe in einfacher Sprache für Fachanwender. Ergänze am Ende negative Tests.\n\nAnforderungen:\n[HIER EINFÜGEN]"},
+  {n:"Release-Notes-Agent", d:"Änderungen in verständliche Release Notes verwandeln.",
+   p:"Du bist mein Release-Notes-Agent.\nFasse die technischen Änderungen unten als Release Notes zusammen: Neu, Geändert, Behoben, Bekannte Einschränkungen. Jede Zeile in einem Satz, aus Sicht der Anwender. Technische Details nur in einem separaten Abschnitt für Admins.\n\nÄnderungen:\n[HIER EINFÜGEN]"}
+ ]},
+ {k:"Organisation", agents:[
+  {n:"Termin-Agent", d:"Kundentermin vorbereiten: Ziel, Agenda, Fragen, Risiken.",
+   p:"Du bist mein Termin-Agent.\nBereite den Termin vor: Ziel, Agenda mit Zeitplan, Fragenliste (priorisiert), Risiken und mögliche Widerstände, Gesprächsleitfaden, was ich unbedingt mitnehmen muss.\n\nTermin und Kontext:\n[HIER EINFÜGEN]"},
+  {n:"Meeting-Agent", d:"Notizen in Protokoll, Entscheidungen und Aufgaben verwandeln.",
+   p:"Du bist mein Meeting-Agent.\nMache aus meiner Mitschrift ein Protokoll: Entscheidungen, Aufgaben (Wer, Was, Bis wann), offene Punkte. Danach eine kurze Follow-up-Mail an die Teilnehmer.\n\nMitschrift:\n[HIER EINFÜGEN]"},
+  {n:"Pre-Sales-Agent", d:"Anfrage strukturieren, Aufwand mit Annahmen und Puffer schätzen.",
+   p:"Du bist mein Pre-Sales-Agent.\nStrukturiere die Kundenanfrage, schätze den Aufwand je Baustein in Personentagen mit Annahmen, Risiken und Puffer. Nenne Ausschlüsse, Lizenzhinweise und einen Phasenplan. Markiere, was noch geklärt werden muss, bevor ein Festpreis möglich ist.\n\nAnfrage:\n[HIER EINFÜGEN]"},
+  {n:"Zertifizierungs-Coach", d:"Lernplan und Übungsfragen für ServiceNow-Prüfungen.",
+   p:"Du bist mein Zertifizierungs-Coach.\nZiel-Prüfung: [HIER EINFÜGEN]. Prüfe mein Wissen mit 5 Szenariofragen, eine nach der anderen. Nach jeder Antwort: richtig oder falsch, kurze Erklärung, und wo ich nacharbeiten sollte. Am Ende ein Lernplan für schwache Bereiche."}
+ ]}
+];
+const REVIEW = "Du bist mein unabhängiger Review-Agent. Du hast diese Ausgabe nicht erstellt.\nPrüfe sie kritisch gegen diese Checkliste: 1. Fachlich korrekt für ServiceNow (keine erfundenen Felder, Tabellen oder Funktionen)? 2. Best Practices (OOTB vor Custom, Upgrade-sicher, Scoped)? 3. Performance und Security? 4. Widersprüche oder Annahmen ohne Beleg? 5. Fehlt etwas Wichtiges?\nAusgabe: Findings nach Schweregrad, dann ein Urteil (freigeben / nachbessern) mit Begründung.\n\nZu prüfende Ausgabe:\n[HIER EINFÜGEN]";
+const KB = ["Namenskonventionen","Coding-Guidelines","Prompt-Sammlung","Architektur-Patterns","Handover-Vorlage","Konzept-Vorlage","Testfall-Vorlagen","Angebotsbausteine","Lessons Learned","Zertifizierungs-Notizen"];
+
+const store = {};
+try{ store.rules = localStorage.getItem('sn-rules'); }catch(e){}
+const rulesEl = document.getElementById('rules');
+if(store.rules==='0') rulesEl.checked=false;
+rulesEl.addEventListener('change',()=>{ try{localStorage.setItem('sn-rules',rulesEl.checked?'1':'0')}catch(e){} });
+
+const prompts = {review: REVIEW};
+const areasEl = document.getElementById('areas');
+const wide = window.matchMedia('(min-width:1100px)').matches;
+AREAS.forEach((a,ai)=>{
+  const det = document.createElement('details');
+  det.className='area'; det.open = wide || ai===0;
+  const sum = document.createElement('summary');
+  sum.innerHTML = '<div><span class="mono">0'+(ai+1)+'</span><h3></h3></div>';
+  sum.querySelector('h3').textContent = a.k;
+  det.appendChild(sum);
+  a.agents.forEach((g,gi)=>{
+    const id = 'a'+ai+'_'+gi; prompts[id]=g.p;
+    const el = document.createElement('div'); el.className='agent';
+    el.dataset.search = (g.n+' '+g.d+' '+g.p).toLowerCase();
+    el.innerHTML = '<h4></h4><p></p><div class="row"><button class="copy" data-id="'+id+'">Prompt kopieren</button><button class="ghost" data-view="'+id+'" aria-expanded="false">Ansehen</button></div>';
+    el.querySelector('h4').textContent=g.n; el.querySelector('p').textContent=g.d;
+    det.appendChild(el);
+  });
+  areasEl.appendChild(det);
+});
+const chips = document.getElementById('chips');
+KB.forEach(t=>{const c=document.createElement('span');c.className='chip';c.innerHTML='<i>.md</i>';c.append(t);chips.appendChild(c);});
+
+function fullText(id){ return (rulesEl.checked?RULES:'') + prompts[id]; }
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
+  const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select(); let ok=false; try{ok=document.execCommand('copy')}catch(e){}
+  ta.remove(); return ok;
+}
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('button'); if(!b) return;
+  if(b.dataset.id){
+    const ok=await copyText(fullText(b.dataset.id));
+    const old=b.textContent; b.textContent= ok?'Kopiert':'Nicht möglich, bitte Ansehen nutzen'; b.classList.toggle('done',ok);
+    setTimeout(()=>{b.textContent=old;b.classList.remove('done')},1600);
+  } else if(b.dataset.view){
+    const agent=b.closest('.agent'); let pre=agent.querySelector('pre');
+    if(pre){pre.remove(); b.textContent='Ansehen'; b.setAttribute('aria-expanded','false');}
+    else{pre=document.createElement('pre'); pre.className='prompt'; pre.textContent=fullText(b.dataset.view); agent.appendChild(pre); b.textContent='Ausblenden'; b.setAttribute('aria-expanded','true');}
+  }
+});
+document.getElementById('q').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.area').forEach(area=>{
+    let n=0;
+    area.querySelectorAll('.agent').forEach(a=>{const m=!q||a.dataset.search.includes(q);a.hidden=!m;if(m)n++;});
+    area.hidden = q && n===0;
+    if(q && n>0) area.open=true;
+  });
+});
+</script>
+</body>
+</html>
