@@ -24,7 +24,12 @@ export function Login() {
     })
     setBusy(false)
     if (error) {
-      setError('Die E-Mail konnte nicht gesendet werden. Bitte Adresse prüfen und später noch einmal versuchen.')
+      // Supabase's built-in mail service only sends a few mails per hour.
+      setError(
+        error.status === 429
+          ? 'Es wurden gerade zu viele Anmelde-Mails angefordert. Bitte in etwa einer Stunde noch einmal versuchen – oder den Link aus der letzten E-Mail verwenden.'
+          : 'Die E-Mail konnte nicht gesendet werden. Bitte Adresse prüfen und später noch einmal versuchen.',
+      )
     } else {
       setSentTo(address)
     }
