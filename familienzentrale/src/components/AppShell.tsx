@@ -31,7 +31,7 @@ export function AppShell() {
         </NavLink>
       </header>
 
-      <main className="flex-1 px-5 pt-3 pb-28">
+      <main className={`flex-1 px-5 pt-3 ${wide ? 'pb-28 md:pb-20' : 'pb-28'}`}>
         <Outlet />
       </main>
 

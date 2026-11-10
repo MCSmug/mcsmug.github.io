@@ -4,11 +4,14 @@ import { personColor } from '../lib/colors'
 import { addDays, formatTime, formatWeekdayLong, formatWeekdayShort, isSameDay } from '../lib/dates'
 import type { CalendarEvent, Member } from '../lib/types'
 
-const HOUR_HEIGHT = 52
+// The grid shows this part of the day without scrolling; the rest is reachable by scrolling.
+const VISIBLE_FROM_HOUR = 7
+const VISIBLE_HOURS = 14
+const MIN_HOUR_HEIGHT = 36
+const DEFAULT_HOUR_HEIGHT = 52
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 const MIN_VISUAL_MINUTES = 30
 const DAY_MINUTES = 24 * 60
-const SCROLL_TO_HOUR = 7
 
 interface Props {
   days: Date[]
@@ -84,9 +87,26 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   const scroller = useRef<HTMLDivElement>(null)
   const now = useNow()
 
+  const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT)
+
+  // Size the hours so that the usual part of the day fills the available height.
   useEffect(() => {
-    scroller.current?.scrollTo({ top: SCROLL_TO_HOUR * HOUR_HEIGHT })
+    const element = scroller.current
+    if (!element) return
+    const measure = () => setHourHeight(Math.max(MIN_HOUR_HEIGHT, element.clientHeight / VISIBLE_HOURS))
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => observer.disconnect()
   }, [])
+
+  // Start at 7:00, or earlier when this week has an earlier appointment.
+  const firstHour = events
+    .filter((e) => !isAllDayLike(e))
+    .reduce((hour, e) => Math.min(hour, new Date(e.starts_at).getHours()), VISIBLE_FROM_HOUR)
+  useEffect(() => {
+    scroller.current?.scrollTo({ top: firstHour * hourHeight })
+  }, [firstHour, hourHeight])
 
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter(isAllDayLike)
@@ -94,7 +114,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
 
   function slotClick(day: Date, e: MouseEvent<HTMLDivElement>) {
     const y = e.clientY - e.currentTarget.getBoundingClientRect().top
-    const minutes = Math.min(DAY_MINUTES - 30, Math.max(0, Math.floor((y / HOUR_HEIGHT) * 2) * 30))
+    const minutes = Math.min(DAY_MINUTES - 30, Math.max(0, Math.floor((y / hourHeight) * 2) * 30))
     onSlotClick(new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, minutes))
   }
 
@@ -154,13 +174,13 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
 
       {/* Time grid */}
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
-        <div className={`${columns} relative`} style={{ height: HOUR_HEIGHT * 24 }}>
+        <div className={`${columns} relative`} style={{ height: hourHeight * 24 }}>
           <div className="relative">
             {HOURS.slice(1).map((hour) => (
               <span
                 key={hour}
                 className="absolute right-2 -translate-y-1/2 text-xs text-muted"
-                style={{ top: hour * HOUR_HEIGHT }}
+                style={{ top: hour * hourHeight }}
               >
                 {String(hour).padStart(2, '0')}:00
               </span>
@@ -177,12 +197,12 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                 className={`relative cursor-pointer border-l border-line ${isToday ? 'bg-bg/60' : ''}`}
                 style={{
                   backgroundImage: 'linear-gradient(to bottom, var(--color-line) 1px, transparent 1px)',
-                  backgroundSize: `100% ${HOUR_HEIGHT}px`,
+                  backgroundSize: `100% ${hourHeight}px`,
                 }}
               >
                 {layoutDay(events, day).map(({ event, start, end, column, columns: count }) => {
                   const member = memberOf(event)
-                  const height = ((end - start) / 60) * HOUR_HEIGHT - 2
+                  const height = ((end - start) / 60) * hourHeight - 2
                   return (
                     <button
                       key={event.id}
@@ -193,7 +213,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                       }}
                       className="absolute overflow-hidden rounded-lg border border-white px-1.5 py-0.5 text-left text-white"
                       style={{
-                        top: (start / 60) * HOUR_HEIGHT + 1,
+                        top: (start / 60) * hourHeight + 1,
                         height,
                         left: `calc(${(column / count) * 100}% + 2px)`,
                         width: `calc(${100 / count}% - 4px)`,
@@ -215,7 +235,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                   <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-danger"
-                    style={{ top: (nowMinutes / 60) * HOUR_HEIGHT }}
+                    style={{ top: (nowMinutes / 60) * hourHeight }}
                   >
                     <span className="absolute -top-[5px] -left-1 size-2 rounded-full bg-danger" />
                   </div>

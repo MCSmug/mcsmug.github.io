@@ -1,5 +1,5 @@
 import { Camera, ChevronLeft, ChevronRight, LoaderCircle, Plus } from 'lucide-react'
-import { useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 
 import { EventDialog } from '../components/EventDialog'
 import { PhotoImportDialog } from '../components/PhotoImportDialog'
@@ -14,6 +14,7 @@ import {
   formatTime,
   formatWeekRange,
   formatWeekdayLong,
+  formatWeekdayShort,
   isSameDay,
   isoWeek,
   startOfDay,
@@ -101,12 +102,25 @@ export function Calendar() {
   const memberById = new Map(members.map((m) => [m.id, m]))
   const showsToday = today >= weekStart && today < weekEnd
 
+  // Phone list: jump to a day, and open on today instead of on Monday.
+  const dayId = (day: Date) => `day-${day.getTime()}`
+  const scrollToDay = (day: Date, smooth = true) =>
+    document.getElementById(dayId(day))?.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' })
+  const todayTime = today.getTime()
+  useEffect(() => {
+    if (!loading && showsToday) {
+      document.getElementById(`day-${todayTime}`)?.scrollIntoView({ block: 'start' })
+    }
+    // Only when a week has finished loading, not on every realtime update.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, weekStart])
+
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div className="basis-full sm:basis-auto sm:flex-1">
-          <h1 className="font-display text-3xl font-bold">Woche {isoWeek(weekStart)}</h1>
-          <p className="text-muted">{formatWeekRange(weekStart)}</p>
+      <div className="mb-3 flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-display text-2xl font-bold sm:text-3xl">Woche {isoWeek(weekStart)}</h1>
+          <p className="truncate text-sm text-muted sm:text-base">{formatWeekRange(weekStart)}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -117,7 +131,12 @@ export function Calendar() {
           >
             <ChevronLeft size={22} />
           </Button>
-          <Button variant="secondary" disabled={showsToday} onClick={() => setWeekStart(startOfWeek(today))}>
+          <Button
+            variant="secondary"
+            disabled={showsToday}
+            className={showsToday ? 'hidden sm:inline-flex' : ''}
+            onClick={() => setWeekStart(startOfWeek(today))}
+          >
             Heute
           </Button>
           <Button
@@ -137,28 +156,51 @@ export function Calendar() {
         </div>
       )}
 
-      <div className={`grid gap-3 md:hidden ${loading ? 'opacity-60' : ''}`}>
+      {/* Phone: week strip to jump between days, then the days as a list */}
+      <nav
+        aria-label="Wochentage"
+        className="sticky top-0 z-10 -mx-5 mb-3 grid grid-cols-7 gap-1 bg-bg px-5 py-2 md:hidden"
+      >
+        {days.map((day) => {
+          const isToday = isSameDay(day, today)
+          const count = eventsOfDay(events, day).length
+          return (
+            <button
+              key={day.getTime()}
+              type="button"
+              aria-label={`${formatWeekdayLong(day)}, ${count} Termine`}
+              onClick={() => scrollToDay(day)}
+              className={`flex min-h-14 flex-col items-center justify-center rounded-2xl border ${
+                isToday ? 'border-ink bg-ink text-white' : 'border-line bg-card'
+              }`}
+            >
+              <span className="text-[11px] font-semibold uppercase opacity-80">{formatWeekdayShort(day)}</span>
+              <span className="font-display text-lg leading-tight font-bold">{day.getDate()}</span>
+              <span
+                className={`size-1.5 rounded-full ${count === 0 ? 'invisible' : isToday ? 'bg-white' : 'bg-ink'}`}
+              />
+            </button>
+          )
+        })}
+      </nav>
+
+      <div className={`grid gap-2 md:hidden ${loading ? 'opacity-60' : ''}`}>
         {days.map((day) => {
           const isToday = isSameDay(day, today)
           const dayEvents = eventsOfDay(events, day)
           return (
             <section
               key={day.getTime()}
+              id={dayId(day)}
               aria-label={formatWeekdayLong(day)}
-              className={`flex flex-col gap-2 rounded-3xl border bg-card p-3 ${
-                isToday ? 'border-ink' : 'border-line'
-              }`}
+              className={`flex scroll-mt-20 flex-col gap-2 rounded-3xl border bg-card px-3 ${
+                dayEvents.length > 0 ? 'pb-3' : ''
+              } ${isToday ? 'border-ink' : 'border-line'}`}
             >
               <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2">
-                  <span
-                    className={`flex size-10 items-center justify-center rounded-full font-display text-lg font-bold ${
-                      isToday ? 'bg-ink text-white' : ''
-                    }`}
-                  >
-                    {day.getDate()}
-                  </span>
-                  <span className="font-semibold">{formatWeekdayLong(day)}</span>
+                <h2 className={`font-semibold ${dayEvents.length === 0 && !isToday ? 'text-muted' : ''}`}>
+                  {formatWeekdayLong(day)}, {day.getDate()}.
+                  {dayEvents.length === 0 && <span className="font-normal"> · frei</span>}
                 </h2>
                 <button
                   type="button"
@@ -183,7 +225,7 @@ export function Calendar() {
         })}
       </div>
 
-      <div className={`hidden h-[calc(100dvh-15.5rem)] min-h-96 md:block ${loading ? 'opacity-60' : ''}`}>
+      <div className={`hidden h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] min-h-80 md:block ${loading ? 'opacity-60' : ''}`}>
         <WeekGrid
           days={days}
           events={events}
