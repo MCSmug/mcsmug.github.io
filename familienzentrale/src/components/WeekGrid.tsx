@@ -117,35 +117,31 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
     return () => observer.disconnect()
   }, [dayCount])
 
-  // Start at 7:00, or earlier when one of the visible days has an earlier appointment.
-  const firstHour = events
+  // Where the grid opens, so that nobody has to scroll first:
+  // - today visible: one hour before now (shows the current time and what comes next)
+  // - other days: one hour before their first appointment, or 7:00 when there is none
+  const firstEventHour = events
     .filter((e) => !isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
-    .reduce((hour, e) => {
+    .reduce<number | null>((hour, e) => {
       const start = new Date(e.starts_at)
       // An event that began on an earlier day does not count as an early start.
-      return start < days[0] ? hour : Math.min(hour, start.getHours())
-    }, VISIBLE_FROM_HOUR)
-  // Open where the day currently is: if today is shown and the current time lies outside the
-  // default window, start two hours before now. Re-applied on paging and when the hour changes.
+      if (start < days[0]) return hour
+      return hour === null ? start.getHours() : Math.min(hour, start.getHours())
+    }, null)
   const firstDay = days[0].getTime()
   const showsToday = days.some((day) => isSameDay(day, today))
   const currentHour = now.getHours()
+  const startHour = showsToday
+    ? Math.max(0, currentHour - 1)
+    : firstEventHour === null
+      ? VISIBLE_FROM_HOUR
+      : Math.max(0, firstEventHour - 1)
+  // Re-applied on paging, on resize and when the hour changes (the wall panel stays open all day).
   useEffect(() => {
     // Wait for the new row height to be laid out; iOS ignores scrolling before that.
-    const frame = requestAnimationFrame(() => {
-      const element = scroller.current
-      if (!element) return
-      let startHour = firstHour
-      if (showsToday) {
-        const visibleHours = element.clientHeight / hourHeight
-        const current = new Date()
-        const nowHour = current.getHours() + current.getMinutes() / 60
-        if (nowHour < startHour || nowHour > startHour + visibleHours - 1) startHour = Math.max(0, nowHour - 2)
-      }
-      element.scrollTo({ top: startHour * hourHeight })
-    })
+    const frame = requestAnimationFrame(() => scroller.current?.scrollTo({ top: startHour * hourHeight }))
     return () => cancelAnimationFrame(frame)
-  }, [firstHour, hourHeight, shown, firstDay, dayCount, showsToday, currentHour])
+  }, [startHour, hourHeight, shown, firstDay, dayCount])
 
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter((e) => isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
