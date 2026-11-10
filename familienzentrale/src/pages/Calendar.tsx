@@ -12,7 +12,7 @@ import { personColor } from '../lib/colors'
 import { extractEventsFromPhoto, type PhotoResult } from '../lib/photoEvents'
 import {
   addDays,
-  formatDayRange,
+  formatDayRangeShort,
   formatTime,
   formatWeekRange,
   formatWeekdayLong,
@@ -166,9 +166,9 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
     <div className={showGrid ? 'flex h-full flex-col' : 'pb-24'}>
       <div className="mb-3 flex shrink-0 items-center gap-3">
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-xl font-bold whitespace-nowrap sm:text-3xl">
+          <h1 className="truncate font-display text-xl font-bold sm:text-3xl">
             {threeDays ? (
-              formatDayRange(anchor, addDays(anchor, 2))
+              formatDayRangeShort(anchor, addDays(anchor, 2))
             ) : (
               <>
                 <span className="sm:hidden">KW</span>

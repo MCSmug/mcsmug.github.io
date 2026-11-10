@@ -58,6 +58,14 @@ export function formatDayRange(start: Date, end: Date): string {
   return `${dayMonth.format(start)} – ${dayMonthYear.format(end)}`
 }
 
+const dayOnly = new Intl.DateTimeFormat('de-DE', { day: 'numeric' })
+
+/** Compact range without the year, e.g. "7. – 9. Nov." or "30. Nov. – 2. Dez." */
+export function formatDayRangeShort(start: Date, end: Date): string {
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()
+  return `${sameMonth ? `${dayOnly.format(start)}.` : dayMonth.format(start)} – ${dayMonth.format(end)}`
+}
+
 export function formatWeekRange(weekStart: Date): string {
   return formatDayRange(weekStart, addDays(weekStart, 6))
 }

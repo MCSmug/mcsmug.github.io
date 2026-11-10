@@ -117,13 +117,21 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
     return () => observer.disconnect()
   }, [dayCount])
 
-  // Start at 7:00, or earlier when this week has an earlier appointment.
+  // Start at 7:00, or earlier when one of the visible days has an earlier appointment.
   const firstHour = events
-    .filter((e) => !isAllDayLike(e))
-    .reduce((hour, e) => Math.min(hour, new Date(e.starts_at).getHours()), VISIBLE_FROM_HOUR)
+    .filter((e) => !isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
+    .reduce((hour, e) => {
+      const start = new Date(e.starts_at)
+      // An event that began on an earlier day does not count as an early start.
+      return start < days[0] ? hour : Math.min(hour, start.getHours())
+    }, VISIBLE_FROM_HOUR)
+  // Also re-apply when the visible days change (paging), not only on resize.
+  const firstDay = days[0].getTime()
   useEffect(() => {
-    scroller.current?.scrollTo({ top: firstHour * hourHeight })
-  }, [firstHour, hourHeight, shown])
+    // Wait for the new row height to be laid out; iOS ignores scrolling before that.
+    const frame = requestAnimationFrame(() => scroller.current?.scrollTo({ top: firstHour * hourHeight }))
+    return () => cancelAnimationFrame(frame)
+  }, [firstHour, hourHeight, shown, firstDay, dayCount])
 
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter((e) => isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
