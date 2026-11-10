@@ -13,9 +13,10 @@ Realtime-Sync.
    oder mit der Supabase-CLI `supabase db push`.
 3. **Auth konfigurieren** (Authentication → URL Configuration): Site-URL und Redirect-URLs
    auf die App-Adresse setzen (lokal `http://localhost:5173`, später die Netlify-URL).
-4. **Optional, empfohlen für installierte PWA und Wandpanel**: In der E-Mail-Vorlage
-   „Magic Link“ zusätzlich den Code `{{ .Token }}` ausgeben. Dann kann man sich auch per
-   Code anmelden, wenn der Link im falschen Browser aufgeht.
+4. **Optional**: Login per Code statt Link. Dafür muss in Supabase ein eigener
+   Mail-Versand (SMTP) eingerichtet sein; erst dann lässt sich in den E-Mail-Vorlagen
+   „Magic Link“ und „Confirm signup“ der Code `{{ .Token }}` ergänzen. Ohne das gibt es
+   nur den Link.
 5. `.env.example` nach `.env.local` kopieren und URL + Anon-Key eintragen.
 6. `npm install`, dann `npm run dev`.
 

@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase'
 export function Login() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
+  const [showCode, setShowCode] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,26 +57,40 @@ export function Login() {
             <Mail className="mt-0.5 shrink-0 text-muted" size={22} />
             <p>
               Wir haben eine E-Mail an <strong>{sentTo}</strong> geschickt. Öffne den Link darin auf
-              diesem Gerät – oder gib den Code aus der E-Mail hier ein.
+              diesem Gerät, dann bist du angemeldet. Schau auch im Spam-Ordner nach.
             </p>
           </div>
-          <Field label="Code aus der E-Mail">
-            <TextInput
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-          </Field>
-          {error && <ErrorNote>{error}</ErrorNote>}
-          <Button type="submit" disabled={busy || !code.trim()}>
-            Anmelden
-          </Button>
+          {showCode ? (
+            <>
+              <Field label="Code aus der E-Mail">
+                <TextInput
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  autoFocus
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                />
+              </Field>
+              {error && <ErrorNote>{error}</ErrorNote>}
+              <Button type="submit" disabled={busy || !code.trim()}>
+                Anmelden
+              </Button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="min-h-12 self-start text-sm text-muted underline"
+              onClick={() => setShowCode(true)}
+            >
+              In der E-Mail steht ein Code? Hier eingeben
+            </button>
+          )}
           <Button
             variant="secondary"
             onClick={() => {
               setSentTo(null)
               setCode('')
+              setShowCode(false)
               setError(null)
             }}
           >
