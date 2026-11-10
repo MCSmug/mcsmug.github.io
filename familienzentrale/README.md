@@ -4,7 +4,7 @@ Familien-App für Wandpanel und Handys: Kalender, Aufgaben, Einkaufsliste, Kinde
 Nachrichten, Push-Erinnerungen. Projektbriefing und Fahrplan stehen in [CLAUDE.md](CLAUDE.md).
 
 **Stand:** Login per Magic Link, Familie und Mitglieder anlegen, Einkaufsliste mit
-Realtime-Sync, Wochenkalender mit eigenen Terminen.
+Realtime-Sync, Wochenkalender mit eigenen Terminen, Aufgaben mit Wiederholung, Kindermodus.
 
 ## Einrichtung
 

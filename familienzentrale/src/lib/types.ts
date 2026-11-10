@@ -39,3 +39,18 @@ export interface CalendarEvent {
   external_id: string | null
   created_at: string
 }
+
+export interface Task {
+  id: string
+  family_id: string
+  assignee_id: string
+  title: string
+  icon: string | null
+  /** YYYY-MM-DD: due day of a one-off task, first day of a recurring one. */
+  due_date: string
+  /** null, 'FREQ=DAILY' or 'FREQ=WEEKLY;BYDAY=MO,TU,...' */
+  recurrence: string | null
+  done_at: string | null
+  is_kid_task: boolean
+  created_at: string
+}

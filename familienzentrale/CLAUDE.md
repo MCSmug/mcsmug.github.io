@@ -59,7 +59,7 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 
 ## Fahrplan
 1. Setup, Auth, Familie & Mitglieder anlegen, Einkaufsliste mit Realtime-Sync — **umgesetzt**
-2. Aufgaben (inkl. Wiederholung) + Kindermodus
+2. Aufgaben (inkl. Wiederholung) + Kindermodus — **umgesetzt**
 3. Lokaler Kalender + iCal-Import + Heute-/Wochenansicht + Wandpanel
 4. Web Push: Erinnerungen und Nachrichten
 5. Feinschliff, Offline, dann Testfamilien
@@ -78,7 +78,12 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 - RLS-Helfer: `is_family_member(family_id)`, `is_family_parent(family_id)` – in neuen Tabellen wiederverwenden.
 - Schriften sind selbst gehostet (`@fontsource-variable/*`), keine Google-Fonts-Requests.
 - Tailwind v4: Design-Tokens in `src/index.css` (`@theme`).
-- Tabs „Aufgaben“ und „Familie“ sind bis Stufe 2 bzw. 4 Platzhalter.
+- Tab „Familie“ ist bis Stufe 4 ein Platzhalter.
+- Aufgaben: Abweichung vom Datenmodell – zusätzliche Tabelle `task_completions` (ein Eintrag pro
+  Aufgabe und Tag; Einträge von Kinderaufgaben sind die Sterne). `tasks.done_at` gilt nur für
+  einmalige Aufgaben. Abhaken läuft ausschließlich über die RPC `set_task_done()`.
+  Wiederholung: nur `FREQ=DAILY` und `FREQ=WEEKLY;BYDAY=…` (Logik in `src/lib/tasks.ts`).
+- Kindermodus: Route `/kinder` ohne Navigation, Bilder aus `src/lib/taskIcons.ts`.
 - Auf Wunsch vorgezogen (aus Stufe 3): lokaler Kalender. Die Startseite ist die Wochenansicht
   (Tab „Kalender“ statt „Heute“), Termine anlegen/ändern/löschen, Tabelle `events`.
   iCal-Import und Wandpanel fehlen noch.

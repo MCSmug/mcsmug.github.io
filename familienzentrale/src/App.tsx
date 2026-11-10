@@ -7,10 +7,12 @@ import { FamilyProvider, useFamilyState } from './context/family'
 import { isSupabaseConfigured } from './lib/supabase'
 import { Calendar } from './pages/Calendar'
 import { ComingSoon } from './pages/ComingSoon'
+import { Kids } from './pages/Kids'
 import { Login } from './pages/Login'
 import { Onboarding } from './pages/Onboarding'
 import { Settings } from './pages/Settings'
 import { Shopping } from './pages/Shopping'
+import { Tasks } from './pages/Tasks'
 
 function FamilyGate() {
   const { session } = useAuth()
@@ -29,12 +31,10 @@ function FamilyGate() {
 
   return (
     <Routes>
+      <Route path="kinder" element={<Kids />} />
       <Route element={<AppShell />}>
         <Route index element={<Calendar />} />
-        <Route
-          path="aufgaben"
-          element={<ComingSoon title="Aufgaben" text="Aufgaben und der Kindermodus folgen im nächsten Schritt." />}
-        />
+        <Route path="aufgaben" element={<Tasks />} />
         <Route path="einkauf" element={<Shopping />} />
         <Route
           path="familie"
