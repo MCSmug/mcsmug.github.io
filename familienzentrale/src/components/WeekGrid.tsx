@@ -125,13 +125,27 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
       // An event that began on an earlier day does not count as an early start.
       return start < days[0] ? hour : Math.min(hour, start.getHours())
     }, VISIBLE_FROM_HOUR)
-  // Also re-apply when the visible days change (paging), not only on resize.
+  // Open where the day currently is: if today is shown and the current time lies outside the
+  // default window, start two hours before now. Re-applied on paging and when the hour changes.
   const firstDay = days[0].getTime()
+  const showsToday = days.some((day) => isSameDay(day, today))
+  const currentHour = now.getHours()
   useEffect(() => {
     // Wait for the new row height to be laid out; iOS ignores scrolling before that.
-    const frame = requestAnimationFrame(() => scroller.current?.scrollTo({ top: firstHour * hourHeight }))
+    const frame = requestAnimationFrame(() => {
+      const element = scroller.current
+      if (!element) return
+      let startHour = firstHour
+      if (showsToday) {
+        const visibleHours = element.clientHeight / hourHeight
+        const current = new Date()
+        const nowHour = current.getHours() + current.getMinutes() / 60
+        if (nowHour < startHour || nowHour > startHour + visibleHours - 1) startHour = Math.max(0, nowHour - 2)
+      }
+      element.scrollTo({ top: startHour * hourHeight })
+    })
     return () => cancelAnimationFrame(frame)
-  }, [firstHour, hourHeight, shown, firstDay, dayCount])
+  }, [firstHour, hourHeight, shown, firstDay, dayCount, showsToday, currentHour])
 
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter((e) => isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
