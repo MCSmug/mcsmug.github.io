@@ -3,13 +3,13 @@
 Familien-App für Wandpanel und Handys: Kalender, Aufgaben, Einkaufsliste, Kindermodus,
 Nachrichten, Push-Erinnerungen. Projektbriefing und Fahrplan stehen in [CLAUDE.md](CLAUDE.md).
 
-**Stand: Stufe 1** – Login per Magic Link, Familie und Mitglieder anlegen, Einkaufsliste mit
-Realtime-Sync.
+**Stand:** Login per Magic Link, Familie und Mitglieder anlegen, Einkaufsliste mit
+Realtime-Sync, Wochenkalender mit eigenen Terminen.
 
 ## Einrichtung
 
 1. **Supabase-Projekt** in einer EU-Region anlegen (z. B. Frankfurt).
-2. **Migration einspielen**: Inhalt von `supabase/migrations/*.sql` im SQL-Editor ausführen
+2. **Migrationen einspielen**: Dateien unter `supabase/migrations/` der Reihe nach im SQL-Editor ausführen
    oder mit der Supabase-CLI `supabase db push`.
 3. **Auth konfigurieren** (Authentication → URL Configuration): Site-URL und Redirect-URLs
    auf die App-Adresse setzen (lokal `http://localhost:5173`, später die Netlify-URL).

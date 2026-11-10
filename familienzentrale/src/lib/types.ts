@@ -26,3 +26,16 @@ export interface ShoppingItem {
   done: boolean
   created_at: string
 }
+
+export interface CalendarEvent {
+  id: string
+  family_id: string
+  member_id: string | null
+  title: string
+  starts_at: string
+  ends_at: string
+  all_day: boolean
+  source: 'local' | 'ical'
+  external_id: string | null
+  created_at: string
+}

@@ -79,3 +79,11 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 - Schriften sind selbst gehostet (`@fontsource-variable/*`), keine Google-Fonts-Requests.
 - Tailwind v4: Design-Tokens in `src/index.css` (`@theme`).
 - Tabs „Aufgaben“ und „Familie“ sind bis Stufe 2 bzw. 4 Platzhalter.
+- Auf Wunsch vorgezogen (aus Stufe 3): lokaler Kalender. Die Startseite ist die Wochenansicht
+  (Tab „Kalender“ statt „Heute“), Termine anlegen/ändern/löschen, Tabelle `events`.
+  iCal-Import und Wandpanel fehlen noch.
+- `events.ends_at` ist exklusiv; ganztägige Termine laufen von lokaler Mitternacht bis Mitternacht.
+- Gewünscht, noch offen: Termine abfotografieren und per Bilderkennung in den Kalender übernehmen.
+- Supabase lässt E-Mail-Vorlagen nur mit eigenem SMTP ändern; Login per Code geht erst dann.
+- Deploy: Netlify-Projekt `familienzentrale-mdf4` (https://familienzentrale-mdf4.netlify.app),
+  nicht mit GitHub verknüpft, wird manuell hochgeladen.

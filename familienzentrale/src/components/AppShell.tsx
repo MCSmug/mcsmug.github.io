@@ -1,10 +1,10 @@
 import { CalendarDays, ListChecks, MessageCircle, Settings, ShoppingCart } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 import { useFamily } from '../context/family'
 
 const tabs = [
-  { to: '/', label: 'Heute', icon: CalendarDays },
+  { to: '/', label: 'Kalender', icon: CalendarDays },
   { to: '/aufgaben', label: 'Aufgaben', icon: ListChecks },
   { to: '/einkauf', label: 'Einkauf', icon: ShoppingCart },
   { to: '/familie', label: 'Familie', icon: MessageCircle },
@@ -12,9 +12,12 @@ const tabs = [
 
 export function AppShell() {
   const { family } = useFamily()
+  // The week calendar uses the full width on tablets and the wall panel.
+  const wide = useLocation().pathname === '/'
+  const width = wide ? 'max-w-7xl' : 'max-w-2xl'
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-2xl flex-col">
+    <div className={`mx-auto flex min-h-dvh flex-col ${width}`}>
       <header className="flex items-center justify-between px-5 pt-[max(1rem,env(safe-area-inset-top))]">
         <p className="font-display text-lg font-semibold">{family.name}</p>
         <NavLink

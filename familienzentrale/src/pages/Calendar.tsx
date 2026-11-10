@@ -1,0 +1,177 @@
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { useMemo, useState } from 'react'
+
+import { EventDialog } from '../components/EventDialog'
+import { Button, ErrorNote } from '../components/ui'
+import { useFamily } from '../context/family'
+import { useEvents } from '../hooks/useEvents'
+import { personColor } from '../lib/colors'
+import {
+  addDays,
+  formatTime,
+  formatWeekRange,
+  formatWeekdayLong,
+  formatWeekdayShort,
+  isSameDay,
+  isoWeek,
+  startOfDay,
+  startOfWeek,
+} from '../lib/dates'
+import type { CalendarEvent, Member } from '../lib/types'
+
+type DialogState = { event?: CalendarEvent; date: Date } | null
+
+function eventsOfDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+  const dayStart = day.getTime()
+  const dayEnd = addDays(day, 1).getTime()
+  return events
+    .filter((e) => new Date(e.starts_at).getTime() < dayEnd && new Date(e.ends_at).getTime() > dayStart)
+    .sort((a, b) => Number(b.all_day) - Number(a.all_day) || a.starts_at.localeCompare(b.starts_at))
+}
+
+function EventChip({
+  event,
+  member,
+  onClick,
+}: {
+  event: CalendarEvent
+  member: Member | undefined
+  onClick: () => void
+}) {
+  const color = personColor(member?.color)
+  const time = event.all_day
+    ? 'Ganztägig'
+    : `${formatTime(new Date(event.starts_at))} – ${formatTime(new Date(event.ends_at))}`
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex min-h-12 w-full flex-col justify-center rounded-2xl border-l-4 px-3 py-2 text-left"
+      style={{ backgroundColor: color.tint, borderColor: color.value }}
+    >
+      <span className="text-xs font-medium" style={{ color: color.value }}>
+        {time}
+        {member ? ` · ${member.name}` : ''}
+      </span>
+      <span className="font-semibold break-words">{event.title}</span>
+    </button>
+  )
+}
+
+export function Calendar() {
+  const { family, members } = useFamily()
+  const [today] = useState(() => startOfDay(new Date()))
+  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
+  const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
+  const { events, loading, error, save, remove } = useEvents(family.id, weekStart, weekEnd)
+  const [dialog, setDialog] = useState<DialogState>(null)
+
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  const memberById = new Map(members.map((m) => [m.id, m]))
+  const showsToday = today >= weekStart && today < weekEnd
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="basis-full sm:basis-auto sm:flex-1">
+          <h1 className="font-display text-3xl font-bold">Woche {isoWeek(weekStart)}</h1>
+          <p className="text-muted">{formatWeekRange(weekStart)}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            aria-label="Vorherige Woche"
+            className="px-3"
+            onClick={() => setWeekStart(addDays(weekStart, -7))}
+          >
+            <ChevronLeft size={22} />
+          </Button>
+          <Button variant="secondary" disabled={showsToday} onClick={() => setWeekStart(startOfWeek(today))}>
+            Heute
+          </Button>
+          <Button
+            variant="secondary"
+            aria-label="Nächste Woche"
+            className="px-3"
+            onClick={() => setWeekStart(addDays(weekStart, 7))}
+          >
+            <ChevronRight size={22} />
+          </Button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-4">
+          <ErrorNote>{error}</ErrorNote>
+        </div>
+      )}
+
+      <div className={`grid gap-3 lg:grid-cols-7 lg:gap-2 ${loading ? 'opacity-60' : ''}`}>
+        {days.map((day) => {
+          const isToday = isSameDay(day, today)
+          const dayEvents = eventsOfDay(events, day)
+          return (
+            <section
+              key={day.getTime()}
+              aria-label={formatWeekdayLong(day)}
+              className={`flex flex-col gap-2 rounded-3xl border bg-card p-3 lg:min-h-80 ${
+                isToday ? 'border-ink' : 'border-line'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="flex items-center gap-2">
+                  <span
+                    className={`flex size-10 items-center justify-center rounded-full font-display text-lg font-bold ${
+                      isToday ? 'bg-ink text-white' : ''
+                    }`}
+                  >
+                    {day.getDate()}
+                  </span>
+                  <span className="font-semibold lg:hidden">{formatWeekdayLong(day)}</span>
+                  <span className="hidden font-semibold lg:inline">{formatWeekdayShort(day)}</span>
+                </h2>
+                <button
+                  type="button"
+                  aria-label={`Termin am ${formatWeekdayLong(day)} hinzufügen`}
+                  onClick={() => setDialog({ date: day })}
+                  className="flex size-12 items-center justify-center rounded-full text-muted lg:size-10"
+                >
+                  <Plus size={22} />
+                </button>
+              </div>
+
+              {dayEvents.map((event) => (
+                <EventChip
+                  key={event.id}
+                  event={event}
+                  member={event.member_id ? memberById.get(event.member_id) : undefined}
+                  onClick={() => setDialog({ event, date: day })}
+                />
+              ))}
+            </section>
+          )
+        })}
+      </div>
+
+      <Button
+        aria-label="Neuer Termin"
+        onClick={() => setDialog({ date: showsToday ? today : weekStart })}
+        className="fixed right-5 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-10 size-16 !rounded-full !px-0 shadow-lg"
+      >
+        <Plus size={28} />
+      </Button>
+
+      {dialog && (
+        <EventDialog
+          event={dialog.event}
+          defaultDate={dialog.date}
+          members={members}
+          onSave={save}
+          onDelete={remove}
+          onClose={() => setDialog(null)}
+        />
+      )}
+    </>
+  )
+}

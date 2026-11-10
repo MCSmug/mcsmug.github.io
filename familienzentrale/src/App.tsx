@@ -5,12 +5,12 @@ import { Button, FullScreenMessage } from './components/ui'
 import { AuthProvider, useAuth } from './context/auth'
 import { FamilyProvider, useFamilyState } from './context/family'
 import { isSupabaseConfigured } from './lib/supabase'
+import { Calendar } from './pages/Calendar'
 import { ComingSoon } from './pages/ComingSoon'
 import { Login } from './pages/Login'
 import { Onboarding } from './pages/Onboarding'
 import { Settings } from './pages/Settings'
 import { Shopping } from './pages/Shopping'
-import { Today } from './pages/Today'
 
 function FamilyGate() {
   const { session } = useAuth()
@@ -30,7 +30,7 @@ function FamilyGate() {
   return (
     <Routes>
       <Route element={<AppShell />}>
-        <Route index element={<Today />} />
+        <Route index element={<Calendar />} />
         <Route
           path="aufgaben"
           element={<ComingSoon title="Aufgaben" text="Aufgaben und der Kindermodus folgen im nächsten Schritt." />}
