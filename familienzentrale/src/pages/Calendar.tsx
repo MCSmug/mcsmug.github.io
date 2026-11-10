@@ -81,7 +81,8 @@ function EventChip({
   )
 }
 
-export function Calendar() {
+/** `inPanel`: rendered inside the wall panel, which has its own navigation and no bottom bar. */
+export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
   const { family, me, members } = useFamily()
   const [today] = useState(() => startOfDay(new Date()))
   // The day the view is built around: its week, or the three days starting with it.
@@ -314,7 +315,9 @@ export function Calendar() {
         <div
           className={`min-h-80 ${
             isWide
-              ? 'h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))]'
+              ? inPanel
+                ? 'h-[calc(100dvh-8.5rem)]'
+                : 'h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))]'
               : 'h-[calc(100dvh-21.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))]'
           } ${loading ? 'opacity-60' : ''}`}
         >
@@ -342,14 +345,18 @@ export function Calendar() {
         aria-label="Termine abfotografieren"
         disabled={photoBusy}
         onClick={() => photoInput.current?.click()}
-        className="fixed right-5 bottom-[calc(10rem+env(safe-area-inset-bottom))] z-10 size-16 !rounded-full !px-0 shadow-lg"
+        className={`fixed right-5 z-10 size-16 !rounded-full !px-0 shadow-lg ${
+          inPanel ? 'bottom-[6.25rem]' : 'bottom-[calc(10rem+env(safe-area-inset-bottom))]'
+        }`}
       >
         {photoBusy ? <LoaderCircle size={26} className="animate-spin" /> : <Camera size={26} />}
       </Button>
       <Button
         aria-label="Neuer Termin"
         onClick={() => setDialog({ date: showsToday ? today : threeDays ? anchor : weekStart })}
-        className="fixed right-5 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-10 size-16 !rounded-full !px-0 shadow-lg"
+        className={`fixed right-5 z-10 size-16 !rounded-full !px-0 shadow-lg ${
+          inPanel ? 'bottom-6' : 'bottom-[calc(5.25rem+env(safe-area-inset-bottom))]'
+        }`}
       >
         <Plus size={28} />
       </Button>

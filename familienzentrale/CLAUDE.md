@@ -86,10 +86,13 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 - Kindermodus: Route `/kinder` ohne Navigation, Bilder aus `src/lib/taskIcons.ts`.
 - Auf Wunsch vorgezogen (aus Stufe 3): lokaler Kalender. Die Startseite ist die Wochenansicht
   (Tab „Kalender“ statt „Heute“), Termine anlegen/ändern/löschen, Tabelle `events`.
-  iCal-Import und Wandpanel fehlen noch.
+  Der iCal-Import fehlt noch.
 - Kalenderansichten: ab 768 px immer das Wochen-Zeitraster (`WeekGrid`); auf dem Handy umschaltbar
   Liste / 3 Tage / Woche (Auswahl in localStorage). In schmalen Spalten liegen gleichzeitige
   Termine versetzt übereinander statt nebeneinander.
+- Wandpanel: Route `/panel` (`src/pages/panel/`), Unterseiten Heute, Kinder, Woche, Einkauf. Hält den
+  Bildschirm an (Wake Lock), dimmt 22–6 Uhr und lädt sich um Mitternacht neu. Der Button
+  „Nachricht an alle“ fehlt noch, bis es den Chat gibt (Stufe 4). Anmeldung mit einem Eltern-Konto.
 - Bereitstellen kostet Netlify-Guthaben (jeder Upload startet dort einen Build): Änderungen
   sammeln und nur auf ausdrücklichen Wunsch hochladen.
 - `events.ends_at` ist exklusiv; ganztägige Termine laufen von lokaler Mitternacht bis Mitternacht.

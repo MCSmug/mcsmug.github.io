@@ -1,5 +1,6 @@
-import { LogOut, Trash2 } from 'lucide-react'
+import { LogOut, MonitorSmartphone, Trash2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 
 import { PageTitle } from '../components/AppShell'
 import { ColorPicker } from '../components/ColorPicker'
@@ -159,6 +160,20 @@ export function Settings() {
             </form>
           </Card>
         )}
+
+        <Card>
+          <h2 className="font-display text-xl font-semibold">Wandpanel</h2>
+          <p className="mt-1 mb-3 text-sm text-muted">
+            Ansicht für ein Tablet im Querformat an der Wand: bleibt eingeschaltet und wird nachts gedimmt.
+          </p>
+          <Link
+            to="/panel"
+            className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-line bg-card px-5 font-semibold"
+          >
+            <MonitorSmartphone size={18} />
+            Wandpanel öffnen
+          </Link>
+        </Card>
 
         <Card>
           <h2 className="font-display text-xl font-semibold">Konto</h2>

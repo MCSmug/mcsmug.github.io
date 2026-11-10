@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { AppShell } from './components/AppShell'
+import { KidsBoard } from './components/KidsBoard'
 import { Button, FullScreenMessage } from './components/ui'
 import { AuthProvider, useAuth } from './context/auth'
 import { FamilyProvider, useFamilyState } from './context/family'
@@ -10,6 +11,9 @@ import { ComingSoon } from './pages/ComingSoon'
 import { Kids } from './pages/Kids'
 import { Login } from './pages/Login'
 import { Onboarding } from './pages/Onboarding'
+import { PanelShell } from './pages/panel/PanelShell'
+import { PanelShopping } from './pages/panel/PanelShopping'
+import { PanelToday } from './pages/panel/PanelToday'
 import { Settings } from './pages/Settings'
 import { Shopping } from './pages/Shopping'
 import { Tasks } from './pages/Tasks'
@@ -32,6 +36,12 @@ function FamilyGate() {
   return (
     <Routes>
       <Route path="kinder" element={<Kids />} />
+      <Route path="panel" element={<PanelShell />}>
+        <Route index element={<PanelToday />} />
+        <Route path="kinder" element={<KidsBoard />} />
+        <Route path="woche" element={<Calendar inPanel />} />
+        <Route path="einkauf" element={<PanelShopping />} />
+      </Route>
       <Route element={<AppShell />}>
         <Route index element={<Calendar />} />
         <Route path="aufgaben" element={<Tasks />} />
