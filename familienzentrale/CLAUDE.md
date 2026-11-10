@@ -83,7 +83,10 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
   (Tab „Kalender“ statt „Heute“), Termine anlegen/ändern/löschen, Tabelle `events`.
   iCal-Import und Wandpanel fehlen noch.
 - `events.ends_at` ist exklusiv; ganztägige Termine laufen von lokaler Mitternacht bis Mitternacht.
-- Gewünscht, noch offen: Termine abfotografieren und per Bilderkennung in den Kalender übernehmen.
+- Termine abfotografieren: Kamera-Knopf im Kalender → Edge Function `extract-events`
+  (`supabase/functions/`, Claude-API mit strukturierter Ausgabe, Secret `ANTHROPIC_API_KEY`)
+  → Vorschlagsliste zum Prüfen → Sammel-Insert in `events`. Das Foto wird nicht gespeichert,
+  verlässt für die Erkennung aber die EU (bewusste Ausnahme vom Datenschutz-Grundsatz).
 - Supabase lässt E-Mail-Vorlagen nur mit eigenem SMTP ändern; Login per Code geht erst dann.
 - Deploy: Netlify-Projekt `familienzentrale-mdf4` (https://familienzentrale-mdf4.netlify.app),
   nicht mit GitHub verknüpft, wird manuell hochgeladen.

@@ -1,11 +1,13 @@
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Camera, ChevronLeft, ChevronRight, LoaderCircle, Plus } from 'lucide-react'
+import { useMemo, useRef, useState, type ChangeEvent } from 'react'
 
 import { EventDialog } from '../components/EventDialog'
+import { PhotoImportDialog } from '../components/PhotoImportDialog'
 import { Button, ErrorNote } from '../components/ui'
 import { useFamily } from '../context/family'
 import { useEvents } from '../hooks/useEvents'
 import { personColor } from '../lib/colors'
+import { extractEventsFromPhoto, type SuggestedEvent } from '../lib/photoEvents'
 import {
   addDays,
   formatTime,
@@ -64,8 +66,36 @@ export function Calendar() {
   const [today] = useState(() => startOfDay(new Date()))
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
-  const { events, loading, error, save, remove } = useEvents(family.id, weekStart, weekEnd)
+  const { events, loading, error, save, saveMany, remove } = useEvents(family.id, weekStart, weekEnd)
   const [dialog, setDialog] = useState<DialogState>(null)
+  const photoInput = useRef<HTMLInputElement>(null)
+  const [photoBusy, setPhotoBusy] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const [suggestions, setSuggestions] = useState<SuggestedEvent[] | null>(null)
+
+  async function onPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = '' // allow picking the same photo again
+    if (!file) return
+    setPhotoBusy(true)
+    setPhotoError(null)
+    try {
+      setSuggestions(await extractEventsFromPhoto(file))
+    } catch (e) {
+      setPhotoError(e instanceof Error ? e.message : 'Die Foto-Erkennung hat nicht geklappt.')
+    }
+    setPhotoBusy(false)
+  }
+
+  async function savePhotoEvents(inputs: Parameters<typeof saveMany>[0]) {
+    const ok = await saveMany(inputs)
+    // Jump to the week of the earliest imported event so the result is visible.
+    if (ok && inputs.length > 0) {
+      const first = inputs.map((i) => i.starts_at).sort()[0]
+      setWeekStart(startOfWeek(new Date(first)))
+    }
+    return ok
+  }
 
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
   const memberById = new Map(members.map((m) => [m.id, m]))
@@ -101,9 +131,9 @@ export function Calendar() {
         </div>
       </div>
 
-      {error && (
+      {(error || photoError) && (
         <div className="mb-4">
-          <ErrorNote>{error}</ErrorNote>
+          <ErrorNote>{error ?? photoError}</ErrorNote>
         </div>
       )}
 
@@ -154,6 +184,22 @@ export function Calendar() {
         })}
       </div>
 
+      <input
+        ref={photoInput}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => void onPhoto(e)}
+      />
+      <Button
+        variant="secondary"
+        aria-label="Termine abfotografieren"
+        disabled={photoBusy}
+        onClick={() => photoInput.current?.click()}
+        className="fixed right-5 bottom-[calc(10rem+env(safe-area-inset-bottom))] z-10 size-16 !rounded-full !px-0 shadow-lg"
+      >
+        {photoBusy ? <LoaderCircle size={26} className="animate-spin" /> : <Camera size={26} />}
+      </Button>
       <Button
         aria-label="Neuer Termin"
         onClick={() => setDialog({ date: showsToday ? today : weekStart })}
@@ -161,6 +207,15 @@ export function Calendar() {
       >
         <Plus size={28} />
       </Button>
+
+      {suggestions && (
+        <PhotoImportDialog
+          suggestions={suggestions}
+          members={members}
+          onSave={savePhotoEvents}
+          onClose={() => setSuggestions(null)}
+        />
+      )}
 
       {dialog && (
         <EventDialog

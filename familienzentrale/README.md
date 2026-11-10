@@ -20,6 +20,18 @@ Realtime-Sync, Wochenkalender mit eigenen Terminen.
 5. `.env.example` nach `.env.local` kopieren und URL + Anon-Key eintragen.
 6. `npm install`, dann `npm run dev`.
 
+## Termine abfotografieren (optional)
+
+Der Kamera-Knopf im Kalender schickt ein verkleinertes Foto an die Edge Function
+`extract-events`, die die Termine mit der Claude-API ausliest. Das Foto wird nicht gespeichert.
+
+1. API-Key unter https://console.anthropic.com anlegen (Guthaben nötig, ein Foto kostet wenige Cent).
+2. Supabase → Edge Functions → Secrets: `ANTHROPIC_API_KEY` mit dem Key anlegen.
+3. Supabase → Edge Functions → neue Funktion `extract-events` anlegen und den Inhalt von
+   `supabase/functions/extract-events/index.ts` einfügen (oder `supabase functions deploy extract-events`).
+4. In den Einstellungen der Funktion „Verify JWT with legacy secret“ ausschalten – die Funktion
+   prüft die Anmeldung und die Familienzugehörigkeit selbst.
+
 ## Zweites Elternteil einladen
 
 Einstellungen → Mitglied hinzufügen → „Elternteil“ mit E-Mail-Adresse. Sobald sich jemand mit

@@ -72,6 +72,19 @@ export function useEvents(familyId: string, from: Date, to: Date) {
     [familyId, refetch],
   )
 
+  /** Inserts several events at once (all or none). */
+  const saveMany = useCallback(
+    async (inputs: EventInput[]) => {
+      const { error } = await supabase
+        .from('events')
+        .insert(inputs.map((input) => ({ ...input, family_id: familyId })))
+      if (error) return false
+      await refetch()
+      return true
+    },
+    [familyId, refetch],
+  )
+
   const remove = useCallback(
     async (id: string) => {
       const { error } = await supabase.from('events').delete().eq('id', id)
@@ -82,5 +95,5 @@ export function useEvents(familyId: string, from: Date, to: Date) {
     [refetch],
   )
 
-  return { events, loading, error, save, remove }
+  return { events, loading, error, save, saveMany, remove }
 }
