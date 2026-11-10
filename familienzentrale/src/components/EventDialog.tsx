@@ -10,7 +10,7 @@ import { Button, ErrorNote, Field, TextInput } from './ui'
 interface Props {
   /** Existing event to edit, or undefined for a new one. */
   event?: CalendarEvent
-  /** Day preselected for a new event. */
+  /** Day preselected for a new event; a time of day other than midnight is used as start time. */
   defaultDate: Date
   members: Member[]
   onSave: (input: EventInput, id?: string) => Promise<boolean>
@@ -31,7 +31,9 @@ function addHour(time: string): string {
 export function EventDialog({ event, defaultDate, members, onSave, onDelete, onClose }: Props) {
   const start = event ? new Date(event.starts_at) : null
   const end = event ? new Date(event.ends_at) : null
-  const initialStartTime = start && !event!.all_day ? toTimeInput(start) : nextFullHour()
+  const hasDefaultTime = defaultDate.getHours() + defaultDate.getMinutes() > 0
+  const initialStartTime =
+    start && !event!.all_day ? toTimeInput(start) : hasDefaultTime ? toTimeInput(defaultDate) : nextFullHour()
 
   const [title, setTitle] = useState(event?.title ?? '')
   const [memberId, setMemberId] = useState<string | null>(event?.member_id ?? null)

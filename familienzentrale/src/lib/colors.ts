@@ -11,6 +11,7 @@ export const PERSON_COLORS: PersonColor[] = [
   { value: '#7C3AED', tint: '#EDE5FD', label: 'Violett' },
 ]
 
+// Used for entries that concern the whole family.
 const NEUTRAL: PersonColor = { value: '#5F5B53', tint: '#ECE8E0', label: 'Neutral' }
 
 export function personColor(value: string | null | undefined): PersonColor {

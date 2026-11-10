@@ -3,6 +3,7 @@ import { useMemo, useRef, useState, type ChangeEvent } from 'react'
 
 import { EventDialog } from '../components/EventDialog'
 import { PhotoImportDialog } from '../components/PhotoImportDialog'
+import { WeekGrid } from '../components/WeekGrid'
 import { Button, ErrorNote } from '../components/ui'
 import { useFamily } from '../context/family'
 import { useEvents } from '../hooks/useEvents'
@@ -13,7 +14,6 @@ import {
   formatTime,
   formatWeekRange,
   formatWeekdayLong,
-  formatWeekdayShort,
   isSameDay,
   isoWeek,
   startOfDay,
@@ -49,10 +49,10 @@ function EventChip({
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-12 w-full flex-col justify-center rounded-2xl border-l-4 px-3 py-2 text-left"
-      style={{ backgroundColor: color.tint, borderColor: color.value }}
+      className="flex min-h-12 w-full flex-col justify-center rounded-2xl px-3 py-2 text-left text-white"
+      style={{ backgroundColor: color.value }}
     >
-      <span className="text-xs font-medium" style={{ color: color.value }}>
+      <span className="text-xs font-medium opacity-90">
         {time}
         {member ? ` · ${member.name}` : ''}
       </span>
@@ -137,7 +137,7 @@ export function Calendar() {
         </div>
       )}
 
-      <div className={`grid gap-3 lg:grid-cols-7 lg:gap-2 ${loading ? 'opacity-60' : ''}`}>
+      <div className={`grid gap-3 lg:hidden ${loading ? 'opacity-60' : ''}`}>
         {days.map((day) => {
           const isToday = isSameDay(day, today)
           const dayEvents = eventsOfDay(events, day)
@@ -145,7 +145,7 @@ export function Calendar() {
             <section
               key={day.getTime()}
               aria-label={formatWeekdayLong(day)}
-              className={`flex flex-col gap-2 rounded-3xl border bg-card p-3 lg:min-h-80 ${
+              className={`flex flex-col gap-2 rounded-3xl border bg-card p-3 ${
                 isToday ? 'border-ink' : 'border-line'
               }`}
             >
@@ -158,14 +158,13 @@ export function Calendar() {
                   >
                     {day.getDate()}
                   </span>
-                  <span className="font-semibold lg:hidden">{formatWeekdayLong(day)}</span>
-                  <span className="hidden font-semibold lg:inline">{formatWeekdayShort(day)}</span>
+                  <span className="font-semibold">{formatWeekdayLong(day)}</span>
                 </h2>
                 <button
                   type="button"
                   aria-label={`Termin am ${formatWeekdayLong(day)} hinzufügen`}
                   onClick={() => setDialog({ date: day })}
-                  className="flex size-12 items-center justify-center rounded-full text-muted lg:size-10"
+                  className="flex size-12 items-center justify-center rounded-full text-muted"
                 >
                   <Plus size={22} />
                 </button>
@@ -182,6 +181,18 @@ export function Calendar() {
             </section>
           )
         })}
+      </div>
+
+      <div className={`hidden h-[calc(100dvh-15.5rem)] min-h-96 lg:block ${loading ? 'opacity-60' : ''}`}>
+        <WeekGrid
+          days={days}
+          events={events}
+          memberById={memberById}
+          today={today}
+          onEventClick={(event, day) => setDialog({ event, date: day })}
+          onSlotClick={(start) => setDialog({ date: start })}
+          onDayClick={(day) => setDialog({ date: day })}
+        />
       </div>
 
       <input
