@@ -9,7 +9,7 @@ import { useFamily } from '../context/family'
 import { useEvents } from '../hooks/useEvents'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { personColor } from '../lib/colors'
-import { extractEventsFromPhoto, type SuggestedEvent } from '../lib/photoEvents'
+import { extractEventsFromPhoto, type PhotoResult } from '../lib/photoEvents'
 import {
   addDays,
   formatDayRange,
@@ -113,7 +113,7 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
   const photoInput = useRef<HTMLInputElement>(null)
   const [photoBusy, setPhotoBusy] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
-  const [suggestions, setSuggestions] = useState<SuggestedEvent[] | null>(null)
+  const [photoResult, setPhotoResult] = useState<PhotoResult | null>(null)
 
   async function onPhoto(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -122,7 +122,7 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
     setPhotoBusy(true)
     setPhotoError(null)
     try {
-      setSuggestions(await extractEventsFromPhoto(file))
+      setPhotoResult(await extractEventsFromPhoto(file))
     } catch (e) {
       setPhotoError(e instanceof Error ? e.message : 'Die Foto-Erkennung hat nicht geklappt.')
     }
@@ -228,6 +228,13 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
             </button>
           ))}
         </div>
+      )}
+
+      {photoBusy && (
+        <p role="status" className="mb-3 flex items-center gap-3 rounded-2xl border border-line bg-card px-4 py-3 font-medium">
+          <LoaderCircle size={22} className="shrink-0 animate-spin" />
+          Foto wird ausgewertet … das dauert bis zu einer halben Minute.
+        </p>
       )}
 
       {(error || photoError) && (
@@ -361,12 +368,13 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
         <Plus size={28} />
       </Button>
 
-      {suggestions && (
+      {photoResult && (
         <PhotoImportDialog
-          suggestions={suggestions}
+          suggestions={photoResult.events}
+          summary={photoResult.summary}
           members={members}
           onSave={savePhotoEvents}
-          onClose={() => setSuggestions(null)}
+          onClose={() => setPhotoResult(null)}
         />
       )}
 

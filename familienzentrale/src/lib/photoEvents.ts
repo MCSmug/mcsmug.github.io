@@ -34,8 +34,14 @@ const ERROR_TEXT: Record<string, string> = {
 }
 const DEFAULT_ERROR = 'Die Foto-Erkennung hat nicht geklappt. Bitte Verbindung prüfen und noch einmal versuchen.'
 
+export interface PhotoResult {
+  events: SuggestedEvent[]
+  /** What the recognition saw in the photo, in one sentence. */
+  summary: string | null
+}
+
 /** Sends a photo to the extract-events function. Throws an Error with a German message. */
-export async function extractEventsFromPhoto(file: File): Promise<SuggestedEvent[]> {
+export async function extractEventsFromPhoto(file: File): Promise<PhotoResult> {
   let image: string
   try {
     image = await toJpegBase64(file)
@@ -58,5 +64,6 @@ export async function extractEventsFromPhoto(file: File): Promise<SuggestedEvent
     }
     throw new Error((code && ERROR_TEXT[code]) ?? DEFAULT_ERROR)
   }
-  return (data as { events: SuggestedEvent[] }).events
+  const result = data as { events: SuggestedEvent[]; summary?: string }
+  return { events: result.events, summary: result.summary ?? null }
 }

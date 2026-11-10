@@ -15,6 +15,8 @@ interface Row extends SuggestedEvent {
 
 interface Props {
   suggestions: SuggestedEvent[]
+  /** What the recognition saw; shown when no appointments were found. */
+  summary: string | null
   members: Member[]
   /** Saves all inputs; returns true on success. */
   onSave: (inputs: EventInput[]) => Promise<boolean>
@@ -46,7 +48,7 @@ function toInput(row: Row): EventInput | null {
   }
 }
 
-export function PhotoImportDialog({ suggestions, members, onSave, onClose }: Props) {
+export function PhotoImportDialog({ suggestions, summary, members, onSave, onClose }: Props) {
   const [rows, setRows] = useState<Row[]>(() =>
     suggestions.map((s, key) => ({ ...s, key, selected: true, memberId: '' })),
   )
@@ -96,9 +98,13 @@ export function PhotoImportDialog({ suggestions, members, onSave, onClose }: Pro
         </div>
 
         {rows.length === 0 ? (
-          <p className="py-4 text-muted">
-            Auf dem Foto wurden keine Termine erkannt. Versuch es näher und mit gutem Licht noch einmal.
-          </p>
+          <div className="py-4 text-muted">
+            <p>Auf dem Foto wurden keine Termine erkannt.</p>
+            {summary && <p className="mt-2">Erkannt wurde: {summary}</p>}
+            <p className="mt-2">
+              Tipp: den Zettel gerade und formatfüllend fotografieren, mit gutem Licht und ohne Spiegelung.
+            </p>
+          </div>
         ) : (
           <>
             <p className="mb-3 text-sm text-muted">

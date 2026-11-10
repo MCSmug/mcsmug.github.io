@@ -19,6 +19,7 @@ const MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 const MAX_BASE64_LENGTH = 6_000_000
 
 const Extraction = z.object({
+  summary: z.string().describe('One short German sentence saying what the photo shows'),
   events: z.array(
     z.object({
       title: z.string().describe('Short title in the language of the document'),
@@ -46,6 +47,8 @@ function systemPrompt(today: string, weekday: string) {
 Today is ${weekday}, ${today}.
 
 Return every appointment that is actually visible in the photo. The family reviews your list before anything is saved, so completeness matters, but never invent appointments or details that are not in the photo. If the photo contains no appointments, return an empty list.
+
+Also give a one-sentence German summary of what the photo shows (e.g. "Aushang des Kindergartens mit drei Terminen im Dezember" or "Unscharfes Foto eines Tisches, kein Text lesbar"). The family sees it when nothing was found, so say plainly if the photo is blurry, too dark, cut off or contains no dates.
 
 For each appointment:
 - title: short and specific, in the language of the document, including what a parent needs to recognise it (e.g. "Laternenfest Kindergarten", "Zahnarzt Kontrolle"). No dates or times in the title.
@@ -140,7 +143,7 @@ Deno.serve(async (req) => {
       }))
       .filter((e) => e.title && DATE.test(e.date) && !Number.isNaN(Date.parse(e.date)))
 
-    return json({ events })
+    return json({ events, summary: response.parsed_output.summary.trim().slice(0, 200) })
   } catch (error) {
     if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) {
       console.error('Anthropic key rejected:', error.message)
