@@ -141,14 +141,17 @@ export function Calendar() {
     <>
       <div className="mb-3 flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">Woche {isoWeek(weekStart)}</h1>
-          <p className="truncate text-sm text-muted sm:text-base">{formatWeekRange(weekStart)}</p>
+          <h1 className="font-display text-xl font-bold whitespace-nowrap sm:text-3xl">
+            <span className="sm:hidden">KW</span>
+            <span className="max-sm:hidden">Woche</span> {isoWeek(weekStart)}
+          </h1>
+          <p className="text-muted max-sm:hidden">{formatWeekRange(weekStart)}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <Button
             variant="secondary"
             aria-label={phoneView === 'list' ? 'Wochenansicht' : 'Listenansicht'}
-            className="px-3 md:hidden"
+            className="!px-3 md:hidden"
             onClick={togglePhoneView}
           >
             {phoneView === 'list' ? <Columns3 size={22} /> : <List size={22} />}
@@ -156,7 +159,7 @@ export function Calendar() {
           <Button
             variant="secondary"
             aria-label="Vorherige Woche"
-            className="px-3"
+            className="!px-3"
             onClick={() => setWeekStart(addDays(weekStart, -7))}
           >
             <ChevronLeft size={22} />
@@ -164,7 +167,7 @@ export function Calendar() {
           <Button
             variant="secondary"
             disabled={showsToday}
-            className={showsToday ? 'max-sm:hidden' : ''}
+            className={`max-sm:!px-3 ${showsToday ? 'max-sm:hidden' : ''}`}
             onClick={() => setWeekStart(startOfWeek(today))}
           >
             Heute
@@ -172,13 +175,16 @@ export function Calendar() {
           <Button
             variant="secondary"
             aria-label="Nächste Woche"
-            className="px-3"
+            className="!px-3"
             onClick={() => setWeekStart(addDays(weekStart, 7))}
           >
             <ChevronRight size={22} />
           </Button>
         </div>
       </div>
+
+      {/* On phones the date range gets its own line so the header row stays on one line. */}
+      <p className="-mt-2 mb-3 text-sm text-muted sm:hidden">{formatWeekRange(weekStart)}</p>
 
       {(error || photoError) && (
         <div className="mb-4">
@@ -256,7 +262,7 @@ export function Calendar() {
       </div>
 
       <div
-        className={`h-[calc(100dvh-18rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] min-h-80 md:block md:h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] ${
+        className={`h-[calc(100dvh-19.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] min-h-80 md:block md:h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] ${
           phoneView === 'week' ? 'block' : 'hidden'
         } ${loading ? 'opacity-60' : ''}`}
       >
