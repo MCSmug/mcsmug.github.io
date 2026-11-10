@@ -54,7 +54,10 @@ export const formatTime = (date: Date) => timeFormat.format(date)
 export const formatWeekdayShort = (date: Date) => weekdayShort.format(date).replace('.', '')
 export const formatWeekdayLong = (date: Date) => weekdayLong.format(date)
 
+export function formatDayRange(start: Date, end: Date): string {
+  return `${dayMonth.format(start)} – ${dayMonthYear.format(end)}`
+}
+
 export function formatWeekRange(weekStart: Date): string {
-  const end = addDays(weekStart, 6)
-  return `${dayMonth.format(weekStart)} – ${dayMonthYear.format(end)}`
+  return formatDayRange(weekStart, addDays(weekStart, 6))
 }

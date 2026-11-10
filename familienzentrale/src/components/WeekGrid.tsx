@@ -10,6 +10,9 @@ const VISIBLE_HOURS = 14
 // Phones show fewer hours at once so the rows are tall enough for readable text.
 const VISIBLE_HOURS_NARROW = 9
 const NARROW_WIDTH = 640
+// Below this column width overlapping events are stacked with an offset instead of side by side.
+const NARROW_COLUMN = 80
+const CASCADE_STEP = 0.3
 const MIN_HOUR_HEIGHT = 36
 const DEFAULT_HOUR_HEIGHT = 52
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
@@ -93,6 +96,8 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT)
   // False while the grid is hidden (phone list view); scrolling only works once it is shown.
   const [shown, setShown] = useState(false)
+  const [narrowColumns, setNarrowColumns] = useState(false)
+  const dayCount = days.length
 
   // Size the hours so that the usual part of the day fills the available height.
   useEffect(() => {
@@ -100,6 +105,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
     if (!element) return
     const measure = () => {
       setShown(element.clientHeight > 0)
+      setNarrowColumns(element.clientWidth / dayCount < NARROW_COLUMN)
       if (element.clientHeight > 0) {
         const hours = element.clientWidth < NARROW_WIDTH ? VISIBLE_HOURS_NARROW : VISIBLE_HOURS
         setHourHeight(Math.max(MIN_HOUR_HEIGHT, element.clientHeight / hours))
@@ -109,7 +115,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
     const observer = new ResizeObserver(measure)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [])
+  }, [dayCount])
 
   // Start at 7:00, or earlier when this week has an earlier appointment.
   const firstHour = events
@@ -120,9 +126,10 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   }, [firstHour, hourHeight, shown])
 
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
-  const allDay = events.filter(isAllDayLike)
-  // Narrow time column on phones so the seven days get as much room as possible.
-  const columns = 'grid grid-cols-[1.75rem_repeat(7,minmax(0,1fr))] sm:grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]'
+  const allDay = events.filter((e) => isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
+  // Narrow time column on phones so the days get as much room as possible.
+  const columns = 'grid [--time-col:1.75rem] sm:[--time-col:3.5rem]'
+  const columnStyle = { gridTemplateColumns: `var(--time-col) repeat(${dayCount}, minmax(0, 1fr))` }
 
   function slotClick(day: Date, e: MouseEvent<HTMLDivElement>) {
     const y = e.clientY - e.currentTarget.getBoundingClientRect().top
@@ -133,7 +140,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-card">
       {/* Day headers */}
-      <div className={`${columns} border-b border-line`}>
+      <div className={`${columns} border-b border-line`} style={columnStyle}>
         <div />
         {days.map((day) => {
           const isToday = isSameDay(day, today)
@@ -162,7 +169,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
 
       {/* All-day row */}
       {allDay.length > 0 && (
-        <div className={`${columns} border-b border-line`}>
+        <div className={`${columns} border-b border-line`} style={columnStyle}>
           <div className="px-1 py-2 text-right text-[11px] text-muted">
             <span className="hidden sm:inline">ganztägig</span>
           </div>
@@ -188,7 +195,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
 
       {/* Time grid */}
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
-        <div className={`${columns} relative`} style={{ height: hourHeight * 24 }}>
+        <div className={`${columns} relative`} style={{ ...columnStyle, height: hourHeight * 24 }}>
           <div className="relative">
             {HOURS.slice(1).map((hour) => (
               <span
@@ -218,6 +225,9 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                 {layoutDay(events, day).map(({ event, start, end, column, columns: count }) => {
                   const member = memberOf(event)
                   const height = ((end - start) / 60) * hourHeight - 2
+                  // Narrow columns: later events overlap earlier ones, shifted right, so text stays horizontal.
+                  const offset = narrowColumns ? Math.min(column * CASCADE_STEP, 0.6) : column / count
+                  const share = narrowColumns ? 1 - offset : 1 / count
                   return (
                     <button
                       key={event.id}
@@ -230,16 +240,17 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                       style={{
                         top: (start / 60) * hourHeight + 1,
                         height,
-                        left: `calc(${(column / count) * 100}% + 2px)`,
-                        width: `calc(${100 / count}% - 4px)`,
+                        left: `calc(${offset * 100}% + 2px)`,
+                        width: `calc(${share * 100}% - 4px)`,
+                        zIndex: column + 1,
                         backgroundColor: personColor(member?.color).value,
                       }}
                     >
                       <span className="block text-[13px] leading-[1.15] font-semibold [overflow-wrap:anywhere] hyphens-auto sm:truncate sm:text-sm sm:leading-tight">
                         {event.title}
                       </span>
-                      {height >= 40 && (
-                        <span className="hidden truncate text-xs leading-tight opacity-90 sm:block">
+                      {height >= 40 && !narrowColumns && (
+                        <span className="block truncate text-xs leading-tight opacity-90">
                           {formatTime(new Date(event.starts_at))} – {formatTime(new Date(event.ends_at))}
                           {member ? ` · ${member.name}` : ''}
                         </span>
@@ -251,7 +262,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                 {isToday && (
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-danger"
+                    className="pointer-events-none absolute inset-x-0 z-20 border-t-2 border-danger"
                     style={{ top: (nowMinutes / 60) * hourHeight }}
                   >
                     <span className="absolute -top-[5px] -left-1 size-2 rounded-full bg-danger" />

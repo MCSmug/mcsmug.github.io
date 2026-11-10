@@ -87,6 +87,11 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 - Auf Wunsch vorgezogen (aus Stufe 3): lokaler Kalender. Die Startseite ist die Wochenansicht
   (Tab „Kalender“ statt „Heute“), Termine anlegen/ändern/löschen, Tabelle `events`.
   iCal-Import und Wandpanel fehlen noch.
+- Kalenderansichten: ab 768 px immer das Wochen-Zeitraster (`WeekGrid`); auf dem Handy umschaltbar
+  Liste / 3 Tage / Woche (Auswahl in localStorage). In schmalen Spalten liegen gleichzeitige
+  Termine versetzt übereinander statt nebeneinander.
+- Bereitstellen kostet Netlify-Guthaben (jeder Upload startet dort einen Build): Änderungen
+  sammeln und nur auf ausdrücklichen Wunsch hochladen.
 - `events.ends_at` ist exklusiv; ganztägige Termine laufen von lokaler Mitternacht bis Mitternacht.
 - Termine abfotografieren: Kamera-Knopf im Kalender → Edge Function `extract-events`
   (`supabase/functions/`, Claude-API mit strukturierter Ausgabe, Secret `ANTHROPIC_API_KEY`)
