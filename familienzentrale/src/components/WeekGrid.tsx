@@ -88,12 +88,19 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   const now = useNow()
 
   const [hourHeight, setHourHeight] = useState(DEFAULT_HOUR_HEIGHT)
+  // False while the grid is hidden (phone list view); scrolling only works once it is shown.
+  const [shown, setShown] = useState(false)
 
   // Size the hours so that the usual part of the day fills the available height.
   useEffect(() => {
     const element = scroller.current
     if (!element) return
-    const measure = () => setHourHeight(Math.max(MIN_HOUR_HEIGHT, element.clientHeight / VISIBLE_HOURS))
+    const measure = () => {
+      setShown(element.clientHeight > 0)
+      if (element.clientHeight > 0) {
+        setHourHeight(Math.max(MIN_HOUR_HEIGHT, element.clientHeight / VISIBLE_HOURS))
+      }
+    }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(element)
@@ -106,11 +113,12 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
     .reduce((hour, e) => Math.min(hour, new Date(e.starts_at).getHours()), VISIBLE_FROM_HOUR)
   useEffect(() => {
     scroller.current?.scrollTo({ top: firstHour * hourHeight })
-  }, [firstHour, hourHeight])
+  }, [firstHour, hourHeight, shown])
 
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter(isAllDayLike)
-  const columns = 'grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]'
+  // Narrow time column on phones so the seven days get as much room as possible.
+  const columns = 'grid grid-cols-[2rem_repeat(7,minmax(0,1fr))] sm:grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]'
 
   function slotClick(day: Date, e: MouseEvent<HTMLDivElement>) {
     const y = e.clientY - e.currentTarget.getBoundingClientRect().top
@@ -137,7 +145,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                 {formatWeekdayShort(day)}
               </span>
               <span
-                className={`flex size-10 items-center justify-center rounded-full font-display text-xl font-bold ${
+                className={`flex size-8 items-center justify-center rounded-full font-display text-base font-bold sm:size-10 sm:text-xl ${
                   isToday ? 'bg-ink text-white' : ''
                 }`}
               >
@@ -151,7 +159,9 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
       {/* All-day row */}
       {allDay.length > 0 && (
         <div className={`${columns} border-b border-line`}>
-          <div className="px-1 py-2 text-right text-[11px] text-muted">ganztägig</div>
+          <div className="px-1 py-2 text-right text-[11px] text-muted">
+            <span className="hidden sm:inline">ganztägig</span>
+          </div>
           {days.map((day) => (
             <div key={day.getTime()} className="flex min-w-0 flex-col gap-1 border-l border-line p-1">
               {allDay
@@ -161,7 +171,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                     key={event.id}
                     type="button"
                     onClick={() => onEventClick(event, day)}
-                    className="truncate rounded-lg px-2 py-1 text-left text-sm font-semibold text-white"
+                    className="truncate rounded-lg px-1 py-1 text-left text-[11px] font-semibold text-white sm:px-2 sm:text-sm"
                     style={{ backgroundColor: personColor(memberOf(event)?.color).value }}
                   >
                     {event.title}
@@ -179,10 +189,11 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
             {HOURS.slice(1).map((hour) => (
               <span
                 key={hour}
-                className="absolute right-2 -translate-y-1/2 text-xs text-muted"
+                className="absolute right-1 -translate-y-1/2 text-xs text-muted sm:right-2"
                 style={{ top: hour * hourHeight }}
               >
-                {String(hour).padStart(2, '0')}:00
+                {String(hour).padStart(2, '0')}
+                <span className="hidden sm:inline">:00</span>
               </span>
             ))}
           </div>
@@ -211,7 +222,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                         e.stopPropagation()
                         onEventClick(event, day)
                       }}
-                      className="absolute overflow-hidden rounded-lg border border-white px-1.5 py-0.5 text-left text-white"
+                      className="absolute overflow-hidden rounded-md border border-white px-0.5 py-0.5 text-left text-white sm:rounded-lg sm:px-1.5"
                       style={{
                         top: (start / 60) * hourHeight + 1,
                         height,
@@ -220,9 +231,11 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                         backgroundColor: personColor(member?.color).value,
                       }}
                     >
-                      <span className="block truncate text-sm leading-tight font-semibold">{event.title}</span>
+                      <span className="block text-[11px] leading-tight font-semibold break-words sm:truncate sm:text-sm">
+                        {event.title}
+                      </span>
                       {height >= 40 && (
-                        <span className="block truncate text-xs leading-tight opacity-90">
+                        <span className="hidden truncate text-xs leading-tight opacity-90 sm:block">
                           {formatTime(new Date(event.starts_at))} – {formatTime(new Date(event.ends_at))}
                           {member ? ` · ${member.name}` : ''}
                         </span>

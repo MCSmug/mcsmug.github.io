@@ -1,4 +1,4 @@
-import { Camera, ChevronLeft, ChevronRight, LoaderCircle, Plus } from 'lucide-react'
+import { Camera, ChevronLeft, ChevronRight, Columns3, List, LoaderCircle, Plus } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 
 import { EventDialog } from '../components/EventDialog'
@@ -21,6 +21,17 @@ import {
   startOfWeek,
 } from '../lib/dates'
 import type { CalendarEvent, Member } from '../lib/types'
+
+type PhoneView = 'list' | 'week'
+const PHONE_VIEW_KEY = 'calendar-phone-view'
+
+function storedPhoneView(): PhoneView {
+  try {
+    return localStorage.getItem(PHONE_VIEW_KEY) === 'week' ? 'week' : 'list'
+  } catch {
+    return 'list'
+  }
+}
 
 type DialogState = { event?: CalendarEvent; date: Date } | null
 
@@ -69,6 +80,17 @@ export function Calendar() {
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
   const { events, loading, error, save, saveMany, remove } = useEvents(family.id, weekStart, weekEnd)
   const [dialog, setDialog] = useState<DialogState>(null)
+  // Phones can switch between the day list and the week grid; wide screens always show the grid.
+  const [phoneView, setPhoneView] = useState<PhoneView>(storedPhoneView)
+  function togglePhoneView() {
+    const next = phoneView === 'list' ? 'week' : 'list'
+    setPhoneView(next)
+    try {
+      localStorage.setItem(PHONE_VIEW_KEY, next)
+    } catch {
+      // Remembering the choice is optional.
+    }
+  }
   const photoInput = useRef<HTMLInputElement>(null)
   const [photoBusy, setPhotoBusy] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
@@ -125,6 +147,14 @@ export function Calendar() {
         <div className="flex items-center gap-2">
           <Button
             variant="secondary"
+            aria-label={phoneView === 'list' ? 'Wochenansicht' : 'Listenansicht'}
+            className="px-3 md:hidden"
+            onClick={togglePhoneView}
+          >
+            {phoneView === 'list' ? <Columns3 size={22} /> : <List size={22} />}
+          </Button>
+          <Button
+            variant="secondary"
             aria-label="Vorherige Woche"
             className="px-3"
             onClick={() => setWeekStart(addDays(weekStart, -7))}
@@ -134,7 +164,7 @@ export function Calendar() {
           <Button
             variant="secondary"
             disabled={showsToday}
-            className={showsToday ? 'hidden sm:inline-flex' : ''}
+            className={showsToday ? 'max-sm:hidden' : ''}
             onClick={() => setWeekStart(startOfWeek(today))}
           >
             Heute
@@ -159,7 +189,7 @@ export function Calendar() {
       {/* Phone: week strip to jump between days, then the days as a list */}
       <nav
         aria-label="Wochentage"
-        className="sticky top-0 z-10 -mx-5 mb-3 grid grid-cols-7 gap-1 bg-bg px-5 py-2 md:hidden"
+        className={`sticky top-0 z-10 -mx-5 mb-3 grid-cols-7 gap-1 bg-bg px-5 py-2 md:hidden ${phoneView === 'list' ? 'grid' : 'hidden'}`}
       >
         {days.map((day) => {
           const isToday = isSameDay(day, today)
@@ -184,7 +214,7 @@ export function Calendar() {
         })}
       </nav>
 
-      <div className={`grid gap-2 md:hidden ${loading ? 'opacity-60' : ''}`}>
+      <div className={`gap-2 md:hidden ${phoneView === 'list' ? 'grid' : 'hidden'} ${loading ? 'opacity-60' : ''}`}>
         {days.map((day) => {
           const isToday = isSameDay(day, today)
           const dayEvents = eventsOfDay(events, day)
@@ -225,7 +255,11 @@ export function Calendar() {
         })}
       </div>
 
-      <div className={`hidden h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] min-h-80 md:block ${loading ? 'opacity-60' : ''}`}>
+      <div
+        className={`h-[calc(100dvh-18rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] min-h-80 md:block md:h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] ${
+          phoneView === 'week' ? 'block' : 'hidden'
+        } ${loading ? 'opacity-60' : ''}`}
+      >
         <WeekGrid
           days={days}
           events={events}
