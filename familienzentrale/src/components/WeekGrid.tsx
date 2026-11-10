@@ -131,15 +131,24 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   const firstDay = days[0].getTime()
   const showsToday = days.some((day) => isSameDay(day, today))
   const currentHour = now.getHours()
+  // Today's appointments that have not ended yet: the earliest one should be visible from its start.
+  const todayTime = today.getTime()
+  const runningSince = events
+    .filter((e) => !isAllDayLike(e) && new Date(e.ends_at) > now && new Date(e.starts_at).getTime() >= todayTime)
+    .reduce((hour, e) => Math.min(hour, new Date(e.starts_at).getHours()), currentHour - 1)
+  // ... but never so far back that the current time drops out of a small screen.
   const startHour = showsToday
-    ? Math.max(0, currentHour - 1)
+    ? Math.max(0, runningSince, currentHour - 5)
     : firstEventHour === null
       ? VISIBLE_FROM_HOUR
       : Math.max(0, firstEventHour - 1)
   // Re-applied on paging, on resize and when the hour changes (the wall panel stays open all day).
   useEffect(() => {
     // Wait for the new row height to be laid out; iOS ignores scrolling before that.
-    const frame = requestAnimationFrame(() => scroller.current?.scrollTo({ top: startHour * hourHeight }))
+    // A few pixels of lead so the first block is not glued to the edge.
+    const frame = requestAnimationFrame(() =>
+      scroller.current?.scrollTo({ top: Math.max(0, startHour * hourHeight - 10) }),
+    )
     return () => cancelAnimationFrame(frame)
   }, [startHour, hourHeight, shown, firstDay, dayCount])
 
@@ -200,7 +209,11 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                     key={event.id}
                     type="button"
                     onClick={() => onEventClick(event, day)}
-                    className="truncate rounded-lg px-1 py-1 text-left text-[13px] font-semibold text-white sm:px-2 sm:text-sm"
+                    className={`rounded-lg text-left font-semibold text-white ${
+                      narrowColumns
+                        ? 'line-clamp-2 px-1 py-0.5 text-[11px] leading-[1.2] hyphens-auto'
+                        : 'truncate px-2 py-1 text-sm'
+                    }`}
                     style={{ backgroundColor: personColor(memberOf(event)?.color).value }}
                   >
                     {event.title}
@@ -230,6 +243,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
           {days.map((day) => {
             const isToday = isSameDay(day, today)
             const nowMinutes = now.getHours() * 60 + now.getMinutes()
+            const placed = layoutDay(events, day)
             return (
               <div
                 key={day.getTime()}
@@ -240,12 +254,19 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                   backgroundSize: `100% ${hourHeight}px`,
                 }}
               >
-                {layoutDay(events, day).map(({ event, start, end, column, columns: count }) => {
+                {placed.map(({ event, start, end, column, columns: count }) => {
                   const member = memberOf(event)
                   const height = ((end - start) / 60) * hourHeight - 2
                   // Narrow columns: later events overlap earlier ones, shifted right, so text stays horizontal.
                   const offset = narrowColumns ? Math.min(column * CASCADE_STEP, 0.6) : column / count
                   const share = narrowColumns ? 1 - offset : 1 / count
+                  // In narrow columns an event that starts at about the same time lies on top of this one:
+                  // move the title below it instead of hiding it.
+                  const covering = narrowColumns
+                    ? placed.filter((o) => o.column > column && o.start < start + 45 && o.end > start)
+                    : []
+                  const coveredUntil = covering.reduce((latest, o) => Math.max(latest, o.end), start)
+                  const titleOffset = coveredUntil < end - 30 ? ((coveredUntil - start) / 60) * hourHeight : 0
                   return (
                     <button
                       key={event.id}
@@ -254,7 +275,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                         e.stopPropagation()
                         onEventClick(event, day)
                       }}
-                      className="absolute overflow-hidden rounded-md border border-white px-[3px] py-0.5 text-left text-white sm:rounded-lg sm:px-1.5"
+                      className="absolute flex flex-col items-stretch justify-start overflow-hidden rounded-md border border-white px-[3px] py-0.5 text-left text-white sm:rounded-lg sm:px-1.5"
                       style={{
                         top: (start / 60) * hourHeight + 1,
                         height,
@@ -262,9 +283,16 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                         width: `calc(${share * 100}% - 4px)`,
                         zIndex: column + 1,
                         backgroundColor: personColor(member?.color).value,
+                        paddingTop: titleOffset || undefined,
                       }}
                     >
-                      <span className="block text-[13px] leading-[1.15] font-semibold [overflow-wrap:anywhere] hyphens-auto sm:truncate sm:text-sm sm:leading-tight">
+                      <span
+                        className={
+                          narrowColumns
+                            ? 'block text-xs leading-[1.2] font-semibold hyphens-auto'
+                            : 'line-clamp-2 text-sm leading-tight font-semibold hyphens-auto'
+                        }
+                      >
                         {event.title}
                       </span>
                       {height >= 40 && !narrowColumns && (
