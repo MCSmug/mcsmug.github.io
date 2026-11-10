@@ -13,6 +13,8 @@
 }
 
 html {
+  /* No rubber-band scrolling of the whole app behind its navigation. */
+  overscroll-behavior: none;
   background-color: var(--color-bg);
   color: var(--color-ink);
   -webkit-text-size-adjust: 100%;

@@ -17,8 +17,12 @@ export function AppShell() {
   const width = wide ? 'max-w-7xl' : 'max-w-2xl'
 
   return (
-    <div className={`mx-auto flex min-h-dvh flex-col ${width}`}>
-      <header className="flex items-center justify-between px-5 pt-[max(1rem,env(safe-area-inset-top))]">
+    // The page itself never scrolls: only <main> does, between the fixed-height header and navigation.
+    // (A document that scrolls under a position:fixed bar ends up misplaced on iOS after the keyboard closes.)
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <header
+        className={`mx-auto flex w-full shrink-0 items-center justify-between px-5 pt-[max(1rem,env(safe-area-inset-top))] ${width}`}
+      >
         <p className="font-display text-lg font-semibold">{family.name}</p>
         <NavLink
           to="/einstellungen"
@@ -31,13 +35,16 @@ export function AppShell() {
         </NavLink>
       </header>
 
-      <main className={`flex-1 px-5 pt-3 ${wide ? 'pb-28 md:pb-20' : 'pb-28'}`}>
-        <Outlet />
+      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        {/* Bottom padding keeps the last rows clear of the floating buttons; the calendar handles this itself. */}
+        <div className={`mx-auto px-5 pt-3 ${width} ${wide ? 'h-full pb-3' : 'pb-28'}`}>
+          <Outlet />
+        </div>
       </main>
 
       <nav
         aria-label="Hauptnavigation"
-        className="fixed inset-x-0 bottom-0 border-t border-line bg-card pb-[env(safe-area-inset-bottom)]"
+        className="shrink-0 border-t border-line bg-card pb-[env(safe-area-inset-bottom)]"
       >
         <ul className="mx-auto flex max-w-2xl">
           {tabs.map(({ to, label, icon: Icon }) => (

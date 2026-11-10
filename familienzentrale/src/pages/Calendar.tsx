@@ -162,8 +162,9 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
   }, [loading, weekStart])
 
   return (
-    <>
-      <div className="mb-3 flex items-center gap-3">
+    // With the grid the page fills the available height exactly; the list simply grows and scrolls.
+    <div className={showGrid ? 'flex h-full flex-col' : 'pb-24'}>
+      <div className="mb-3 flex shrink-0 items-center gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="font-display text-xl font-bold whitespace-nowrap sm:text-3xl">
             {threeDays ? (
@@ -319,15 +320,7 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
       )}
 
       {showGrid && (
-        <div
-          className={`min-h-80 ${
-            isWide
-              ? inPanel
-                ? 'h-[calc(100dvh-8.5rem)]'
-                : 'h-[calc(100dvh-14.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))]'
-              : 'h-[calc(100dvh-21.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))]'
-          } ${loading ? 'opacity-60' : ''}`}
-        >
+        <div className={`min-h-64 flex-1 ${loading ? 'opacity-60' : ''}`}>
           <WeekGrid
             days={gridDays}
             events={events}
@@ -389,6 +382,6 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
           onClose={() => setDialog(null)}
         />
       )}
-    </>
+    </div>
   )
 }
