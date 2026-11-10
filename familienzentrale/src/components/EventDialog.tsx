@@ -13,6 +13,8 @@ interface Props {
   /** Day preselected for a new event; a time of day other than midnight is used as start time. */
   defaultDate: Date
   members: Member[]
+  /** Person preselected for a new event. */
+  defaultMemberId: string | null
   onSave: (input: EventInput, id?: string) => Promise<boolean>
   onDelete: (id: string) => Promise<boolean>
   onClose: () => void
@@ -28,7 +30,7 @@ function addHour(time: string): string {
   return h >= 23 ? '23:59' : `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
-export function EventDialog({ event, defaultDate, members, onSave, onDelete, onClose }: Props) {
+export function EventDialog({ event, defaultDate, members, defaultMemberId, onSave, onDelete, onClose }: Props) {
   const start = event ? new Date(event.starts_at) : null
   const end = event ? new Date(event.ends_at) : null
   const hasDefaultTime = defaultDate.getHours() + defaultDate.getMinutes() > 0
@@ -36,7 +38,7 @@ export function EventDialog({ event, defaultDate, members, onSave, onDelete, onC
     start && !event!.all_day ? toTimeInput(start) : hasDefaultTime ? toTimeInput(defaultDate) : nextFullHour()
 
   const [title, setTitle] = useState(event?.title ?? '')
-  const [memberId, setMemberId] = useState<string | null>(event?.member_id ?? null)
+  const [memberId, setMemberId] = useState<string | null>(event ? event.member_id : defaultMemberId)
   const [allDay, setAllDay] = useState(event?.all_day ?? false)
   const [date, setDate] = useState(toDateInput(start ?? defaultDate))
   // All-day events store an exclusive end, the form shows the last day.

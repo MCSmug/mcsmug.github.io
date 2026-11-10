@@ -62,7 +62,7 @@ function EventChip({
 }
 
 export function Calendar() {
-  const { family, members } = useFamily()
+  const { family, me, members } = useFamily()
   const [today] = useState(() => startOfDay(new Date()))
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
@@ -137,7 +137,7 @@ export function Calendar() {
         </div>
       )}
 
-      <div className={`grid gap-3 lg:hidden ${loading ? 'opacity-60' : ''}`}>
+      <div className={`grid gap-3 md:hidden ${loading ? 'opacity-60' : ''}`}>
         {days.map((day) => {
           const isToday = isSameDay(day, today)
           const dayEvents = eventsOfDay(events, day)
@@ -183,7 +183,7 @@ export function Calendar() {
         })}
       </div>
 
-      <div className={`hidden h-[calc(100dvh-15.5rem)] min-h-96 lg:block ${loading ? 'opacity-60' : ''}`}>
+      <div className={`hidden h-[calc(100dvh-15.5rem)] min-h-96 md:block ${loading ? 'opacity-60' : ''}`}>
         <WeekGrid
           days={days}
           events={events}
@@ -233,6 +233,7 @@ export function Calendar() {
           event={dialog.event}
           defaultDate={dialog.date}
           members={members}
+          defaultMemberId={me.id}
           onSave={save}
           onDelete={remove}
           onClose={() => setDialog(null)}
