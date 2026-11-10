@@ -28,6 +28,8 @@ interface Props {
   /** Called with the clicked day and time (rounded to half hours). */
   onSlotClick: (start: Date) => void
   onDayClick: (day: Date) => void
+  /** Phones: run edge to edge (no side borders or rounded corners) to give the days more width. */
+  flush?: boolean
 }
 
 interface Placed {
@@ -89,7 +91,7 @@ function useNow() {
   return now
 }
 
-export function WeekGrid({ days, events, memberById, today, onEventClick, onSlotClick, onDayClick }: Props) {
+export function WeekGrid({ days, events, memberById, today, onEventClick, onSlotClick, onDayClick, flush = false }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
   const now = useNow()
 
@@ -155,7 +157,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter((e) => isAllDayLike(e) && days.some((day) => overlapsDay(e, day)))
   // Narrow time column on phones so the days get as much room as possible.
-  const columns = 'grid [--time-col:1.75rem] sm:[--time-col:3.5rem]'
+  const columns = 'grid [--time-col:1.375rem] sm:[--time-col:3.5rem]'
   const columnStyle = { gridTemplateColumns: `var(--time-col) repeat(${dayCount}, minmax(0, 1fr))` }
 
   function slotClick(day: Date, e: MouseEvent<HTMLDivElement>) {
@@ -165,7 +167,11 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-card">
+    <div
+      className={`flex h-full flex-col overflow-hidden border-line bg-card ${
+        flush ? 'border-y' : 'rounded-3xl border'
+      }`}
+    >
       {/* Day headers */}
       <div className={`${columns} border-b border-line`} style={columnStyle}>
         <div />
@@ -231,7 +237,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
             {HOURS.slice(1).map((hour) => (
               <span
                 key={hour}
-                className="absolute right-1 -translate-y-1/2 text-[13px] font-medium text-ink/70 sm:right-2 sm:text-xs"
+                className="absolute right-0.5 -translate-y-1/2 text-xs font-medium text-ink/70 sm:right-2"
                 style={{ top: hour * hourHeight }}
               >
                 {String(hour).padStart(2, '0')}

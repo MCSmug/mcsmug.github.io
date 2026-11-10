@@ -37,7 +37,7 @@ export function AppShell() {
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {/* Bottom padding keeps the last rows clear of the floating buttons; the calendar handles this itself. */}
-        <div className={`mx-auto px-5 pt-3 ${width} ${wide ? 'h-full pb-3' : 'pb-28'}`}>
+        <div className={`mx-auto px-5 pt-3 ${width} ${wide ? 'h-full md:pb-3' : 'pb-28'}`}>
           <Outlet />
         </div>
       </main>

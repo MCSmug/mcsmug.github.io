@@ -320,7 +320,7 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
       )}
 
       {showGrid && (
-        <div className={`min-h-64 flex-1 ${loading ? 'opacity-60' : ''}`}>
+        <div className={`min-h-64 flex-1 ${isWide ? '' : '-mx-5'} ${loading ? 'opacity-60' : ''}`}>
           <WeekGrid
             days={gridDays}
             events={events}
@@ -329,6 +329,7 @@ export function Calendar({ inPanel = false }: { inPanel?: boolean }) {
             onEventClick={(event, day) => setDialog({ event, date: day })}
             onSlotClick={(start) => setDialog({ date: start })}
             onDayClick={(day) => setDialog({ date: day })}
+            flush={!isWide}
           />
         </div>
       )}
