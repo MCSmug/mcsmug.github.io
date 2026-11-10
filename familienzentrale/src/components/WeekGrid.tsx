@@ -7,6 +7,9 @@ import type { CalendarEvent, Member } from '../lib/types'
 // The grid shows this part of the day without scrolling; the rest is reachable by scrolling.
 const VISIBLE_FROM_HOUR = 7
 const VISIBLE_HOURS = 14
+// Phones show fewer hours at once so the rows are tall enough for readable text.
+const VISIBLE_HOURS_NARROW = 9
+const NARROW_WIDTH = 640
 const MIN_HOUR_HEIGHT = 36
 const DEFAULT_HOUR_HEIGHT = 52
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
@@ -98,7 +101,8 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
     const measure = () => {
       setShown(element.clientHeight > 0)
       if (element.clientHeight > 0) {
-        setHourHeight(Math.max(MIN_HOUR_HEIGHT, element.clientHeight / VISIBLE_HOURS))
+        const hours = element.clientWidth < NARROW_WIDTH ? VISIBLE_HOURS_NARROW : VISIBLE_HOURS
+        setHourHeight(Math.max(MIN_HOUR_HEIGHT, element.clientHeight / hours))
       }
     }
     measure()
@@ -118,7 +122,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
   const memberOf = (e: CalendarEvent) => (e.member_id ? memberById.get(e.member_id) : undefined)
   const allDay = events.filter(isAllDayLike)
   // Narrow time column on phones so the seven days get as much room as possible.
-  const columns = 'grid grid-cols-[2rem_repeat(7,minmax(0,1fr))] sm:grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]'
+  const columns = 'grid grid-cols-[1.75rem_repeat(7,minmax(0,1fr))] sm:grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]'
 
   function slotClick(day: Date, e: MouseEvent<HTMLDivElement>) {
     const y = e.clientY - e.currentTarget.getBoundingClientRect().top
@@ -141,7 +145,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
               onClick={() => onDayClick(day)}
               className="flex flex-col items-center gap-0.5 border-l border-line py-2"
             >
-              <span className={`text-xs font-semibold uppercase ${isToday ? 'text-ink' : 'text-muted'}`}>
+              <span className={`text-xs font-semibold uppercase ${isToday ? 'text-ink' : 'text-ink/70'}`}>
                 {formatWeekdayShort(day)}
               </span>
               <span
@@ -171,7 +175,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                     key={event.id}
                     type="button"
                     onClick={() => onEventClick(event, day)}
-                    className="truncate rounded-lg px-1 py-1 text-left text-[11px] font-semibold text-white sm:px-2 sm:text-sm"
+                    className="truncate rounded-lg px-1 py-1 text-left text-[13px] font-semibold text-white sm:px-2 sm:text-sm"
                     style={{ backgroundColor: personColor(memberOf(event)?.color).value }}
                   >
                     {event.title}
@@ -189,7 +193,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
             {HOURS.slice(1).map((hour) => (
               <span
                 key={hour}
-                className="absolute right-1 -translate-y-1/2 text-xs text-muted sm:right-2"
+                className="absolute right-1 -translate-y-1/2 text-[13px] font-medium text-ink/70 sm:right-2 sm:text-xs"
                 style={{ top: hour * hourHeight }}
               >
                 {String(hour).padStart(2, '0')}
@@ -222,7 +226,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                         e.stopPropagation()
                         onEventClick(event, day)
                       }}
-                      className="absolute overflow-hidden rounded-md border border-white px-0.5 py-0.5 text-left text-white sm:rounded-lg sm:px-1.5"
+                      className="absolute overflow-hidden rounded-md border border-white px-[3px] py-0.5 text-left text-white sm:rounded-lg sm:px-1.5"
                       style={{
                         top: (start / 60) * hourHeight + 1,
                         height,
@@ -231,7 +235,7 @@ export function WeekGrid({ days, events, memberById, today, onEventClick, onSlot
                         backgroundColor: personColor(member?.color).value,
                       }}
                     >
-                      <span className="block text-[11px] leading-tight font-semibold break-words sm:truncate sm:text-sm">
+                      <span className="block text-[13px] leading-[1.15] font-semibold [overflow-wrap:anywhere] hyphens-auto sm:truncate sm:text-sm sm:leading-tight">
                         {event.title}
                       </span>
                       {height >= 40 && (

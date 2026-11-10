@@ -12,7 +12,7 @@ export const PERSON_COLORS: PersonColor[] = [
 ]
 
 // Used for entries that concern the whole family.
-const NEUTRAL: PersonColor = { value: '#5F5B53', tint: '#ECE8E0', label: 'Neutral' }
+const NEUTRAL: PersonColor = { value: '#44403A', tint: '#ECE8E0', label: 'Neutral' }
 
 export function personColor(value: string | null | undefined): PersonColor {
   if (!value) return NEUTRAL
