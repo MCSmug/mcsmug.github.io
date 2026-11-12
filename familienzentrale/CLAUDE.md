@@ -90,8 +90,7 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
   Liste / 3 Tage / Woche (Auswahl in localStorage). In schmalen Spalten liegen gleichzeitige
   Termine versetzt übereinander statt nebeneinander.
 - Wandpanel: Route `/panel` (`src/pages/panel/`), Unterseiten Heute, Kinder, Woche, Einkauf. Hält den
-  Bildschirm an (Wake Lock), dimmt 22–6 Uhr und lädt sich um Mitternacht neu. Der Button
-  „Nachricht an alle“ fehlt noch, bis es den Chat gibt (Stufe 4). Anmeldung mit einem Eltern-Konto.
+  Bildschirm an (Wake Lock), dimmt 22–6 Uhr und lädt sich um Mitternacht neu. Anmeldung mit einem Eltern-Konto.
 - Chat: Tabelle `messages`, Tab „Familie“; „Nachricht an alle“ am Wandpanel schreibt in den Chat und pusht immer.
 - Push: `notify`-Funktion (VAPID-Secrets), Geräte in `push_subscriptions`, Service Worker lädt
   `public/push-sw.js`. Auf iOS nur als Home-Bildschirm-App. Erinnerungen (`reminders`) verschickt
