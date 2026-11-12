@@ -1,6 +1,7 @@
-import { SendHorizontal, Trash2 } from 'lucide-react'
+import { BellRing, SendHorizontal, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
+import { ReminderDialog } from '../components/ReminderDialog'
 import { Button, ErrorNote, TextInput } from '../components/ui'
 import { useFamily } from '../context/family'
 import { useMessages } from '../hooks/useMessages'
@@ -15,6 +16,8 @@ export function Chat() {
   const { messages, loading, error, send, remove } = useMessages(family.id, me.id)
   const [text, setText] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
+  const [push, setPush] = useState(false)
+  const [reminders, setReminders] = useState(false)
   const end = useRef<HTMLDivElement>(null)
 
   const memberById = new Map(members.map((m) => [m.id, m]))
@@ -29,14 +32,24 @@ export function Chat() {
     event.preventDefault()
     const current = text
     setText('')
-    void send(current).then((ok) => {
+    void send(current, push).then((ok) => {
       if (!ok) setText(current)
     })
   }
 
   return (
     <div className="flex h-full flex-col">
-      <h1 className="mb-2 shrink-0 font-display text-3xl font-bold">Familie</h1>
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-3">
+        <h1 className="font-display text-3xl font-bold">Familie</h1>
+        <button
+          type="button"
+          onClick={() => setReminders(true)}
+          className="flex min-h-12 items-center gap-2 rounded-2xl border border-line bg-card px-4 font-semibold"
+        >
+          <BellRing size={18} />
+          Erinnerungen
+        </button>
+      </div>
 
       <div className="-mx-5 min-h-0 flex-1 overflow-y-auto px-5">
         {loading ? (
@@ -104,7 +117,16 @@ export function Chat() {
         </div>
       )}
 
-      <form onSubmit={submit} className="mt-2 flex shrink-0 gap-2 pb-3">
+      <label className="mt-2 flex min-h-11 shrink-0 items-center gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={push}
+          onChange={(e) => setPush(e.target.checked)}
+          className="size-5 accent-ink"
+        />
+        Auch als Push senden
+      </label>
+      <form onSubmit={submit} className="flex shrink-0 gap-2 pb-3">
         <TextInput
           aria-label="Nachricht"
           placeholder="Nachricht an die Familie"
@@ -117,6 +139,10 @@ export function Chat() {
           <SendHorizontal size={22} />
         </Button>
       </form>
+
+      {reminders && (
+        <ReminderDialog familyId={family.id} members={members} onClose={() => setReminders(false)} />
+      )}
     </div>
   )
 }

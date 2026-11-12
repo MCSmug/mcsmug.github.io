@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom'
 
 import { PageTitle } from '../components/AppShell'
 import { ColorPicker } from '../components/ColorPicker'
+import { FeedsCard } from '../components/FeedsCard'
 import { MemberDialog } from '../components/MemberDialog'
+import { PushCard } from '../components/PushCard'
 import { Avatar, Button, Card, ErrorNote, Field, TextInput } from '../components/ui'
 import { useAuth } from '../context/auth'
 import { useFamily } from '../context/family'
@@ -209,6 +211,10 @@ export function Settings() {
             )}
           </Card>
         )}
+
+        <PushCard memberId={me.id} />
+
+        {isParent && <FeedsCard familyId={family.id} members={members} />}
 
         <Card>
           <h2 className="font-display text-xl font-semibold">Wandpanel</h2>

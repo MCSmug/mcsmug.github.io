@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
+import { pushMessage } from '../lib/push'
 import { supabase } from '../lib/supabase'
 import { Button, ErrorNote } from './ui'
 
@@ -20,12 +21,18 @@ export function BroadcastDialog({ familyId, authorId, onClose }: Props) {
     event.preventDefault()
     setBusy(true)
     setError(null)
+    // A message from the panel is meant to reach everyone right away: always push it.
+    const id = crypto.randomUUID()
     const { error } = await supabase
       .from('messages')
-      .insert({ family_id: familyId, author_id: authorId, text: text.trim() })
+      .insert({ id, family_id: familyId, author_id: authorId, text: text.trim(), send_push: true })
     setBusy(false)
-    if (error) setError('Die Nachricht konnte nicht gesendet werden.')
-    else onClose()
+    if (error) {
+      setError('Die Nachricht konnte nicht gesendet werden.')
+      return
+    }
+    void pushMessage(id)
+    onClose()
   }
 
   return (

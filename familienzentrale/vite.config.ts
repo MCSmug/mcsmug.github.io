@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'push-sw.js'],
       manifest: {
         name: 'Familienzentrale',
         short_name: 'Familie',
@@ -30,6 +30,8 @@ export default defineConfig({
         // Only precache the latin font subsets; others load on demand.
         globIgnores: ['**/*-{cyrillic,greek,vietnamese}*.woff2'],
         navigateFallback: '/index.html',
+        // Push handling lives in a plain file that the generated worker loads.
+        importScripts: ['/push-sw.js'],
       },
     }),
   ],

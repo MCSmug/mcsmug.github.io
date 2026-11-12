@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { pushMessage } from '../lib/push'
 import { supabase } from '../lib/supabase'
 import type { Message } from '../lib/types'
 
@@ -46,9 +47,9 @@ export function useMessages(familyId: string, authorId: string) {
     }
   }, [familyId, refetch])
 
-  /** Returns true when the message was stored. */
+  /** Returns true when the message was stored. With `push` the family also gets a notification. */
   const send = useCallback(
-    async (rawText: string) => {
+    async (rawText: string, push = false) => {
       const text = rawText.trim()
       if (!text) return false
       const message: Message = {
@@ -56,19 +57,20 @@ export function useMessages(familyId: string, authorId: string) {
         family_id: familyId,
         author_id: authorId,
         text,
-        send_push: false,
+        send_push: push,
         created_at: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, message])
       const { error } = await supabase
         .from('messages')
-        .insert({ id: message.id, family_id: familyId, author_id: authorId, text })
+        .insert({ id: message.id, family_id: familyId, author_id: authorId, text, send_push: push })
       if (error) {
         setMessages((prev) => prev.filter((m) => m.id !== message.id))
         setError('Die Nachricht konnte nicht gesendet werden.')
         return false
       }
       setError(null)
+      if (push) void pushMessage(message.id)
       return true
     },
     [familyId, authorId],

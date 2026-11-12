@@ -88,6 +88,14 @@ export function Datenschutz() {
         </li>
       </ul>
 
+      <h2>Benachrichtigungen und abonnierte Kalender</h2>
+      <p>
+        Wenn Sie Benachrichtigungen einschalten, speichert die App eine technische Adresse Ihres Geräts.
+        Erinnerungen und Nachrichten werden verschlüsselt über den Benachrichtigungsdienst Ihres Browsers
+        zugestellt (je nach Gerät Apple, Google oder Mozilla). Wenn Sie einen Kalender abonnieren, ruft der
+        Server die angegebene Adresse regelmäßig ab und speichert die Termine in der Datenbank.
+      </p>
+
       <h2>Speicherung im Browser</h2>
       <p>
         Damit Sie angemeldet bleiben, speichert die App Ihre Anmeldung und einzelne Einstellungen (zum

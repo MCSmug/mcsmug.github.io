@@ -63,3 +63,24 @@ export interface Message {
   send_push: boolean
   created_at: string
 }
+
+export interface Reminder {
+  id: string
+  family_id: string
+  target_member_id: string | null
+  text: string
+  fire_at: string
+  sent_at: string | null
+  created_at: string
+}
+
+export interface CalendarFeed {
+  id: string
+  family_id: string
+  member_id: string | null
+  name: string
+  ical_url: string
+  last_synced_at: string | null
+  last_error: string | null
+  created_at: string
+}
