@@ -60,8 +60,8 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 ## Fahrplan
 1. Setup, Auth, Familie & Mitglieder anlegen, Einkaufsliste mit Realtime-Sync — **umgesetzt**
 2. Aufgaben (inkl. Wiederholung) + Kindermodus — **umgesetzt**
-3. Lokaler Kalender + iCal-Import + Heute-/Wochenansicht + Wandpanel
-4. Web Push: Erinnerungen und Nachrichten
+3. Lokaler Kalender + iCal-Import + Heute-/Wochenansicht + Wandpanel — **umgesetzt**
+4. Web Push: Erinnerungen und Nachrichten — **umgesetzt** (auf echten Geräten noch ungetestet)
 5. Feinschliff, Offline, dann Testfamilien
 
 ## Arbeitsweise
@@ -78,7 +78,6 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 - RLS-Helfer: `is_family_member(family_id)`, `is_family_parent(family_id)` – in neuen Tabellen wiederverwenden.
 - Schriften sind selbst gehostet (`@fontsource-variable/*`), keine Google-Fonts-Requests.
 - Tailwind v4: Design-Tokens in `src/index.css` (`@theme`).
-- Tab „Familie“ ist bis Stufe 4 ein Platzhalter.
 - Aufgaben: Abweichung vom Datenmodell – zusätzliche Tabelle `task_completions` (ein Eintrag pro
   Aufgabe und Tag; Einträge von Kinderaufgaben sind die Sterne). `tasks.done_at` gilt nur für
   einmalige Aufgaben. Abhaken läuft ausschließlich über die RPC `set_task_done()`.
@@ -93,6 +92,18 @@ Untere Navigation: Heute · Aufgaben · Einkauf · Familie (Chat).
 - Wandpanel: Route `/panel` (`src/pages/panel/`), Unterseiten Heute, Kinder, Woche, Einkauf. Hält den
   Bildschirm an (Wake Lock), dimmt 22–6 Uhr und lädt sich um Mitternacht neu. Der Button
   „Nachricht an alle“ fehlt noch, bis es den Chat gibt (Stufe 4). Anmeldung mit einem Eltern-Konto.
+- Chat: Tabelle `messages`, Tab „Familie“; „Nachricht an alle“ am Wandpanel schreibt in den Chat und pusht immer.
+- Push: `notify`-Funktion (VAPID-Secrets), Geräte in `push_subscriptions`, Service Worker lädt
+  `public/push-sw.js`. Auf iOS nur als Home-Bildschirm-App. Erinnerungen (`reminders`) verschickt
+  pg_cron jede Minute über `notify`.
+- Kalender-Abos: `calendar_feeds` + Funktion `sync-calendars` (ical.js, Zeitzone Europe/Berlin für
+  ganztägige Termine); importierte Termine haben `events.feed_id` und sind in der App schreibgeschützt.
+- Abweichungen vom Datenmodell: `photo_imports` (Kostenbremse), `calendar_feeds.name/last_error`,
+  `events.feed_id`. Löschen über die RPCs `delete_family()` und `delete_account()`.
+- Service-Rolle hat nur ausdrücklich vergebene Rechte (Projekt ohne „expose new tables“).
+- Supabase-Projekt `upvbrgepebbciuuqebvw` liegt in eu-west-1 (Irland), nicht Frankfurt.
+- Betreiber-Angaben für Impressum/Datenschutz stehen in `src/lib/legal.ts` (noch leer).
+- Offen: eigener Mail-Versand (SMTP), Offline-Bearbeitung (nur Hinweisbanner), Betreiber-Angaben.
 - Bereitstellen kostet Netlify-Guthaben (jeder Upload startet dort einen Build): Änderungen
   sammeln und nur auf ausdrücklichen Wunsch hochladen.
 - `events.ends_at` ist exklusiv; ganztägige Termine laufen von lokaler Mitternacht bis Mitternacht.

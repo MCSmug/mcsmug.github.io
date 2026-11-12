@@ -4,33 +4,45 @@ Familien-App für Wandpanel und Handys: Kalender, Aufgaben, Einkaufsliste, Kinde
 Nachrichten, Push-Erinnerungen. Projektbriefing und Fahrplan stehen in [CLAUDE.md](CLAUDE.md).
 
 **Stand:** Login per Magic Link, Familie und Mitglieder anlegen, Einkaufsliste mit
-Realtime-Sync, Wochenkalender mit eigenen Terminen, Aufgaben mit Wiederholung, Kindermodus, Wandpanel unter `/panel`.
+Realtime-Sync, Wochenkalender mit eigenen Terminen, Aufgaben mit Wiederholung, Kindermodus, Wandpanel unter `/panel`, Familien-Chat, Push-Nachrichten
+und Erinnerungen, Kalender-Abos, Termine aus Fotos.
 
 ## Einrichtung
 
-1. **Supabase-Projekt** in einer EU-Region anlegen (z. B. Frankfurt).
-2. **Migrationen einspielen**: Dateien unter `supabase/migrations/` der Reihe nach im SQL-Editor ausführen
-   oder mit der Supabase-CLI `supabase db push`.
+1. **Supabase-Projekt** in einer EU-Region anlegen.
+2. **Migrationen einspielen**: Dateien unter `supabase/migrations/` der Reihe nach im SQL-Editor
+   ausführen (oder `supabase db push`).
 3. **Auth konfigurieren** (Authentication → URL Configuration): Site-URL und Redirect-URLs
    auf die App-Adresse setzen (lokal `http://localhost:5173`, später die Netlify-URL).
-4. **Optional**: Login per Code statt Link. Dafür muss in Supabase ein eigener
-   Mail-Versand (SMTP) eingerichtet sein; erst dann lässt sich in den E-Mail-Vorlagen
-   „Magic Link“ und „Confirm signup“ der Code `{{ .Token }}` ergänzen. Ohne das gibt es
-   nur den Link.
+4. **Eigener Mail-Versand (SMTP)** unter Authentication → Emails: ohne ihn verschickt Supabase nur
+   etwa zwei Anmelde-Mails pro Stunde, und die E-Mail-Vorlagen lassen sich nicht ändern. Erst mit
+   SMTP kann in den Vorlagen „Magic Link“ und „Confirm signup“ der Code `{{ .Token }}` ergänzt
+   werden (Login per Code statt Link).
 5. `.env.example` nach `.env.local` kopieren und URL + Anon-Key eintragen.
 6. `npm install`, dann `npm run dev`.
 
-## Termine abfotografieren (optional)
+## Server-Funktionen (Edge Functions)
 
-Der Kamera-Knopf im Kalender schickt ein verkleinertes Foto an die Edge Function
-`extract-events`, die die Termine mit der Claude-API ausliest. Das Foto wird nicht gespeichert.
+Alle drei mit `supabase functions deploy <name> --no-verify-jwt` einspielen; sie prüfen die Anmeldung selbst.
 
-1. API-Key unter https://console.anthropic.com anlegen (Guthaben nötig, ein Foto kostet wenige Cent).
-2. Supabase → Edge Functions → Secrets: `ANTHROPIC_API_KEY` mit dem Key anlegen.
-3. Supabase → Edge Functions → neue Funktion `extract-events` anlegen und den Inhalt von
-   `supabase/functions/extract-events/index.ts` einfügen (oder `supabase functions deploy extract-events`).
-4. In den Einstellungen der Funktion „Verify JWT with legacy secret“ ausschalten – die Funktion
-   prüft die Anmeldung und die Familienzugehörigkeit selbst.
+| Funktion | Zweck | Secrets |
+|---|---|---|
+| `extract-events` | Termine aus einem Foto lesen (Claude-API), Limit 30 Fotos pro Familie und Monat | `ANTHROPIC_API_KEY` |
+| `notify` | Web Push: Chat-Nachrichten und fällige Erinnerungen | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` |
+| `sync-calendars` | Abonnierte Kalender (iCal) importieren | – |
+
+- VAPID-Schlüssel erzeugen: `npx web-push generate-vapid-keys`; `VAPID_SUBJECT` ist die App-Adresse
+  oder eine `mailto:`-Adresse.
+- **Zeitgesteuerte Jobs**: `supabase/cron.sql` einmal ausführen (Projekt-Ref eintragen). Sendet fällige
+  Erinnerungen jede Minute und aktualisiert Kalender alle 30 Minuten.
+- Wurde das Projekt ohne „Automatically expose new tables“ angelegt, bekommt auch die Service-Rolle
+  keine Standardrechte; die Migrationen vergeben die nötigen Rechte ausdrücklich.
+- Die Foto-Erkennung schickt das verkleinerte Foto an Anthropic (USA); es wird nicht gespeichert.
+
+## Betreiber-Angaben
+
+Vor der Weitergabe an andere Familien Name, Anschrift und E-Mail in `src/lib/legal.ts` eintragen.
+Sie erscheinen unter `/impressum` und `/datenschutz`.
 
 ## Zweites Elternteil einladen
 
