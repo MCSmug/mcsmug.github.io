@@ -2,6 +2,7 @@ import { CalendarDays, ListChecks, MessageCircle, Settings, ShoppingCart } from 
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 import { useFamily } from '../context/family'
+import { InstallHint } from './InstallHint'
 import { OfflineBanner } from './OfflineBanner'
 
 const tabs = [
@@ -39,6 +40,10 @@ export function AppShell() {
           <Settings size={22} />
         </NavLink>
       </header>
+
+      <div className={`mx-auto w-full shrink-0 ${width}`}>
+        <InstallHint />
+      </div>
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {/* Bottom padding keeps the last rows clear of the floating buttons; the calendar handles this itself. */}

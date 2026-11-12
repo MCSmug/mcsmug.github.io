@@ -1,6 +1,7 @@
 import '@fontsource-variable/inter'
 import '@fontsource-variable/bricolage-grotesque'
 import './index.css'
+import './lib/install' // registers the install-prompt listener as early as possible
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
