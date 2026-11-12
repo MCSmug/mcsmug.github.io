@@ -1,7 +1,9 @@
-import { CalendarDays, Settings, ShoppingCart, Star, Sun } from 'lucide-react'
+import { CalendarDays, Megaphone, Settings, ShoppingCart, Star, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
+import { BroadcastDialog } from '../../components/BroadcastDialog'
+import { OfflineBanner } from '../../components/OfflineBanner'
 import { useFamily } from '../../context/family'
 import { useClock } from '../../hooks/useClock'
 import { useWakeLock } from '../../hooks/useWakeLock'
@@ -19,7 +21,8 @@ const NIGHT_UNTIL_HOUR = 6
 
 /** Wall panel (tablet in landscape): dark navigation on the left, always on, dimmed at night. */
 export function PanelShell() {
-  const { family } = useFamily()
+  const { family, me } = useFamily()
+  const [broadcast, setBroadcast] = useState(false)
   const now = useClock()
   useWakeLock()
 
@@ -50,18 +53,31 @@ export function PanelShell() {
             {label}
           </NavLink>
         ))}
+        <button
+          type="button"
+          onClick={() => setBroadcast(true)}
+          className="mt-auto flex min-h-16 items-center gap-3 rounded-2xl border border-white/30 px-4 text-left text-base leading-tight font-semibold"
+        >
+          <Megaphone size={24} className="shrink-0" />
+          Nachricht an alle
+        </button>
         <NavLink
           to="/einstellungen"
-          className="mt-auto flex min-h-12 items-center gap-3 rounded-2xl px-4 text-sm text-white/60"
+          className="flex min-h-12 items-center gap-3 rounded-2xl px-4 text-sm text-white/60"
         >
           <Settings size={20} />
           Zur App
         </NavLink>
       </nav>
 
-      <main className="min-w-0 flex-1 overflow-y-auto p-6">
-        <Outlet />
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <OfflineBanner />
+        <main className="min-h-0 flex-1 overflow-y-auto p-6">
+          <Outlet />
+        </main>
+      </div>
+
+      {broadcast && <BroadcastDialog familyId={family.id} authorId={me.id} onClose={() => setBroadcast(false)} />}
 
       {/* Night dimming: darkens the screen but still lets touches through. */}
       {isNight && <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-50 bg-black/70" />}

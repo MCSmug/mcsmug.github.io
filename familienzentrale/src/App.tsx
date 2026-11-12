@@ -7,8 +7,9 @@ import { AuthProvider, useAuth } from './context/auth'
 import { FamilyProvider, useFamilyState } from './context/family'
 import { isSupabaseConfigured } from './lib/supabase'
 import { Calendar } from './pages/Calendar'
-import { ComingSoon } from './pages/ComingSoon'
+import { Chat } from './pages/Chat'
 import { Kids } from './pages/Kids'
+import { Datenschutz, Impressum } from './pages/Legal'
 import { Login } from './pages/Login'
 import { Onboarding } from './pages/Onboarding'
 import { PanelShell } from './pages/panel/PanelShell'
@@ -46,10 +47,7 @@ function FamilyGate() {
         <Route index element={<Calendar />} />
         <Route path="aufgaben" element={<Tasks />} />
         <Route path="einkauf" element={<Shopping />} />
-        <Route
-          path="familie"
-          element={<ComingSoon title="Familie" text="Der Familien-Chat folgt in einem späteren Schritt." />}
-        />
+        <Route path="familie" element={<Chat />} />
         <Route path="einstellungen" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
@@ -84,7 +82,12 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <AuthGate />
+      <Routes>
+        {/* Readable without an account. */}
+        <Route path="impressum" element={<Impressum />} />
+        <Route path="datenschutz" element={<Datenschutz />} />
+        <Route path="*" element={<AuthGate />} />
+      </Routes>
     </AuthProvider>
   )
 }

@@ -31,6 +31,7 @@ const ERROR_TEXT: Record<string, string> = {
   unreadable: 'Das Foto konnte nicht ausgewertet werden. Bitte näher und schärfer fotografieren.',
   refused: 'Dieses Foto konnte nicht ausgewertet werden.',
   forbidden: 'Du gehörst zu keiner Familie.',
+  limit: 'Für diesen Monat sind alle Foto-Auswertungen eurer Familie verbraucht. Nächsten Monat geht es weiter.',
 }
 const DEFAULT_ERROR = 'Die Foto-Erkennung hat nicht geklappt. Bitte Verbindung prüfen und noch einmal versuchen.'
 

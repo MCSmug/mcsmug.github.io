@@ -17,6 +17,8 @@ const corsHeaders = {
 const MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 // ~4.5 MB of image data; the app downsizes photos far below this.
 const MAX_BASE64_LENGTH = 6_000_000
+// Cost limit: photos a family may analyse per calendar month.
+const MONTHLY_PHOTO_LIMIT = 30
 
 const Extraction = z.object({
   summary: z.string().describe('One short German sentence saying what the photo shows'),
@@ -74,10 +76,25 @@ Deno.serve(async (req) => {
   if (userError || !userData.user) return json({ error: 'unauthorized' }, 401)
   const { data: membership } = await supabase
     .from('members')
-    .select('id')
+    .select('id, family_id')
     .eq('user_id', userData.user.id)
     .limit(1)
   if (!membership?.length) return json({ error: 'forbidden' }, 403)
+  const familyId = membership[0].family_id as string
+
+  const monthStart = new Date()
+  monthStart.setUTCDate(1)
+  monthStart.setUTCHours(0, 0, 0, 0)
+  const usage = await supabase
+    .from('photo_imports')
+    .select('*', { count: 'exact', head: true })
+    .eq('family_id', familyId)
+    .gte('created_at', monthStart.toISOString())
+  if (usage.error) {
+    console.error('Could not read photo usage:', usage.error.message)
+    return json({ error: 'internal' }, 500)
+  }
+  if ((usage.count ?? 0) >= MONTHLY_PHOTO_LIMIT) return json({ error: 'limit' }, 429)
 
   let body: { image?: unknown; media_type?: unknown; today?: unknown }
   try {
@@ -126,6 +143,10 @@ Deno.serve(async (req) => {
         },
       ],
     })
+
+    // Count every analysed photo, whatever the outcome: the API call has been paid for.
+    const recorded = await supabase.from('photo_imports').insert({ family_id: familyId })
+    if (recorded.error) console.error('Could not record photo usage:', recorded.error.message)
 
     if (response.stop_reason === 'refusal') return json({ error: 'refused' }, 422)
     if (response.stop_reason === 'max_tokens' || !response.parsed_output) {

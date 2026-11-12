@@ -54,3 +54,12 @@ export interface Task {
   is_kid_task: boolean
   created_at: string
 }
+
+export interface Message {
+  id: string
+  family_id: string
+  author_id: string | null
+  text: string
+  send_push: boolean
+  created_at: string
+}

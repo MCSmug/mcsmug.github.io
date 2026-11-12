@@ -1,5 +1,6 @@
 import { Mail } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 
 import { Button, ErrorNote, Field, TextInput } from '../components/ui'
 import { supabase } from '../lib/supabase'
@@ -121,6 +122,14 @@ export function Login() {
           <p className="text-sm text-muted">Kein Passwort nötig: Du bekommst einen Link per E-Mail.</p>
         </form>
       )}
+      <p className="flex gap-4 text-sm text-muted">
+        <Link to="/impressum" className="flex min-h-12 items-center underline">
+          Impressum
+        </Link>
+        <Link to="/datenschutz" className="flex min-h-12 items-center underline">
+          Datenschutz
+        </Link>
+      </p>
     </main>
   )
 }

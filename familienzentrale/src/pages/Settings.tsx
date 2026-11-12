@@ -1,9 +1,10 @@
-import { LogOut, MonitorSmartphone, Trash2 } from 'lucide-react'
+import { LogOut, MonitorSmartphone, Pencil } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 
 import { PageTitle } from '../components/AppShell'
 import { ColorPicker } from '../components/ColorPicker'
+import { MemberDialog } from '../components/MemberDialog'
 import { Avatar, Button, Card, ErrorNote, Field, TextInput } from '../components/ui'
 import { useAuth } from '../context/auth'
 import { useFamily } from '../context/family'
@@ -19,6 +20,8 @@ function memberStatus(member: Member, isMe: boolean): string {
   return 'Elternteil · ohne Login'
 }
 
+type Confirm = 'family' | 'account' | null
+
 export function Settings() {
   const { session } = useAuth()
   const { family, me, members, reload } = useFamily()
@@ -33,7 +36,12 @@ export function Settings() {
   const [email, setEmail] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [editing, setEditing] = useState<Member | null>(null)
+
+  const [familyName, setFamilyName] = useState(family.name)
+  const [familyError, setFamilyError] = useState<string | null>(null)
+  const [confirm, setConfirm] = useState<Confirm>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   async function addMember(event: FormEvent) {
     event.preventDefault()
@@ -57,13 +65,38 @@ export function Settings() {
     await reload()
   }
 
-  async function removeMember(member: Member) {
-    setError(null)
-    const { error } = await supabase.from('members').delete().eq('id', member.id)
-    setConfirmDelete(null)
-    if (error) setError('Das Mitglied konnte nicht entfernt werden.')
+  async function renameFamily(event: FormEvent) {
+    event.preventDefault()
+    setFamilyError(null)
+    const { error } = await supabase.from('families').update({ name: familyName.trim() }).eq('id', family.id)
+    if (error) setFamilyError('Der Name konnte nicht gespeichert werden.')
+    else await reload()
+  }
+
+  async function deleteFamily() {
+    setDeleteError(null)
+    const { error } = await supabase.rpc('delete_family', { p_family_id: family.id })
+    if (error) {
+      setDeleteError('Die Familie konnte nicht gelöscht werden.')
+      return
+    }
+    setConfirm(null)
     await reload()
   }
+
+  async function deleteAccount() {
+    setDeleteError(null)
+    const { error } = await supabase.rpc('delete_account')
+    if (error) {
+      setDeleteError('Das Konto konnte nicht gelöscht werden.')
+      return
+    }
+    // The account no longer exists; drop the local session without asking the server.
+    await supabase.auth.signOut({ scope: 'local' })
+  }
+
+  // The caller is the only parent with a login: deleting the account removes the family as well.
+  const onlyParent = !members.some((m) => m.role === 'parent' && m.user_id && m.id !== me.id)
 
   return (
     <>
@@ -80,27 +113,16 @@ export function Settings() {
                   <p className="font-semibold">{member.name}</p>
                   <p className="truncate text-sm text-muted">{memberStatus(member, member.id === me.id)}</p>
                 </div>
-                {isParent &&
-                  member.id !== me.id &&
-                  (confirmDelete === member.id ? (
-                    <div className="flex gap-2">
-                      <Button variant="secondary" onClick={() => setConfirmDelete(null)} className="px-3 text-sm">
-                        Abbrechen
-                      </Button>
-                      <Button onClick={() => void removeMember(member)} className="bg-danger px-3 text-sm">
-                        Entfernen
-                      </Button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      aria-label={`${member.name} entfernen`}
-                      onClick={() => setConfirmDelete(member.id)}
-                      className="flex size-12 shrink-0 items-center justify-center rounded-full text-muted"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  ))}
+                {isParent && (
+                  <button
+                    type="button"
+                    aria-label={`${member.name} bearbeiten`}
+                    onClick={() => setEditing(member)}
+                    className="flex size-12 shrink-0 items-center justify-center rounded-full text-muted"
+                  >
+                    <Pencil size={18} />
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -161,6 +183,33 @@ export function Settings() {
           </Card>
         )}
 
+        {isParent && (
+          <Card>
+            <h2 className="mb-3 font-display text-xl font-semibold">Familie</h2>
+            <form onSubmit={renameFamily} className="flex gap-2">
+              <TextInput
+                aria-label="Name der Familie"
+                required
+                maxLength={80}
+                value={familyName}
+                onChange={(e) => setFamilyName(e.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="secondary"
+                disabled={!familyName.trim() || familyName.trim() === family.name}
+              >
+                Speichern
+              </Button>
+            </form>
+            {familyError && (
+              <div className="mt-3">
+                <ErrorNote>{familyError}</ErrorNote>
+              </div>
+            )}
+          </Card>
+        )}
+
         <Card>
           <h2 className="font-display text-xl font-semibold">Wandpanel</h2>
           <p className="mt-1 mb-3 text-sm text-muted">
@@ -183,7 +232,71 @@ export function Settings() {
             Abmelden
           </Button>
         </Card>
+
+        <Card>
+          <h2 className="font-display text-xl font-semibold">Daten löschen</h2>
+          {confirm === null ? (
+            <div className="mt-3 flex flex-col items-start gap-3">
+              <Button variant="secondary" onClick={() => setConfirm('account')} className="text-danger">
+                Mein Konto löschen
+              </Button>
+              {isParent && (
+                <Button variant="secondary" onClick={() => setConfirm('family')} className="text-danger">
+                  Ganze Familie löschen
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-danger/30 bg-danger/5 p-4">
+              <p>
+                {confirm === 'family'
+                  ? `„${family.name}“ mit allen Mitgliedern, Terminen, Aufgaben, Einkäufen und Nachrichten wird endgültig gelöscht.`
+                  : onlyParent
+                    ? `Dein Konto wird endgültig gelöscht. Weil außer dir kein Elternteil angemeldet ist, wird auch „${family.name}“ mit allen Einträgen gelöscht.`
+                    : 'Dein Konto wird endgültig gelöscht. Die Familie und ihre Einträge bleiben für die anderen erhalten.'}{' '}
+                Das lässt sich nicht rückgängig machen.
+              </p>
+              {deleteError && <ErrorNote>{deleteError}</ErrorNote>}
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setConfirm(null)
+                    setDeleteError(null)
+                  }}
+                  className="flex-1"
+                >
+                  Abbrechen
+                </Button>
+                <Button
+                  onClick={() => void (confirm === 'family' ? deleteFamily() : deleteAccount())}
+                  className="flex-1 bg-danger"
+                >
+                  Endgültig löschen
+                </Button>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        <p className="flex gap-4 px-1 text-sm text-muted">
+          <Link to="/impressum" className="flex min-h-12 items-center underline">
+            Impressum
+          </Link>
+          <Link to="/datenschutz" className="flex min-h-12 items-center underline">
+            Datenschutz
+          </Link>
+        </p>
       </div>
+
+      {editing && (
+        <MemberDialog
+          member={editing}
+          isMe={editing.id === me.id}
+          onClose={() => setEditing(null)}
+          onChanged={reload}
+        />
+      )}
     </>
   )
 }

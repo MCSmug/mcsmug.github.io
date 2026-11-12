@@ -2,6 +2,7 @@ import { CalendarDays, ListChecks, MessageCircle, Settings, ShoppingCart } from 
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 import { useFamily } from '../context/family'
+import { OfflineBanner } from './OfflineBanner'
 
 const tabs = [
   { to: '/', label: 'Kalender', icon: CalendarDays },
@@ -13,13 +14,17 @@ const tabs = [
 export function AppShell() {
   const { family } = useFamily()
   // The week calendar uses the full width on tablets and the wall panel.
-  const wide = useLocation().pathname === '/'
+  const path = useLocation().pathname
+  const wide = path === '/'
+  // Pages that fill the height themselves and scroll internally (calendar grid, chat).
+  const fill = wide || path === '/familie'
   const width = wide ? 'max-w-7xl' : 'max-w-2xl'
 
   return (
     // The page itself never scrolls: only <main> does, between the fixed-height header and navigation.
     // (A document that scrolls under a position:fixed bar ends up misplaced on iOS after the keyboard closes.)
     <div className="flex h-dvh flex-col overflow-hidden">
+      <OfflineBanner />
       <header
         className={`mx-auto flex w-full shrink-0 items-center justify-between px-5 pt-[max(1rem,env(safe-area-inset-top))] ${width}`}
       >
@@ -37,7 +42,7 @@ export function AppShell() {
 
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {/* Bottom padding keeps the last rows clear of the floating buttons; the calendar handles this itself. */}
-        <div className={`mx-auto px-5 pt-3 ${width} ${wide ? 'h-full md:pb-3' : 'pb-28'}`}>
+        <div className={`mx-auto px-5 pt-3 ${width} ${fill ? `h-full ${wide ? 'md:pb-3' : ''}` : 'pb-28'}`}>
           <Outlet />
         </div>
       </main>

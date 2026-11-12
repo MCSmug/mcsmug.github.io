@@ -6,6 +6,7 @@ import { TaskIcon } from '../../components/TaskIcon'
 import { useFamily } from '../../context/family'
 import { useClock } from '../../hooks/useClock'
 import { useEvents } from '../../hooks/useEvents'
+import { useMessages } from '../../hooks/useMessages'
 import { useShoppingList } from '../../hooks/useShoppingList'
 import { useTasks } from '../../hooks/useTasks'
 import { personColor } from '../../lib/colors'
@@ -14,6 +15,8 @@ import { tasksForToday } from '../../lib/tasks'
 
 const dateFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
 const SHOPPING_PREVIEW = 8
+// A message stays on the panel this long.
+const MESSAGE_VISIBLE_MS = 12 * 60 * 60 * 1000
 
 function Column({ title, count, children }: { title: string; count?: string; children: ReactNode }) {
   return (
@@ -78,6 +81,7 @@ export function PanelToday() {
   const { events } = useEvents(family.id, dayStart, dayEnd)
   const { tasks, doneToday, setDone } = useTasks(family.id, childIds)
   const { items, toggle } = useShoppingList(family.id, me.id)
+  const { messages } = useMessages(family.id, me.id)
 
   const memberById = new Map(members.map((m) => [m.id, m]))
   const todaysEvents = [...events].sort(
@@ -86,12 +90,26 @@ export function PanelToday() {
   const todaysTasks = tasksForToday(tasks, doneToday, dayStart).sort((a, b) => Number(a.done) - Number(b.done))
   const openTasks = todaysTasks.filter((t) => !t.done).length
   const openItems = items.filter((i) => !i.done)
+  const lastMessage = messages.at(-1)
+  const showMessage = lastMessage && now.getTime() - new Date(lastMessage.created_at).getTime() < MESSAGE_VISIBLE_MS
+  const messageAuthor = lastMessage?.author_id ? memberById.get(lastMessage.author_id) : undefined
 
   return (
     <div className="flex h-full flex-col gap-5">
       <header className="flex items-baseline gap-5">
         <p className="font-display text-6xl font-bold tabular-nums">{formatTime(now)}</p>
         <p className="text-2xl text-muted">{dateFormat.format(now)}</p>
+        {showMessage && (
+          <p
+            className="ml-auto max-w-[45%] rounded-2xl px-4 py-2 text-lg"
+            style={{ backgroundColor: personColor(messageAuthor?.color).tint }}
+          >
+            <span className="font-semibold" style={{ color: personColor(messageAuthor?.color).value }}>
+              {messageAuthor?.name ?? 'Nachricht'} · {formatTime(new Date(lastMessage.created_at))}
+            </span>
+            <span className="line-clamp-2 break-words">{lastMessage.text}</span>
+          </p>
+        )}
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-3 gap-5">
