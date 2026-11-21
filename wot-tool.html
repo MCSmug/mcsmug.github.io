@@ -18,6 +18,8 @@
     <div class="tabs" role="tablist" aria-label="Bereiche">
       <button role="tab" data-view="gfx">Grafik</button>
       <button role="tab" data-view="game">Spiel</button>
+      <button role="tab" data-view="pc">PC</button>
+      <button role="tab" data-view="file">Prüfen</button>
       <button role="tab" data-view="tank">Panzer</button>
       <button role="tab" data-view="money">Sparen</button>
     </div>
@@ -89,6 +91,42 @@
       <p>Diese Einstellungen kosten nichts und bringen oft mehr als jede Ausrüstung. Zu finden unter Einstellungen → Spiel, Steuerung, Markierungen und Ton.</p>
     </header>
     <div id="gameGroups"></div>
+  </section>
+
+  <!-- PC -->
+  <section class="view" id="v-pc">
+    <header>
+      <h2>PC, Treiber &amp; Maus</h2>
+      <p>Alles außerhalb des Spiels, das FPS, Verzögerung und Zielen beeinflusst. Bildwiederholrate und G-Sync/FreeSync kommen aus dem Grafik-Bereich.</p>
+    </header>
+    <div class="panel">
+      <label class="f" style="max-width:320px">Grafikkarte von<select id="pcVendor">
+        <option value="nv">NVIDIA</option>
+        <option value="amd">AMD</option>
+      </select></label>
+    </div>
+    <div id="pcGroups"></div>
+  </section>
+
+  <!-- PRUEFEN -->
+  <section class="view" id="v-file">
+    <header>
+      <h2>Deine Einstellungen prüfen</h2>
+      <p>Lade deine Einstellungsdatei, und das Tool zeigt dir, was nicht passt. Die Datei bleibt auf deinem Rechner und wird nur hier im Browser gelesen.</p>
+    </header>
+    <div class="panel">
+      <h3>So findest du die Datei</h3>
+      <ol class="tips">
+        <li>World of Tanks schließen, damit die Datei aktuell ist.</li>
+        <li>Windows-Taste + R drücken, <span class="mono">%APPDATA%\Wargaming.net\WorldOfTanks</span> einfügen und Enter drücken.</li>
+        <li>Die Datei <span class="mono">preferences.xml</span> hier laden.</li>
+      </ol>
+      <div class="actions">
+        <label class="btn" style="background:var(--accent);border-color:var(--accent);color:var(--void)">Datei laden<input type="file" id="prefFile" accept=".xml,text/xml" hidden></label>
+      </div>
+      <p class="muted" style="font-size:.85rem;margin-top:12px">Das Tool ändert nichts an der Datei. Ändere die Einstellungen im Spiel, das ist sicherer als die Datei von Hand zu bearbeiten.</p>
+    </div>
+    <div id="prefOut"></div>
   </section>
 
   <!-- PANZER -->

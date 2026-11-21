@@ -318,9 +318,137 @@
     }).join('');
   }
 
+  /* ---------- PC: driver, Windows, mouse, network, sound ---------- */
+  function pcGroups() {
+    var vrr = $('sync').value === 'vrr', hz = +$('hz').value;
+    var vendor = $('pcVendor').value;
+    var drv = vendor === 'nv' ? ['NVIDIA-Systemsteuerung', 'Unter 3D-Einstellungen → Programmeinstellungen „WorldOfTanks.exe“ auswählen, damit nur WoT betroffen ist.', [
+      ['Energieverwaltungsmodus', 'Maximale Leistung bevorzugen', 'Verhindert, dass die Grafikkarte mitten im Gefecht heruntertaktet.', true],
+      ['Modus für geringe Latenz', 'Ein', 'Kürzere Verzögerung zwischen Maus und Bild.', true],
+      ['Vertikale Synchronisierung', vrr ? 'Ein' : 'Aus', vrr ? 'Zusammen mit G-Sync und der FPS-Begrenzung im Spiel: kein Reißen und keine spürbare Verzögerung. Im Spiel selbst bleibt VSync aus.' : 'Ohne G-Sync verzögert VSync das Zielen.'],
+      ['G-SYNC einrichten', vrr ? 'Für Vollbild aktivieren' : 'Nicht vorhanden', vrr ? 'Unter Anzeige → G-SYNC einrichten.' : ''],
+      ['Maximale Bildfrequenz', 'Aus', 'Die Begrenzung im Spiel reicht. Zwei Begrenzungen stören sich.'],
+      ['Texturfilterung – Qualität', 'Hohe Leistung', 'Kaum sichtbar, etwas mehr FPS.'],
+      ['Bildschärfe', 'Optional, 0,3–0,5', 'Hilft, wenn das Bild mit TSSAA zu weich wirkt.'],
+    ]] : ['AMD Software: Adrenalin', 'Unter Gaming → Spiele → World of Tanks ein eigenes Profil anlegen.', [
+      ['Radeon Anti-Lag', 'Ein', 'Kürzere Verzögerung zwischen Maus und Bild.', true],
+      ['Radeon Chill', 'Aus', 'Senkt sonst die FPS, wenn du wenig bewegst, also genau beim Zielen.', true],
+      ['Radeon Boost', 'Aus', 'Senkt beim Schwenken die Auflösung.'],
+      ['Enhanced Sync', 'Aus', 'Kann zu Rucklern führen.'],
+      ['Warten auf vertikale Aktualisierung', vrr ? 'Aus, außer die Anwendung bestimmt' : 'Aus', ''],
+      ['AMD FreeSync', vrr ? 'Ein' : 'Nicht vorhanden', vrr ? 'Unter Anzeige. Im Spiel FPS knapp unter ' + hz + ' begrenzen.' : ''],
+      ['Radeon Image Sharpening', 'Optional, 40–60 %', 'Hilft, wenn das Bild mit TSSAA zu weich wirkt.'],
+    ]];
+    return [drv,
+      ['Windows', '', [
+        ['Bildwiederholrate des Monitors', hz + ' Hz', 'Einstellungen → System → Anzeige → Erweiterte Anzeige. Steht oft noch auf 60 Hz, obwohl der Monitor mehr kann.', true],
+        ['Spielmodus', 'Ein', 'Einstellungen → Spielen → Spielmodus.'],
+        ['Hardwarebeschleunigte GPU-Planung', 'Ein', 'Einstellungen → System → Anzeige → Grafik. Danach neu starten.'],
+        ['Energiemodus', 'Beste Leistung', 'Einstellungen → System → Netzbetrieb. Bei Laptops nur mit Netzteil.'],
+        ['Zeigerbeschleunigung verbessern', 'Aus', 'Systemsteuerung → Maus → Zeigeroptionen. Sonst hängt der Weg des Fadenkreuzes vom Tempo der Hand ab.', true],
+        ['Xbox Game Bar: Aufnahmen im Hintergrund', 'Aus', 'Nimmt sonst ständig auf und kostet Leistung.'],
+        ['Overlays (Discord, Steam usw.)', 'Für WoT aus', 'Weniger Ruckler. Discord-Sprache funktioniert trotzdem.'],
+      ]],
+      ['Maus', '', [
+        ['DPI', '800–1600', 'Genug für feines Zielen, ohne dass das Fadenkreuz zittert.'],
+        ['Abfragerate (Polling Rate)', '1000 Hz', 'In der Software der Maus.'],
+        ['Empfindlichkeit im Spiel, normale Ansicht', 'Mittel', 'Ein Wisch über das Mauspad sollte den Turm etwa einmal ganz herumdrehen lassen.'],
+        ['Empfindlichkeit im Scharfschützenmodus', 'Niedriger als normal', 'Bei x8 und x16 sonst zu unruhig.', true],
+        ['Seitentasten', 'Belegen', 'Zum Beispiel mit Reparatur, Erste Hilfe oder Munitionswechsel. Dann musst du die Hand nicht von WASD nehmen.'],
+      ]],
+      ['Netzwerk', '', [
+        ['Verbindung', 'LAN-Kabel statt WLAN', 'WLAN verursacht Paketverlust. Das sieht man im Spiel als Ruckeln von Gegnern.', true],
+        ['Server', 'Der mit dem niedrigsten Ping', 'In der Serverauswahl vor dem Login wird der Ping angezeigt.'],
+        ['Downloads im Hintergrund', 'Pausieren', 'Steam, Windows Update und das Wargaming Game Center laden sonst während des Gefechts.'],
+      ]],
+      ['Sound am PC', '', [
+        ['Windows-Raumklang (Sonic, Dolby Atmos usw.)', 'Aus, wenn im Spiel das Kopfhörer-Profil an ist', 'Sonst wird der Ton doppelt bearbeitet und die Richtung ungenau.'],
+        ['Crew-Ansagen im Spiel', 'An', '„Ketten beschädigt“ oder „Munitionslager getroffen“ sind wichtige Informationen.'],
+        ['Kopfhörer', 'Stereo-Kopfhörer reicht', 'Für die Richtung von Schüssen besser als Lautsprecher.'],
+      ]],
+    ];
+  }
+  function renderPc() {
+    $('pcGroups').innerHTML = pcGroups().map(function (g) {
+      return '<div class="panel"><h3>' + esc(g[0]) + '</h3>' + (g[1] ? '<p class="muted">' + esc(g[1]) + '</p>' : '') +
+        '<table class="rows"><thead><tr><th>Einstellung</th><th>Wert</th><th>Warum</th></tr></thead><tbody>' +
+        g[2].map(function (r) {
+          return '<tr><td>' + esc(r[0]) + (r[3] ? '<span class="tag key">wichtig</span>' : '') + '</td><td class="val">' + esc(r[1]) + '</td><td class="why">' + esc(r[2]) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }).join('');
+  }
+  $('pcVendor').addEventListener('change', renderPc);
+  ['hz', 'sync'].forEach(function (id) { $(id).addEventListener('change', renderPc); });
+
+  /* ---------- preferences.xml check (read only, in browser) ---------- */
+  var GFX_NAMES = {
+    TEXTURE_QUALITY: 'Texturqualität', SHADOWS_QUALITY: 'Schattenqualität', TERRAIN_QUALITY: 'Landschaftsqualität',
+    LIGHTING_QUALITY: 'Beleuchtungsqualität', OBJECT_LOD: 'Objektdetails', SPEEDTREE_QUALITY: 'Baumdetails',
+    FLORA_QUALITY: 'Anzahl der Pflanzen', EFFECTS_QUALITY: 'Zusätzliche Effekte', SNIPER_MODE_EFFECTS_QUALITY: 'Effekte im Scharfschützenmodus',
+    POST_PROCESSING_QUALITY: 'Nachbearbeitung', MOTION_BLUR_QUALITY: 'Bewegungsunschärfe', WATER_QUALITY: 'Wasserqualität',
+    FAR_PLANE: 'Sichtweite', CUSTOM_AA_MODE: 'Kantenglättung', DECALS_QUALITY: 'Decals', TRACK_PHYSICS_QUALITY: 'Kettenphysik',
+    VEHICLE_DUST_ENABLED: 'Staub der Fahrzeuge', VEHICLE_TRACES_ENABLED: 'Kettenspuren', SNIPER_MODE_GRASS_ENABLED: 'Gras im Scharfschützenmodus',
+    SEMITRANSPARENT_LEAVES_ENABLED: 'Durchsichtige Blätter', RENDER_PIPELINE: 'Renderer (Standard/Verbessert)', HAVOK_ENABLED: 'Zerstörungsphysik',
+  };
+  function readPrefs(txt) {
+    var hz = +$('hz').value, out = [], m;
+    function tag(name) {
+      var r = new RegExp('<' + name + '>\\s*([^<]*?)\\s*</' + name + '>', 'i').exec(txt);
+      return r ? r[1] : null;
+    }
+    function bool(v) { return v !== null && /^(true|1)$/i.test(v); }
+    if (!/<graphicsPreferences>|<devicePreferences>/i.test(txt)) {
+      $('prefOut').innerHTML = '<div class="warn bad">Das sieht nicht nach der preferences.xml von World of Tanks aus. Sie liegt unter %APPDATA%\\Wargaming.net\\WorldOfTanks\\.</div>';
+      return;
+    }
+    var checks = [];
+    var refresh = tag('fullscreenRefresh'), w = tag('fullscreenWidth'), h = tag('fullscreenHeight');
+    var windowed = tag('windowed'), vs = tag('waitVSync'), tb = tag('tripleBuffering');
+    if (w && h) checks.push(['Auflösung', w + ' × ' + h, 'ok', '']);
+    if (refresh !== null) {
+      var r = +refresh;
+      checks.push(['Bildwiederholrate im Spiel', r + ' Hz', r && r < hz - 1 ? 'bad' : 'ok',
+        r && r < hz - 1 ? 'Dein Monitor kann ' + hz + ' Hz (Angabe im Grafik-Bereich). Im Spiel unter Grafik → Bildschirm die Bildwiederholrate hochsetzen.' : '']);
+    }
+    if (windowed !== null) checks.push(['Fenstermodus', bool(windowed) ? 'Fenster' : 'Vollbild', bool(windowed) ? 'warn' : 'ok', bool(windowed) ? 'Vollbild hat die geringste Verzögerung.' : '']);
+    if (vs !== null) checks.push(['VSync', bool(vs) ? 'An' : 'Aus', bool(vs) ? 'bad' : 'ok', bool(vs) ? 'Im Spiel ausschalten. Mit G-Sync/FreeSync stattdessen die FPS knapp unter der Bildwiederholrate begrenzen.' : '']);
+    if (tb !== null) checks.push(['Dreifachpufferung', bool(tb) ? 'An' : 'Aus', bool(tb) ? 'warn' : 'ok', bool(tb) ? 'Ohne VSync unnötig, ausschalten.' : '']);
+
+    var entries = [], re = /<entry>\s*<label>\s*([^<]+?)\s*<\/label>\s*<activeOption>\s*(-?\d+)\s*<\/activeOption>/gi;
+    while ((m = re.exec(txt))) entries.push([m[1], +m[2]]);
+
+    var html = '';
+    if (checks.length) {
+      html += '<div class="panel"><h3>Bildschirm</h3><table class="rows"><thead><tr><th>Einstellung</th><th>Bei dir</th><th>Hinweis</th></tr></thead><tbody>' +
+        checks.map(function (c) {
+          var mark = { ok: '<span class="tag" style="color:var(--c-ok);border-color:var(--c-ok)">passt</span>', warn: '<span class="tag key">prüfen</span>', bad: '<span class="tag" style="color:var(--c-bad);border-color:var(--c-bad)">ändern</span>' }[c[2]];
+          return '<tr><td>' + esc(c[0]) + mark + '</td><td class="val">' + esc(c[1]) + '</td><td class="why">' + esc(c[3]) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    if (entries.length) {
+      html += '<div class="panel"><h3>Grafik-Einträge</h3><p class="muted">Gefundene Einträge mit der gespeicherten Stufe. Die Zahl ist der Index im Auswahlmenü des Spiels, nicht der Name. Vergleiche ihn mit der Tabelle im Grafik-Bereich.</p>' +
+        '<table class="rows"><thead><tr><th>Einstellung</th><th>Gespeicherter Index</th><th>Eintrag in der Datei</th></tr></thead><tbody>' +
+        entries.map(function (e) {
+          return '<tr><td>' + esc(GFX_NAMES[e[0]] || e[0]) + '</td><td class="val mono">' + e[1] + '</td><td class="why mono">' + esc(e[0]) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    if (!html) html = '<div class="warn">Die Datei wurde gelesen, aber keine bekannten Einträge gefunden.</div>';
+    var bad = checks.filter(function (c) { return c[2] === 'bad'; }).length;
+    $('prefOut').innerHTML = '<div class="' + (bad ? 'warn bad' : 'warn') + '">' + (bad ? bad + ' Punkt(e) solltest du ändern. Am einfachsten direkt im Spiel, nicht in der Datei.' : 'Keine groben Fehler bei Bildschirm und Synchronisation gefunden.') + ' ' + entries.length + ' Grafik-Einträge gelesen.</div>' + html;
+  }
+  $('prefFile').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    if (f.size > 5e6) { $('prefOut').innerHTML = '<div class="warn bad">Die Datei ist zu groß für eine preferences.xml.</div>'; return; }
+    var rd = new FileReader();
+    rd.onload = function () { readPrefs(String(rd.result)); };
+    rd.readAsText(f);
+    this.value = '';
+  });
+
   /* ---------- init ---------- */
   fillStyles();
-  gfx(); renderGame(); tank(); renderMoney();
+  gfx(); renderGame(); tank(); renderMoney(); renderPc();
   var start = (location.hash || '').slice(1);
   if (!document.getElementById('v-' + start)) { try { start = localStorage.getItem('wot-view') || 'gfx'; } catch (e) { start = 'gfx'; } }
   if (!document.getElementById('v-' + start)) start = 'gfx';

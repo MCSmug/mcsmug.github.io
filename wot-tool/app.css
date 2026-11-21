@@ -79,7 +79,7 @@ table.rows td.why{color:var(--muted);font-size:.9rem}
 .slot.special{border-color:var(--accent)}
 
 ul.tips{margin:10px 0 0;padding-left:20px}
-ul.tips li{margin:6px 0}
+ul.tips li{margin:6px 0;overflow-wrap:anywhere}
 .warn{border-left:3px solid var(--c-warn);padding:10px 14px;background:rgba(227,179,65,.07);margin-top:14px;border-radius:0 var(--r) var(--r) 0}
 .bad{border-left-color:var(--c-bad);background:rgba(255,107,91,.07)}
 .foot{margin-top:40px;font-size:.82rem;color:var(--muted);max-width:75ch}
