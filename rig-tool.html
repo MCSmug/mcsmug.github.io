@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Rig-Tool — Christian Seitz</title>
+<meta name="description" content="iRacing Grafik-Optimierer und Tastenbelegungs-Planer passend zu deiner Hardware.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E13;--surface:#121821;--surface-2:#1A2430;--border:#26323F;
+    --text:#E7ECF1;--text-muted:#8FA0AF;--teal:#23D2B5;--amber:#EFA23B;--rose:#F26E82;
+    --font-display:'Saira Condensed', sans-serif;--font-body:'IBM Plex Sans', sans-serif;--font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{color-scheme:dark;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:980px;margin:0 auto;padding:48px 24px 80px;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:600;margin:0;}
+  :focus-visible{outline:2px solid var(--teal);outline-offset:3px;}
+  button,select,input{font:inherit;color:inherit;}
+  a{color:var(--teal);}
+
+  .sg-topbar{position:sticky;top:0;z-index:50;background:rgba(10,14,19,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .sg-topbar-inner{max-width:980px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:26px;overflow-x:auto;}
+  .sg-topbar .brand{margin-right:auto;font-family:var(--font-display);font-weight:600;color:var(--text);font-size:1rem;text-decoration:none;white-space:nowrap;}
+  .sg-topbar a:not(.brand){font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;padding:8px 0;border-bottom:2px solid transparent;white-space:nowrap;}
+  .sg-topbar a:not(.brand):hover{color:var(--text);}
+  .sg-topbar a.active{color:var(--teal);border-color:var(--teal);}
+
+  .eyebrow{font-family:var(--font-mono);font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .eyebrow .dot{width:6px;height:6px;background:var(--teal);border-radius:50%;flex:none;}
+  h1{font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;}
+  .sub{color:var(--text-muted);max-width:62ch;margin-top:14px;}
+
+  .tabs{display:flex;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:32px;overflow-x:auto;}
+  .tab{flex:1;min-width:130px;background:var(--surface);border:none;padding:14px 12px;cursor:pointer;text-align:left;}
+  .tab .n{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);display:block;}
+  .tab .t{font-family:var(--font-display);font-weight:600;font-size:1.05rem;}
+  .tab:hover{background:var(--surface-2);}
+  .tab[aria-selected="true"]{background:var(--surface-2);box-shadow:inset 0 -3px 0 var(--teal);}
+  .panel{display:none;margin-top:28px;}
+  .panel.show{display:block;}
+
+  .card{border:1px solid var(--border);background:var(--surface);padding:20px 22px;margin-top:16px;}
+  .card h2{font-size:1.25rem;margin-bottom:4px;}
+  .card h3{font-size:1.05rem;}
+  .muted{color:var(--text-muted);font-size:0.88rem;}
+  .mono{font-family:var(--font-mono);font-size:0.8rem;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px;}
+  label.f{display:flex;flex-direction:column;gap:6px;font-size:0.82rem;color:var(--text-muted);}
+  select,input[type=number],input[type=text]{background:var(--bg);border:1px solid var(--border);padding:10px 12px;min-height:44px;width:100%;}
+  select:focus,input:focus{border-color:var(--teal);outline:none;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.04em;text-transform:uppercase;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn.primary{background:var(--teal);color:#06231E;border-color:var(--teal);}
+  .btn.primary:hover{background:#4fe0c7;color:#06231E;}
+  .btn.danger:hover{border-color:var(--rose);color:var(--rose);}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;}
+
+  .detect{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--border);background:var(--bg);margin-top:14px;}
+  .detect .badge{font-family:var(--font-mono);font-size:0.7rem;padding:2px 8px;border:1px solid currentColor;white-space:nowrap;}
+  .ok{color:var(--teal);} .warn{color:var(--amber);} .bad{color:var(--rose);}
+
+  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-top:16px;}
+  .summary div{background:var(--surface);padding:14px 16px;}
+  .summary .k{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
+  .summary .v{font-family:var(--font-display);font-size:1.4rem;font-weight:600;}
+
+  table{width:100%;border-collapse:collapse;}
+  .settings td,.settings th{padding:11px 10px;border-bottom:1px solid var(--surface-2);text-align:left;vertical-align:top;font-size:0.88rem;}
+  .settings th{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+  .settings .grp td{background:var(--bg);font-family:var(--font-mono);font-size:0.72rem;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;}
+  .val{font-family:var(--font-mono);font-weight:500;color:var(--text);white-space:nowrap;}
+  .cost{font-family:var(--font-mono);font-size:0.7rem;white-space:nowrap;}
+  .note{color:var(--text-muted);font-size:0.8rem;}
+  .tbl-scroll{overflow-x:auto;}
+
+  ul.tips{margin:10px 0 0;padding-left:20px;}
+  ul.tips li{margin:6px 0;font-size:0.9rem;}
+
+  .dev{border:1px solid var(--border);background:var(--bg);padding:14px;margin-top:12px;}
+  .dev-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .dev-name{font-family:var(--font-display);font-weight:600;font-size:1.05rem;word-break:break-word;}
+  .btns{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;}
+  .b{width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.65rem;border:1px solid var(--border);color:var(--text-muted);}
+  .b.on{background:var(--teal);color:#06231E;border-color:var(--teal);}
+  .axes{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px;}
+  .ax{font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);}
+  .ax .bar{height:8px;background:var(--surface-2);margin-top:3px;position:relative;overflow:hidden;}
+  .ax .bar i{position:absolute;top:0;bottom:0;left:0;background:var(--amber);}
+
+  .binds td{padding:9px 10px;border-bottom:1px solid var(--surface-2);font-size:0.88rem;vertical-align:middle;}
+  .binds .assign{font-family:var(--font-mono);font-size:0.76rem;}
+  .binds tr.learning td{background:rgba(35,210,181,.08);}
+  .binds tr.conflict .assign{color:var(--rose);}
+  .mini{min-height:36px;padding:6px 10px;font-size:0.68rem;}
+
+  .file{border:1px solid var(--border);background:var(--bg);margin-top:12px;}
+  .file summary{cursor:pointer;padding:12px 14px;font-family:var(--font-mono);font-size:0.82rem;display:flex;justify-content:space-between;gap:10px;}
+  .file .body{padding:0 14px 14px;max-height:420px;overflow:auto;}
+  .file pre{margin:0;font-family:var(--font-mono);font-size:0.74rem;white-space:pre-wrap;word-break:break-all;color:var(--text-muted);}
+  .ini td{font-family:var(--font-mono);font-size:0.74rem;padding:4px 8px;border-bottom:1px solid var(--surface-2);}
+  .ini .sec td{color:var(--teal);padding-top:12px;}
+
+  textarea.report{width:100%;min-height:180px;background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:var(--font-mono);font-size:0.72rem;padding:12px;margin-top:12px;}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--teal);color:#06231E;padding:10px 18px;font-family:var(--font-mono);font-size:0.8rem;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .toast.show{opacity:1;}
+
+  @media (max-width:640px){
+    .wrap{padding:32px 16px 64px;}
+    .sg-topbar-inner{padding:0 16px;}
+    .card{padding:16px;}
+    .summary{grid-template-columns:repeat(2,1fr);}
+  }
+  @media print{
+    body{background:#fff;color:#000;}
+    .sg-topbar,.tabs,.no-print,.panel:not(#p-binds),header.intro{display:none !important;}
+    #p-binds{display:block !important;}
+    .card{border:1px solid #999;background:#fff;}
+    .binds td{color:#000;border-color:#ccc;}
+    .binds tr.unassigned{display:none;}
+  }
+</style>
+</head>
+<body>
+<header class="sg-topbar">
+  <div class="sg-topbar-inner">
+    <a class="brand" href="index.html">Christian Seitz</a>
+    <a href="index.html">Home</a>
+    <a href="setup-guide.html">Setup Guide</a>
+    <a href="setup-rechner.html">Rechner</a>
+    <a href="rig-tool.html" class="active">Rig-Tool</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow"><span class="dot"></span>iRacing · Grafik & Tastenbelegung · Beta</div>
+    <h1>Rig-Tool</h1>
+    <p class="sub">Grafikeinstellungen passend zu deiner Hardware, Tastenbelegung mit Live-Erkennung deiner Geräte und ein Blick in deine iRacing-Dateien. Alles läuft lokal in deinem Browser, nichts wird hochgeladen.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="hw"><span class="n">01</span><span class="t">Hardware</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="gfx"><span class="n">02</span><span class="t">Grafik</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="binds"><span class="n">03</span><span class="t">Tasten</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="files"><span class="n">04</span><span class="t">Dateien & Bericht</span></button>
+  </div>
+
+  <!-- 01 HARDWARE -->
+  <section class="panel show" id="p-hw" role="tabpanel">
+    <div class="card">
+      <h2>Grafikkarte</h2>
+      <p class="muted">Wird automatisch erkannt, wenn dein Browser es zulässt. Stimmt etwas nicht, wähle sie unten selbst aus.</p>
+      <div class="detect" id="gpuDetect"></div>
+      <div class="grid">
+        <label class="f">Grafikkarte
+          <select id="gpu"></select>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Prozessor & Speicher</h2>
+      <p class="muted">iRacing hängt stark an der Leistung eines einzelnen CPU-Kerns. Die CPU bestimmt vor allem, wie viele Fahrzeuge flüssig dargestellt werden.</p>
+      <div class="grid">
+        <label class="f">CPU-Klasse
+          <select id="cpu">
+            <option value="1">Einsteiger · z. B. i5-8400, Ryzen 5 2600</option>
+            <option value="2" selected>Mittelklasse · z. B. i5-12600K, Ryzen 5 5600X</option>
+            <option value="3">Oberklasse · z. B. i7-13700K, Ryzen 7 7700X</option>
+            <option value="4">Top · z. B. Ryzen 7 7800X3D / 9800X3D, i9-14900K</option>
+          </select>
+        </label>
+        <label class="f">Arbeitsspeicher
+          <select id="ram">
+            <option value="8">8 GB</option>
+            <option value="16">16 GB</option>
+            <option value="32" selected>32 GB</option>
+            <option value="64">64 GB oder mehr</option>
+          </select>
+        </label>
+      </div>
+      <p class="muted mono" id="cpuDetect" style="margin-top:12px"></p>
+    </div>
+
+    <div class="card">
+      <h2>Anzeige</h2>
+      <div class="grid">
+        <label class="f">Setup
+          <select id="mode">
+            <option value="single">Ein Monitor</option>
+            <option value="ultrawide">Ultrawide / Super-Ultrawide</option>
+            <option value="triple">Triple-Screen</option>
+            <option value="vr">VR-Brille</option>
+          </select>
+        </label>
+        <label class="f" id="resWrap">Auflösung (pro Monitor)
+          <select id="res"></select>
+        </label>
+        <label class="f">Bildwiederholrate
+          <select id="hz"></select>
+        </label>
+        <label class="f">Ziel
+          <select id="goal">
+            <option value="race">Rennen · maximale FPS, wenig Ablenkung</option>
+            <option value="balanced" selected>Ausgewogen</option>
+            <option value="looks">Optik · Replays, Streams, Screenshots</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button class="btn primary" data-goto="gfx">Empfehlung ansehen →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 GRAFIK -->
+  <section class="panel" id="p-gfx" role="tabpanel">
+    <div class="summary" id="gfxSummary"></div>
+    <div class="card">
+      <h2>Empfohlene Einstellungen</h2>
+      <p class="muted">In iRacing unter <b>Optionen → Grafik</b>. Die Werte sind Richtwerte nach Leistungsklasse. Bezeichnungen können im Sim leicht abweichen. Sobald deine echte <span class="mono">rendererDX11Monitor.ini</span> vorliegt, gleichen wir sie damit ab.</p>
+      <div class="tbl-scroll">
+        <table class="settings" id="gfxTable"></table>
+      </div>
+      <div class="row no-print">
+        <button class="btn" id="copyGfx">Empfehlung kopieren</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Tipps für dein Setup</h2>
+      <ul class="tips" id="tips"></ul>
+    </div>
+  </section>
+
+  <!-- 03 TASTEN -->
+  <section class="panel" id="p-binds" role="tabpanel">
+    <div class="card no-print">
+      <h2>Angeschlossene Geräte</h2>
+      <p class="muted">Lenkrad, Pedale und Button-Boxen erscheinen hier, sobald du am Gerät eine Taste drückst oder eine Achse bewegst. Funktioniert in Chrome und Edge am besten.</p>
+      <div id="devices"><p class="muted mono" id="noDev">Noch kein Gerät erkannt. Drück eine Taste am Lenkrad.</p></div>
+    </div>
+
+    <div class="card">
+      <div class="dev-head">
+        <div>
+          <h2>Belegung planen</h2>
+          <p class="muted no-print">Klick bei einer Funktion auf <b>Zuweisen</b> und drück dann die gewünschte Taste oder bewege die Achse. Doppelte Belegungen werden rot markiert.</p>
+        </div>
+      </div>
+      <div class="row no-print">
+        <label class="f" style="min-width:220px;flex:1">Profil
+          <select id="profile"></select>
+        </label>
+        <button class="btn mini" id="newProfile">+ Profil</button>
+        <button class="btn mini danger" id="delProfile">Profil löschen</button>
+      </div>
+      <div class="tbl-scroll"><table class="binds" id="bindTable"></table></div>
+      <div class="row no-print">
+        <button class="btn primary" id="printBinds">Spickzettel drucken</button>
+        <button class="btn" id="exportBinds">Profil exportieren</button>
+        <label class="btn" style="cursor:pointer">Profil importieren<input type="file" id="importBinds" accept=".json" hidden></label>
+        <button class="btn danger" id="clearBinds">Alle Zuweisungen löschen</button>
+      </div>
+      <p class="muted no-print" style="margin-top:14px">Die Belegung wird hier geplant und in diesem Browser gespeichert. In iRacing überträgst du sie unter <b>Optionen → Steuerung</b>: Funktion anklicken, Taste drücken. Direktes Schreiben in die <span class="mono">controls.cfg</span> folgt, sobald das Dateiformat geprüft ist.</p>
+    </div>
+  </section>
+
+  <!-- 04 DATEIEN -->
+  <section class="panel" id="p-files" role="tabpanel">
+    <div class="card">
+      <h2>iRacing-Ordner einlesen</h2>
+      <p class="muted">Wähle den Ordner <span class="mono">Dokumente\iRacing</span>. Die Dateien werden nur gelesen, nichts wird verändert oder hochgeladen.</p>
+      <div class="row">
+        <button class="btn primary" id="pickDir">Ordner auswählen</button>
+        <label class="btn" style="cursor:pointer">Einzelne Dateien wählen<input type="file" id="pickFiles" multiple accept=".ini,.cfg,.yaml,.yml,.txt" hidden></label>
+      </div>
+      <div id="fileList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Bericht für die Auswertung</h2>
+      <p class="muted">Fasst Hardware, erkannte Geräte, die gewählte Empfehlung und die eingelesenen Dateien zusammen. Kopier den Bericht und schick ihn mir im Chat, dann passe ich das Tool genau an dein Rig an.</p>
+      <div class="row">
+        <button class="btn primary" id="makeReport">Bericht erstellen & kopieren</button>
+      </div>
+      <textarea class="report" id="report" readonly placeholder="Hier erscheint der Bericht."></textarea>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Hilfsfunktionen ---------- */
+const $ = s => document.querySelector(s);
+const el = (tag, attrs, html) => { const e = document.createElement(tag); if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('rigtool:' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('rigtool:' + k, JSON.stringify(v)); } catch(e){} }
+};
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200); }
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); toast('In die Zwischenablage kopiert'); return true; }
+  catch(e){ toast('Kopieren nicht erlaubt – bitte manuell markieren'); return false; }
+}
+
+/* ---------- Tabs ---------- */
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === id ? 'true' : 'false'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('show', p.id === 'p-' + id));
+  store.set('tab', id);
+  if (id === 'gfx') renderGfx();
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => { showTab(b.dataset.goto); window.scrollTo({top:0, behavior:'smooth'}); }));
+
+/* ---------- GPU-Datenbank (Leistungsindex, RTX 4090 = 100, Richtwerte) ---------- */
+const GPUS = [
+  ['NVIDIA RTX 5090',130],['NVIDIA RTX 5080',85],['NVIDIA RTX 5070 Ti',75],['NVIDIA RTX 5070',60],['NVIDIA RTX 5060 Ti',45],['NVIDIA RTX 5060',40],
+  ['NVIDIA RTX 4090',100],['NVIDIA RTX 4080 Super',80],['NVIDIA RTX 4080',78],['NVIDIA RTX 4070 Ti Super',68],['NVIDIA RTX 4070 Ti',63],['NVIDIA RTX 4070 Super',58],['NVIDIA RTX 4070',50],['NVIDIA RTX 4060 Ti',38],['NVIDIA RTX 4060',32],
+  ['NVIDIA RTX 3090 Ti',62],['NVIDIA RTX 3090',57],['NVIDIA RTX 3080 Ti',55],['NVIDIA RTX 3080',50],['NVIDIA RTX 3070 Ti',42],['NVIDIA RTX 3070',39],['NVIDIA RTX 3060 Ti',35],['NVIDIA RTX 3060',27],['NVIDIA RTX 3050',18],
+  ['NVIDIA RTX 2080 Ti',40],['NVIDIA RTX 2080 Super',34],['NVIDIA RTX 2080',32],['NVIDIA RTX 2070 Super',30],['NVIDIA RTX 2070',27],['NVIDIA RTX 2060 Super',25],['NVIDIA RTX 2060',22],
+  ['NVIDIA GTX 1660 Ti',18],['NVIDIA GTX 1660 Super',18],['NVIDIA GTX 1660',16],['NVIDIA GTX 1650',11],['NVIDIA GTX 1080 Ti',28],['NVIDIA GTX 1080',22],['NVIDIA GTX 1070 Ti',20],['NVIDIA GTX 1070',18],['NVIDIA GTX 1060',13],
+  ['AMD RX 9070 XT',72],['AMD RX 9070',62],['AMD RX 7900 XTX',82],['AMD RX 7900 XT',70],['AMD RX 7900 GRE',58],['AMD RX 7800 XT',52],['AMD RX 7700 XT',43],['AMD RX 7600 XT',30],['AMD RX 7600',28],
+  ['AMD RX 6950 XT',56],['AMD RX 6900 XT',52],['AMD RX 6800 XT',48],['AMD RX 6800',42],['AMD RX 6750 XT',36],['AMD RX 6700 XT',34],['AMD RX 6650 XT',28],['AMD RX 6600 XT',27],['AMD RX 6600',24],['AMD RX 5700 XT',23],['AMD RX 580',11],
+  ['Intel Arc B580',30],['Intel Arc A770',27],['Intel Arc A750',24]
+];
+const norm = s => s.toLowerCase().replace(/geforce|radeon|nvidia|amd|intel|\(r\)|\(tm\)/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+const gpuSel = $('#gpu');
+gpuSel.appendChild(el('option', {value:''}, '– bitte wählen –'));
+['NVIDIA','AMD','Intel'].forEach(brand => {
+  const og = el('optgroup', {label: brand});
+  GPUS.filter(g => g[0].startsWith(brand)).forEach(g => og.appendChild(el('option', {value:g[0]}, esc(g[0].replace(brand + ' ','')))));
+  gpuSel.appendChild(og);
+});
+
+function detectGpu(){
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    if (!gl) return null;
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const r = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    return r || null;
+  } catch(e){ return null; }
+}
+function matchGpu(renderer){
+  if (!renderer) return null;
+  const n = ' ' + norm(renderer) + ' ';
+  const sorted = GPUS.slice().sort((a,b) => norm(b[0]).length - norm(a[0]).length);
+  for (const g of sorted){
+    const key = norm(g[0]);
+    if (n.includes(' ' + key + ' ')) return g[0];
+  }
+  return null;
+}
+const gpuRenderer = detectGpu();
+const gpuMatch = matchGpu(gpuRenderer);
+(function(){
+  const d = $('#gpuDetect');
+  if (gpuMatch){
+    d.innerHTML = '<span class="badge ok">erkannt</span><div><b>' + esc(gpuMatch) + '</b><div class="muted mono">' + esc(gpuRenderer) + '</div></div>';
+  } else if (gpuRenderer){
+    d.innerHTML = '<span class="badge warn">unklar</span><div>Erkannt: <span class="mono">' + esc(gpuRenderer) + '</span><div class="muted">Nicht eindeutig zuzuordnen. Bitte unten auswählen. Läuft der Browser über die Onboard-Grafik, zeigt er hier die falsche Karte.</div></div>';
+  } else {
+    d.innerHTML = '<span class="badge bad">nicht erkannt</span><div class="muted">Dein Browser gibt die Grafikkarte nicht preis. Bitte unten auswählen.</div>';
+  }
+  const cores = navigator.hardwareConcurrency;
+  $('#cpuDetect').textContent = cores ? 'Browser meldet ' + cores + ' CPU-Threads' + (navigator.deviceMemory ? ' · mindestens ' + navigator.deviceMemory + ' GB RAM (Browser zeigt höchstens 8)' : '') + '. Das CPU-Modell selbst gibt der Browser nicht preis.' : '';
+})();
+
+/* ---------- Anzeige-Optionen ---------- */
+const RES = {
+  single: [['1920x1080','1920 × 1080 (Full HD)'],['2560x1440','2560 × 1440 (WQHD)'],['3840x2160','3840 × 2160 (4K)']],
+  ultrawide: [['2560x1080','2560 × 1080'],['3440x1440','3440 × 1440'],['3840x1600','3840 × 1600'],['5120x1440','5120 × 1440 (Super-Ultrawide)'],['5120x2160','5120 × 2160']],
+  triple: [['1920x1080','3 × 1920 × 1080'],['2560x1440','3 × 2560 × 1440'],['3840x2160','3 × 3840 × 2160']],
+  vr: [['quest3','Meta Quest 3 / 3S'],['quest2','Meta Quest 2'],['pico4','Pico 4 / 4 Ultra'],['g2','HP Reverb G2'],['index','Valve Index'],['crystal','Pimax Crystal / Light'],['beyond2','Bigscreen Beyond 2'],['aero','Varjo Aero']]
+};
+const VR_RES = {quest3:[2064,2208],quest2:[1832,1920],pico4:[2160,2160],g2:[2160,2160],index:[1440,1600],crystal:[2880,2880],beyond2:[2560,2560],aero:[2880,2720]};
+const HZ = { flat:[60,75,100,120,144,165,180,240], vr:[72,80,90,120] };
+
+function fillRes(){
+  const m = $('#mode').value, rs = $('#res'), hz = $('#hz');
+  const prevRes = rs.value, prevHz = hz.value;
+  rs.innerHTML = ''; RES[m].forEach(r => rs.appendChild(el('option', {value:r[0]}, r[1])));
+  hz.innerHTML = ''; (m === 'vr' ? HZ.vr : HZ.flat).forEach(h => hz.appendChild(el('option', {value:h}, h + ' Hz')));
+  if ([...rs.options].some(o => o.value === prevRes)) rs.value = prevRes;
+  if ([...hz.options].some(o => o.value === prevHz)) hz.value = prevHz; else hz.value = m === 'vr' ? '90' : '144';
+  $('#resWrap').firstChild.textContent = m === 'vr' ? 'Headset' : (m === 'triple' ? 'Auflösung (pro Monitor)' : 'Auflösung');
+}
+
+/* gespeicherte Hardware wiederherstellen */
+const saved = store.get('hw', null);
+$('#mode').addEventListener('change', () => { fillRes(); saveHw(); });
+if (saved){ ['cpu','ram','mode','goal'].forEach(k => { if (saved[k]) $('#' + k).value = saved[k]; }); }
+fillRes();
+if (saved){ ['res','hz'].forEach(k => { if (saved[k]) $('#' + k).value = saved[k]; }); }
+gpuSel.value = (saved && saved.gpu) || gpuMatch || '';
+function saveHw(){ store.set('hw', {gpu:gpuSel.value, cpu:$('#cpu').value, ram:$('#ram').value, mode:$('#mode').value, res:$('#res').value, hz:$('#hz').value, goal:$('#goal').value}); }
+['gpu','cpu','ram','res','hz','goal'].forEach(k => $('#' + k).addEventListener('change', saveHw));
+
+/* ---------- Grafik-Logik ---------- */
+const LV = ['Sehr niedrig','Niedrig','Mittel','Hoch','Ultra'];
+/* kind: gpu = Grafikkarte, cpu = Prozessor, eye = Optik (bei "Rennen" gedrosselt) */
+const SETTINGS = [
+  {g:'Bild', n:'Kantenglättung (MSAA)', k:'gpu', v:['Aus','2x','2x','4x','8x'], c:'hoch', note:'Kostet bei Triple-Screen und VR besonders viel. Lieber eine Stufe runter als unter die Ziel-FPS fallen.'},
+  {g:'Bild', n:'Anisotrope Filterung', k:'gpu', v:['4x','8x','16x','16x','16x'], c:'gering', note:'Macht Strecke und Curbs in der Ferne scharf. Fast kostenlos.'},
+  {g:'Bild', n:'Post-Processing / HDR', k:'eye', v:['Aus','Aus','An','An','An'], c:'mittel', note:'Reine Optik. Für Rennen verzichtbar.'},
+  {g:'Bild', n:'Hitzeflimmern', k:'eye', v:['Aus','Aus','Aus','An','An'], c:'gering', race:0, note:'Lenkt im Rennen ab, deshalb dort immer aus.'},
+  {g:'Schatten', n:'Schattenqualität', k:'gpu', v:['Niedrig','Niedrig','Mittel','Hoch','Sehr hoch'], c:'hoch', note:'Einer der größten FPS-Fresser. Mittel reicht für saubere Bremspunkte.'},
+  {g:'Schatten', n:'Dynamische Fahrzeugschatten', k:'gpu', v:['Aus','Aus','An','An','An'], c:'mittel', note:'Kostet pro Fahrzeug, wird in vollen Feldern spürbar.'},
+  {g:'Fahrzeuge', n:'Gerenderte Fahrzeuge', k:'cpu', v:['12','20','30','45','63'], c:'hoch (CPU)', note:'Wichtigster Regler für die CPU. Bei Rucklern am Start zuerst hier reduzieren.'},
+  {g:'Fahrzeuge', n:'Detaillierte Fahrzeuge', k:'cpu', v:['4','6','10','15','20'], c:'mittel (CPU)', note:'Nur die nächsten Autos brauchen volle Details.'},
+  {g:'Fahrzeuge', n:'Fahrzeug-Details / Texturen', k:'gpu', v:['Niedrig','Mittel','Mittel','Hoch','Hoch'], c:'mittel', note:'Hohe Texturen brauchen genug Grafikspeicher (ab ca. 8 GB).'},
+  {g:'Spiegel', n:'Spiegel: Fahrzeuge', k:'cpu', v:['4','6','8','12','16'], c:'mittel (CPU)', note:'Mehr als 8 bis 10 bringt im Rennen kaum etwas.'},
+  {g:'Spiegel', n:'Spiegel: Qualität', k:'gpu', v:['Niedrig','Niedrig','Mittel','Hoch','Hoch'], c:'mittel', note:'Mit virtuellem Spiegel oder Spotter-Overlay kann der Cockpit-Spiegel weiter runter.'},
+  {g:'Umgebung', n:'Strecken-Details', k:'gpu', v:['Niedrig','Mittel','Hoch','Hoch','Sehr hoch'], c:'mittel', note:''},
+  {g:'Umgebung', n:'Himmel & Wolken', k:'gpu', v:['Niedrig','Mittel','Mittel','Hoch','Sehr hoch'], c:'mittel', note:'Volumetrische Wolken sind teuer, besonders in VR.'},
+  {g:'Umgebung', n:'Gras', k:'eye', v:['Aus','Niedrig','Mittel','Hoch','Hoch'], c:'gering', race:2, note:''},
+  {g:'Umgebung', n:'Zuschauer', k:'cpu', v:['Aus','Niedrig','Niedrig','Mittel','Hoch'], c:'mittel (CPU)', race:1, note:'Kostet CPU und bringt im Rennen nichts.'},
+  {g:'Umgebung', n:'Boxenobjekte & Crew', k:'cpu', v:['Aus','Niedrig','Mittel','Hoch','Hoch'], c:'gering (CPU)', note:''},
+  {g:'Umgebung', n:'Partikel & Effekte', k:'eye', v:['Niedrig','Niedrig','Mittel','Hoch','Hoch'], c:'gering', note:'Regen-Gischt bleibt auch auf Niedrig sichtbar.'}
+];
+
+function calc(){
+  const mode = $('#mode').value, hz = +$('#hz').value, goal = $('#goal').value, cpu = +$('#cpu').value;
+  const gpu = GPUS.find(g => g[0] === gpuSel.value);
+  let w, h, screens = 1, overhead = 1;
+  if (mode === 'vr'){ [w, h] = VR_RES[$('#res').value] || [2064,2208]; screens = 2; overhead = 1.25; }
+  else { [w, h] = $('#res').value.split('x').map(Number); if (mode === 'triple') screens = 3; }
+  const mpix = w * h * screens * overhead / 1e6;
+  const load = mpix * hz / (2.0736 * 60);            /* 1080p bei 60 FPS = 1 */
+  const cap = gpu ? gpu[1] / 5 : 6;                   /* unbekannt: Mittelklasse annehmen */
+  const ratio = cap / load;
+  let gl = ratio >= 3.2 ? 4 : ratio >= 2.2 ? 3 : ratio >= 1.5 ? 2 : ratio >= 1.0 ? 1 : 0;
+  if (goal === 'looks') gl = Math.min(4, gl + 1);
+  let cl = cpu;
+  if (hz >= 144 || mode === 'vr' || mode === 'triple') cl -= 1;
+  if (goal === 'looks') cl += 1;
+  cl = Math.max(0, Math.min(4, cl));
+  const eyeLevel = goal === 'race' ? Math.max(0, gl - 1) : gl;
+  const rows = SETTINGS.map(s => {
+    let lvl = s.k === 'cpu' ? cl : s.k === 'eye' ? eyeLevel : gl;
+    if (goal === 'race' && s.race != null) lvl = Math.min(lvl, s.race);
+    return {...s, lvl, val: s.v[lvl]};
+  });
+  return {mode, hz, goal, gpu, w, h, screens, mpix, load, ratio, gl, cl, rows};
+}
+
+function renderGfx(){
+  const r = calc();
+  const vram = r.gpu && r.gpu[1] < 20;
+  const fpsTxt = r.mode === 'vr' ? r.hz + ' FPS (Headset-Takt)' : r.hz + ' FPS';
+  const reserve = r.ratio >= 2.2 ? ['viel','ok'] : r.ratio >= 1.2 ? ['passt','ok'] : r.ratio >= 0.8 ? ['knapp','warn'] : ['zu wenig','bad'];
+  $('#gfxSummary').innerHTML =
+    '<div><div class="k">Grafikkarte</div><div class="v">' + esc(r.gpu ? r.gpu[0].replace(/^(NVIDIA|AMD|Intel) /,'') : 'nicht gewählt') + '</div></div>' +
+    '<div><div class="k">Ziel</div><div class="v">' + esc(fpsTxt) + '</div></div>' +
+    '<div><div class="k">Pixel pro Bild</div><div class="v">' + r.mpix.toFixed(1) + ' MP</div></div>' +
+    '<div><div class="k">GPU-Reserve</div><div class="v ' + reserve[1] + '">' + reserve[0] + '</div></div>' +
+    '<div><div class="k">Grafik-Stufe</div><div class="v">' + LV[r.gl] + '</div></div>' +
+    '<div><div class="k">CPU-Stufe</div><div class="v">' + LV[r.cl] + '</div></div>';
+  let html = '<tr><th>Einstellung</th><th>Wert</th><th>Kostet</th><th>Hinweis</th></tr>', grp = '';
+  html += '<tr class="grp"><td colspan="4">Allgemein</td></tr>';
+  html += '<tr><td>FPS-Limit</td><td class="val">' + (r.mode === 'vr' ? 'Aus / Headset' : r.hz) + '</td><td class="cost">–</td><td class="note">' + (r.mode === 'vr' ? 'Im VR-Modus gibt das Headset den Takt vor.' : 'Auf die Bildwiederholrate deines Monitors begrenzen. Das hält die Frametimes gleichmäßig.') + '</td></tr>';
+  r.rows.forEach(s => {
+    if (s.g !== grp){ grp = s.g; html += '<tr class="grp"><td colspan="4">' + esc(grp) + '</td></tr>'; }
+    const cc = /hoch/.test(s.c) ? 'bad' : /mittel/.test(s.c) ? 'warn' : 'ok';
+    html += '<tr><td>' + esc(s.n) + '</td><td class="val">' + esc(s.val) + '</td><td class="cost ' + cc + '">' + esc(s.c) + '</td><td class="note">' + esc(s.note) + '</td></tr>';
+  });
+  $('#gfxTable').innerHTML = html;
+
+  const tips = [];
+  if (!r.gpu) tips.push('Wähle unter <b>Hardware</b> deine Grafikkarte, sonst rechnet das Tool mit einer Mittelklasse-Karte.');
+  if (r.ratio < 0.8) tips.push('Deine Grafikkarte kommt bei dieser Auflösung und Bildrate an ihre Grenze. Eine niedrigere Ziel-FPS (z. B. ' + (r.mode === 'vr' ? '72 oder 80 Hz' : '100 oder 120') + ') bringt mehr als jeder einzelne Regler.');
+  if (r.mode === 'triple') tips.push('In iRacing die <b>Triple-Screen-Projektion</b> einschalten und Monitorbreite, Rahmen und Abstand zum Auge exakt eintragen. Nur dann stimmt das Sichtfeld.');
+  if (r.mode === 'vr') tips.push('Über <b>OpenXR</b> starten und die Render-Auflösung zuerst auf 100 % lassen. Erst hochziehen, wenn die FPS im vollen Feld stabil bleiben.');
+  if (r.mode === 'vr') tips.push('Wolken, Schatten und MSAA sind in VR die teuersten Regler. Ruckelt es, zuerst diese senken.');
+  if (r.mode !== 'vr') tips.push('<b>Sichtfeld (FOV)</b> mit dem FOV-Rechner in iRacing passend zu Monitorgröße und Sitzabstand einstellen. Ein falsches FOV verfälscht das Tempogefühl.');
+  if (+$('#ram').value <= 8) tips.push('8 GB Arbeitsspeicher sind für iRacing knapp. 16 GB, besser 32 GB, verhindern Nachladeruckler.');
+  if (vram) tips.push('Deine Karte hat vermutlich wenig Grafikspeicher. Texturen auf Mittel lassen, sonst ruckelt es beim Laden neuer Streckenabschnitte.');
+  tips.push('Test immer im <b>vollen Feld</b> (z. B. KI-Rennen mit maximaler Fahrzeuganzahl am Start). Das ist der härteste Moment für CPU und Grafikkarte.');
+  tips.push('Grafiktreiber aktuell halten und im Windows-Energiesparplan „Höchstleistung“ wählen.');
+  $('#tips').innerHTML = tips.map(t => '<li>' + t + '</li>').join('');
+}
+$('#copyGfx').addEventListener('click', () => copyText(gfxText()));
+function gfxText(){
+  const r = calc();
+  const lines = ['iRacing Grafik-Empfehlung (Rig-Tool)', 'GPU: ' + (r.gpu ? r.gpu[0] : 'nicht gewählt') + ' | Setup: ' + $('#mode').selectedOptions[0].text + ' ' + $('#res').selectedOptions[0].text + ' @ ' + r.hz + ' Hz | Ziel: ' + $('#goal').selectedOptions[0].text, ''];
+  lines.push('FPS-Limit: ' + (r.mode === 'vr' ? 'Aus / Headset' : r.hz));
+  r.rows.forEach(s => lines.push(s.n + ': ' + s.val));
+  return lines.join('\n');
+}
+
+/* ---------- Tastenbelegung ---------- */
+const FUNCS = [
+  ['Fahren', [['steer','Lenkung','axis'],['throttle','Gas','axis'],['brake','Bremse','axis'],['clutch','Kupplung','axis'],['up','Hochschalten'],['down','Runterschalten'],['handbrake','Handbremse']]],
+  ['Fahrzeug', [['bbPlus','Bremsbalance +'],['bbMinus','Bremsbalance −'],['tcPlus','Traktionskontrolle +'],['tcMinus','Traktionskontrolle −'],['absPlus','ABS +'],['absMinus','ABS −'],['mapPlus','Motor-Map +'],['mapMinus','Motor-Map −'],['limiter','Pit-Limiter'],['lights','Scheinwerfer'],['flash','Lichthupe'],['wipers','Scheibenwischer'],['ignition','Zündung'],['starter','Starter']]],
+  ['Black Box', [['bbxNext','Black Box weiter'],['bbxPrev','Black Box zurück'],['selUp','Auswahl hoch'],['selDown','Auswahl runter'],['valUp','Wert +'],['valDown','Wert −'],['pitBox','Boxenstopp-Menü'],['relative','Relative']]],
+  ['Kommunikation', [['ptt','Push-to-Talk'],['chat','Chat']]],
+  ['Sicht', [['lookL','Blick links'],['lookR','Blick rechts'],['fov','FFB / Sicht zurücksetzen']]]
+];
+
+let profiles = store.get('profiles', null);
+if (!profiles || typeof profiles !== 'object' || !Object.keys(profiles).length) profiles = {'Allgemein':{}, 'GT3':{}, 'GTP / LMDh':{}, 'Formel':{}, 'Oval':{}};
+let current = store.get('currentProfile', 'Allgemein');
+if (!profiles[current]) current = Object.keys(profiles)[0];
+let learning = null, baseline = null;
+const saveProfiles = () => { store.set('profiles', profiles); store.set('currentProfile', current); };
+
+function fillProfiles(){
+  const s = $('#profile'); s.innerHTML = '';
+  Object.keys(profiles).forEach(p => s.appendChild(el('option', {value:p}, esc(p))));
+  s.value = current;
+}
+$('#profile').addEventListener('change', e => { current = e.target.value; learning = null; saveProfiles(); renderBinds(); });
+$('#newProfile').addEventListener('click', () => {
+  const n = (prompt('Name des neuen Profils (z. B. Porsche 963 oder Mazda MX-5):') || '').trim();
+  if (!n) return;
+  if (profiles[n]) { toast('Profil gibt es schon'); return; }
+  const copy = confirm('Belegung von „' + current + '“ als Vorlage übernehmen?');
+  profiles[n] = copy ? JSON.parse(JSON.stringify(profiles[current])) : {};
+  current = n; saveProfiles(); fillProfiles(); renderBinds();
+});
+$('#delProfile').addEventListener('click', () => {
+  if (Object.keys(profiles).length < 2) { toast('Mindestens ein Profil muss bleiben'); return; }
+  if (!confirm('Profil „' + current + '“ wirklich löschen?')) return;
+  delete profiles[current]; current = Object.keys(profiles)[0]; saveProfiles(); fillProfiles(); renderBinds();
+});
+$('#clearBinds').addEventListener('click', () => { if (confirm('Alle Zuweisungen in „' + current + '“ löschen?')) { profiles[current] = {}; saveProfiles(); renderBinds(); } });
+$('#printBinds').addEventListener('click', () => window.print());
+$('#exportBinds').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({rigtool:1, name:current, binds:profiles[current]}, null, 2)], {type:'application/json'});
+  const a = el('a', {href:URL.createObjectURL(blob), download:'rigtool-' + current.replace(/[^\w-]+/g,'_') + '.json'});
+  document.body.appendChild(a); a.click(); a.remove();
+});
+$('#importBinds').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d.binds || typeof d.binds !== 'object') throw 0;
+    let name = d.name || f.name.replace(/\.json$/,''); while (profiles[name]) name += ' (Import)';
+    profiles[name] = d.binds; current = name; saveProfiles(); fillProfiles(); renderBinds(); toast('Profil importiert');
+  } catch(err){ toast('Datei ist kein gültiges Rig-Tool-Profil'); }
+  e.target.value = '';
+});
+
+const shortDev = id => id.replace(/\(.*?Vendor.*?\)/i,'').replace(/\s+/g,' ').trim() || id;
+function fmtBind(b){ return b ? esc(shortDev(b.dev)) + ' · ' + (b.type === 'axis' ? 'Achse ' + (b.i + 1) : 'Taste ' + (b.i + 1)) : '<span class="muted">–</span>'; }
+function renderBinds(){
+  const binds = profiles[current] || {};
+  const used = {};
+  Object.entries(binds).forEach(([f,b]) => { const k = b.dev + '|' + b.type + '|' + b.i; (used[k] = used[k] || []).push(f); });
+  let html = '';
+  FUNCS.forEach(([grp, list]) => {
+    html += '<tr class="grp"><td colspan="3" class="mono" style="color:var(--teal);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;background:var(--bg)">' + esc(grp) + '</td></tr>';
+    list.forEach(([id, name, kind]) => {
+      const b = binds[id];
+      const conflict = b && used[b.dev + '|' + b.type + '|' + b.i].length > 1;
+      const cls = [learning === id ? 'learning' : '', conflict ? 'conflict' : '', b ? '' : 'unassigned'].join(' ');
+      html += '<tr class="' + cls + '"><td>' + esc(name) + (kind === 'axis' ? ' <span class="muted mono">(Achse)</span>' : '') + '</td>' +
+        '<td class="assign">' + (learning === id ? '<span class="ok">Jetzt ' + (kind === 'axis' ? 'Achse bewegen' : 'Taste drücken') + ' …</span>' : fmtBind(b)) + (conflict ? ' <span class="bad">doppelt</span>' : '') + '</td>' +
+        '<td class="no-print" style="text-align:right;white-space:nowrap">' +
+        '<button class="btn mini" data-learn="' + id + '">' + (learning === id ? 'Abbrechen' : 'Zuweisen') + '</button> ' +
+        (b ? '<button class="btn mini danger" data-clear="' + id + '" aria-label="Zuweisung löschen">×</button>' : '') + '</td></tr>';
+    });
+  });
+  $('#bindTable').innerHTML = html;
+}
+$('#bindTable').addEventListener('click', e => {
+  const l = e.target.closest('[data-learn]'), c = e.target.closest('[data-clear]');
+  if (l){ const id = l.dataset.learn; learning = learning === id ? null : id; baseline = snapshot(); if (learning && !pads().length) toast('Drück zuerst eine Taste am Gerät, damit der Browser es erkennt'); renderBinds(); }
+  if (c){ delete profiles[current][c.dataset.clear]; saveProfiles(); renderBinds(); }
+});
+
+/* Gamepad-Abfrage */
+const pads = () => [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean);
+function snapshot(){ const s = {}; pads().forEach(p => { s[p.index] = {b:p.buttons.map(x => x.pressed), a:p.axes.slice()}; }); return s; }
+let prev = {}, devSig = '';
+function renderDevices(list){
+  const box = $('#devices');
+  if (!list.length){ box.innerHTML = '<p class="muted mono">Noch kein Gerät erkannt. Drück eine Taste am Lenkrad.</p>'; return; }
+  box.innerHTML = list.map(p =>
+    '<div class="dev" data-pad="' + p.index + '"><div class="dev-head"><span class="dev-name">' + esc(shortDev(p.id)) + '</span><span class="muted mono">' + p.buttons.length + ' Tasten · ' + p.axes.length + ' Achsen</span></div>' +
+    '<div class="btns">' + p.buttons.map((_, i) => '<span class="b" data-b="' + i + '">' + (i + 1) + '</span>').join('') + '</div>' +
+    '<div class="axes">' + p.axes.map((_, i) => '<div class="ax">Achse ' + (i + 1) + '<div class="bar"><i data-a="' + i + '"></i></div></div>').join('') + '</div></div>'
+  ).join('');
+}
+function poll(){
+  const list = pads();
+  const sig = list.map(p => p.index + p.id + p.buttons.length).join('|');
+  if (sig !== devSig){ devSig = sig; renderDevices(list); }
+  list.forEach(p => {
+    const node = document.querySelector('[data-pad="' + p.index + '"]');
+    const pv = prev[p.index] || {b:[], a:[]};
+    p.buttons.forEach((b, i) => {
+      if (node && b.pressed !== pv.b[i]){ const n = node.querySelector('[data-b="' + i + '"]'); if (n) n.classList.toggle('on', b.pressed); }
+      if (learning && b.pressed && !pv.b[i]) assign({dev:p.id, type:'btn', i});
+    });
+    p.axes.forEach((a, i) => {
+      if (node){ const n = node.querySelector('[data-a="' + i + '"]'); if (n) n.style.width = ((a + 1) * 50).toFixed(1) + '%'; }
+      const base = baseline && baseline[p.index] ? baseline[p.index].a[i] : a;
+      if (learning && Math.abs(a - base) > 0.5) assign({dev:p.id, type:'axis', i});
+    });
+    prev[p.index] = {b:p.buttons.map(x => x.pressed), a:p.axes.slice()};
+  });
+  requestAnimationFrame(poll);
+}
+function assign(b){
+  if (!learning) return;
+  if (!profiles[current]) profiles[current] = {};
+  profiles[current][learning] = b; learning = null; baseline = null; saveProfiles(); renderBinds();
+}
+window.addEventListener('gamepadconnected', () => { devSig = ''; });
+window.addEventListener('gamepaddisconnected', () => { devSig = ''; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && learning){ learning = null; renderBinds(); } });
+fillProfiles(); renderBinds(); requestAnimationFrame(poll);
+
+/* ---------- Dateien ---------- */
+const KNOWN = /^(renderer.*\.ini|app\.ini|core\.ini|controls\.cfg|joycalib\.yaml|.*\.ini)$/i;
+const loaded = [];
+function parseIni(txt){
+  const out = []; let sec = null;
+  txt.split(/\r?\n/).forEach(line => {
+    const t = line.trim(); if (!t || t[0] === ';' || t[0] === '#') return;
+    const m = t.match(/^\[(.+)\]$/); if (m){ sec = {name:m[1], items:[]}; out.push(sec); return; }
+    const kv = t.match(/^([^=]+)=(.*)$/); if (kv){ if (!sec){ sec = {name:'(ohne Abschnitt)', items:[]}; out.push(sec); } sec.items.push([kv[1].trim(), kv[2].split(';')[0].trim()]); }
+  });
+  return out;
+}
+async function readFile(name, file){
+  const buf = new Uint8Array(await file.arrayBuffer());
+  let printable = 0; const n = Math.min(buf.length, 4096);
+  for (let i = 0; i < n; i++){ const c = buf[i]; if (c === 9 || c === 10 || c === 13 || (c >= 32 && c < 127) || c >= 160) printable++; }
+  const isText = n === 0 || printable / n > 0.9;
+  const entry = {name, size:buf.length, isText};
+  if (isText) entry.text = new TextDecoder('utf-8').decode(buf);
+  else entry.hex = [...buf.slice(0, 512)].map(b => b.toString(16).padStart(2,'0')).join(' ');
+  const i = loaded.findIndex(x => x.name.toLowerCase() === name.toLowerCase());
+  if (i >= 0) loaded[i] = entry; else loaded.push(entry);
+}
+function renderFiles(){
+  const box = $('#fileList');
+  if (!loaded.length){ box.innerHTML = '<p class="muted mono" style="margin-top:12px">Keine passenden Dateien gefunden.</p>'; return; }
+  const found = n => loaded.some(f => f.name.toLowerCase() === n);
+  const checks = [['rendererdx11monitor.ini','Grafik (Monitor)'],['app.ini','Allgemein / FFB'],['controls.cfg','Tastenbelegung']];
+  let html = '<div class="row">' + checks.map(([f,l]) => '<span class="mono ' + (found(f) ? 'ok' : 'warn') + '">' + (found(f) ? '✓ ' : '✗ ') + l + '</span>').join('') + '</div>';
+  loaded.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
+    let body;
+    if (f.isText && /\.ini$/i.test(f.name)){
+      const secs = parseIni(f.text);
+      body = '<table class="ini">' + secs.map(s => '<tr class="sec"><td colspan="2">[' + esc(s.name) + ']</td></tr>' + s.items.map(([k,v]) => '<tr><td>' + esc(k) + '</td><td>' + esc(v) + '</td></tr>').join('')).join('') + '</table>';
+    } else if (f.isText){ body = '<pre>' + esc(f.text.slice(0, 20000)) + '</pre>'; }
+    else { body = '<p class="muted">Binärdatei – nicht direkt lesbar. Die ersten 512 Bytes helfen bei der Analyse des Formats:</p><pre>' + f.hex + '</pre>'; }
+    html += '<details class="file"><summary><span>' + esc(f.name) + '</span><span class="muted">' + (f.size / 1024).toFixed(1) + ' KB · ' + (f.isText ? 'Text' : 'Binär') + '</span></summary><div class="body">' + body + '</div></details>';
+  });
+  box.innerHTML = html;
+}
+$('#pickDir').addEventListener('click', async () => {
+  if (!window.showDirectoryPicker){ toast('Ordnerauswahl geht nur in Chrome oder Edge – nutze „Einzelne Dateien“'); return; }
+  try {
+    const dir = await window.showDirectoryPicker({id:'iracing', mode:'read', startIn:'documents'});
+    for await (const [name, handle] of dir.entries()){
+      if (handle.kind === 'file' && KNOWN.test(name)) await readFile(name, await handle.getFile());
+    }
+    renderFiles(); toast(loaded.length + ' Dateien eingelesen');
+  } catch(e){ if (e && e.name !== 'AbortError') toast('Ordner konnte nicht gelesen werden'); }
+});
+$('#pickFiles').addEventListener('change', async e => {
+  for (const f of e.target.files) await readFile(f.name, f);
+  renderFiles(); e.target.value = '';
+});
+
+/* ---------- Bericht ---------- */
+$('#makeReport').addEventListener('click', () => {
+  const L = [];
+  L.push('=== RIG-TOOL BERICHT ===', 'Erstellt: ' + new Date().toLocaleString('de-DE'), '');
+  L.push('--- Hardware ---');
+  L.push('GPU (Browser): ' + (gpuRenderer || 'nicht erkannt'));
+  L.push('GPU (gewählt): ' + (gpuSel.value || '–'));
+  L.push('CPU-Klasse: ' + $('#cpu').selectedOptions[0].text + ' | Threads laut Browser: ' + (navigator.hardwareConcurrency || '?'));
+  L.push('RAM (gewählt): ' + $('#ram').value + ' GB');
+  L.push('Bildschirm (Browser): ' + screen.width + 'x' + screen.height + ' @ Skalierung ' + window.devicePixelRatio);
+  L.push('Setup: ' + $('#mode').selectedOptions[0].text + ' | ' + $('#res').selectedOptions[0].text + ' | ' + $('#hz').value + ' Hz | Ziel: ' + $('#goal').selectedOptions[0].text);
+  L.push('', '--- Geräte ---');
+  const ps = pads();
+  if (!ps.length) L.push('keine erkannt (vorher im Tab „Tasten“ eine Taste am Gerät drücken)');
+  ps.forEach(p => L.push(p.id + ' | ' + p.buttons.length + ' Tasten, ' + p.axes.length + ' Achsen | mapping: ' + (p.mapping || 'keins')));
+  L.push('', '--- Empfehlung ---', gfxText());
+  L.push('', '--- Belegung (Profil ' + current + ') ---');
+  const b = profiles[current] || {}; const names = {}; FUNCS.forEach(([, l]) => l.forEach(([id, n]) => names[id] = n));
+  Object.keys(b).length ? Object.entries(b).forEach(([f, x]) => L.push((names[f] || f) + ': ' + shortDev(x.dev) + ' ' + (x.type === 'axis' ? 'Achse ' : 'Taste ') + (x.i + 1))) : L.push('noch nichts zugewiesen');
+  L.push('', '--- Dateien ---');
+  if (!loaded.length) L.push('keine eingelesen');
+  loaded.forEach(f => {
+    L.push('', '##### ' + f.name + ' (' + f.size + ' Bytes, ' + (f.isText ? 'Text' : 'Binär') + ')');
+    L.push(f.isText ? f.text.slice(0, 30000) : 'HEX (erste 512 Bytes): ' + f.hex);
+  });
+  const txt = L.join('\n');
+  $('#report').value = txt;
+  copyText(txt);
+});
+
+/* Start */
+const startTab = store.get('tab', 'hw');
+if (document.getElementById('p-' + startTab)) showTab(startTab);
+})();
+</script>
+</body>
+</html>
