@@ -57,6 +57,7 @@
   select:focus,input:focus{border-color:var(--teal);outline:none;}
 
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.04em;text-transform:uppercase;}
+  a.btn{text-decoration:none;color:var(--text);}
   .btn:hover{border-color:var(--teal);color:var(--teal);}
   .btn.primary{background:var(--teal);color:#06231E;border-color:var(--teal);}
   .btn.primary:hover{background:#4fe0c7;color:#06231E;}
@@ -108,6 +109,10 @@
   .ini td{font-family:var(--font-mono);font-size:0.74rem;padding:4px 8px;border-bottom:1px solid var(--surface-2);}
   .ini .sec td{color:var(--teal);padding-top:12px;}
 
+  .cmd{display:flex;gap:8px;align-items:stretch;margin-top:12px;flex-wrap:wrap;}
+  .cmd code{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);padding:12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--teal);overflow-x:auto;white-space:nowrap;}
+  ol.steps{margin:12px 0 0;padding-left:20px;font-size:0.9rem;}
+  ol.steps li{margin:6px 0;}
   textarea.report{width:100%;min-height:180px;background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:var(--font-mono);font-size:0.72rem;padding:12px;margin-top:12px;}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--teal);color:#06231E;padding:10px 18px;font-family:var(--font-mono);font-size:0.8rem;opacity:0;pointer-events:none;transition:opacity .2s;}
   .toast.show{opacity:1;}
@@ -155,6 +160,24 @@
 
   <!-- 01 HARDWARE -->
   <section class="panel show" id="p-hw" role="tabpanel">
+    <div class="card">
+      <h2>Komplettes System auslesen</h2>
+      <p class="muted">Der Browser darf nicht alles sehen. Ein kurzes Windows-Skript liest CPU, Grafikkarte samt Speicher und Treiber, RAM, alle Monitore mit Hz, Lenkrad, Pedale, Button-Boxen, VR, Windows-Einstellungen und deine iRacing-Dateien aus. Es <b>liest nur</b>, ändert nichts und sendet nichts.</p>
+      <ol class="steps">
+        <li>Auf dem iRacing-PC <b>PowerShell</b> öffnen (Windows-Taste, „PowerShell“ tippen, Enter).</li>
+        <li>Diesen Befehl einfügen und Enter drücken:</li>
+      </ol>
+      <div class="cmd"><code id="scanCmd">irm https://mcsmug.github.io/rig-tool-scan.txt | iex</code><button class="btn" id="copyCmd">Kopieren</button></div>
+      <ol class="steps" start="3">
+        <li>Das Skript legt <span class="mono">rigtool-system.json</span> auf deinem Desktop ab. Hier laden:</li>
+      </ol>
+      <div class="row">
+        <label class="btn primary" style="cursor:pointer">System-Scan laden<input type="file" id="loadScan" accept=".json,application/json" hidden></label>
+        <a class="btn" href="rig-tool-scan.txt" target="_blank" rel="noopener">Skript ansehen</a>
+      </div>
+      <div id="scanInfo"></div>
+    </div>
+
     <div class="card">
       <h2>Grafikkarte</h2>
       <p class="muted">Wird automatisch erkannt, wenn dein Browser es zulässt. Stimmt etwas nicht, wähle sie unten selbst aus.</p>
@@ -411,6 +434,75 @@ gpuSel.value = (saved && saved.gpu) || gpuMatch || '';
 function saveHw(){ store.set('hw', {gpu:gpuSel.value, cpu:$('#cpu').value, ram:$('#ram').value, mode:$('#mode').value, res:$('#res').value, hz:$('#hz').value, goal:$('#goal').value}); }
 ['gpu','cpu','ram','res','hz','goal'].forEach(k => $('#' + k).addEventListener('change', saveHw));
 
+/* ---------- System-Scan ---------- */
+let scan = null;
+const INTEGRATED = /intel\(r\) (uhd|iris|hd)|radeon\(tm\) graphics|microsoft basic|parsec|virtual|meta virtual/i;
+function mainGpu(sc){
+  const list = (sc && sc.gpu) || [];
+  return list.find(g => matchGpu(g.name)) || list.find(g => !INTEGRATED.test(g.name || '')) || list[0] || null;
+}
+function cpuClass(name){
+  const n = name || '';
+  if (/X3D|i9-1[34]\d{3}|Ultra 9|Ryzen 9 (7|9)\d{3}/i.test(n)) return 4;
+  if (/i7-1[2-4]\d{3}|i9-1[12]\d{3}|Ultra 7|Ryzen 7 (5|7|9)\d{3}|Ryzen 9 5\d{3}/i.test(n)) return 3;
+  if (/i5-1[2-4]\d{3}|i7-1[01]\d{3}|i9-(9|10|11)\d{3}|Ultra 5|Ryzen 5 (5|7|9)\d{3}|Ryzen 7 [23]\d{3}|Ryzen 9 3\d{3}/i.test(n)) return 2;
+  return 1;
+}
+function ensureOption(sel, value, label){
+  if (![...sel.options].some(o => o.value === String(value))) sel.appendChild(el('option', {value:value}, label));
+  sel.value = String(value);
+}
+function applyScan(sc){
+  scan = sc;
+  const info = [];
+  const g = mainGpu(sc);
+  if (g){ const m = matchGpu(g.name); if (m) gpuSel.value = m; info.push(['GPU', g.name + (g.vramGB ? ' · ' + g.vramGB + ' GB' : '') + (g.driver ? ' · Treiber ' + g.driver : ''), !!m]); }
+  const cpu = sc.cpu && sc.cpu[0];
+  if (cpu){ const c = cpuClass(cpu.name); $('#cpu').value = String(c); info.push(['CPU', cpu.name + ' · ' + cpu.cores + ' Kerne / ' + cpu.threads + ' Threads → ' + $('#cpu').selectedOptions[0].text.split(' · ')[0], true]); }
+  if (sc.ram && sc.ram.totalGB){ const t = sc.ram.totalGB; $('#ram').value = t <= 8 ? '8' : t <= 16 ? '16' : t <= 32 ? '32' : '64'; const mod = sc.ram.modules && sc.ram.modules[0]; info.push(['RAM', t + ' GB' + (mod && (mod.configuredMHz || mod.speedMHz) ? ' · ' + (mod.configuredMHz || mod.speedMHz) + ' MHz' : ''), true]); }
+  const mons = (sc.monitors && sc.monitors.active) || [];
+  if (mons.length){
+    const key = m => m.width + 'x' + m.height;
+    const groups = {}; mons.forEach(m => (groups[key(m)] = groups[key(m)] || []).push(m));
+    const triple = Object.values(groups).find(gr => gr.length >= 3);
+    const prim = triple ? triple[0] : (mons.find(m => m.primary) || mons[0]);
+    const hz = Math.min(...(triple || [prim]).map(m => m.hz || 60));
+    const mode = triple ? 'triple' : (prim.width / prim.height >= 2.2 ? 'ultrawide' : 'single');
+    $('#mode').value = mode; fillRes();
+    ensureOption($('#res'), key(prim), (triple ? '3 × ' : '') + prim.width + ' × ' + prim.height);
+    ensureOption($('#hz'), hz, hz + ' Hz');
+    info.push(['Monitore', mons.map(m => m.width + '×' + m.height + ' @ ' + m.hz + ' Hz').join(', ') + ((sc.monitors.models || []).length ? ' · ' + sc.monitors.models.join(', ') : ''), true]);
+  }
+  if (sc.vr && sc.vr.openxrRuntime) info.push(['VR', 'OpenXR: ' + sc.vr.openxrRuntime, true]);
+  const devs = sc.inputDevices || [];
+  info.push(['Geräte', devs.length ? devs.map(d => d.name + (d.vendor ? ' (' + d.vendor + ')' : '')).join(', ') : 'keine erkannt', devs.length > 0]);
+  if (sc.windows) info.push(['Windows', [sc.os && sc.os.name, 'Energie: ' + sc.windows.powerPlan, 'Spielmodus: ' + sc.windows.gameMode, 'HAGS: ' + sc.windows.hags].filter(Boolean).join(' · '), true]);
+  const files = (sc.iracing && sc.iracing.files) || [];
+  files.forEach(f => {
+    const entry = {name:f.name, size:f.size, isText:f.isText, text:f.text, hex:f.hex};
+    const i = loaded.findIndex(x => x.name.toLowerCase() === f.name.toLowerCase());
+    if (i >= 0) loaded[i] = entry; else loaded.push(entry);
+  });
+  info.push(['iRacing', sc.iracing && sc.iracing.documentsFound ? files.length + ' Dateien übernommen' : 'Ordner Dokumente\\iRacing nicht gefunden', !!(sc.iracing && sc.iracing.documentsFound)]);
+  $('#scanInfo').innerHTML = '<div class="detect" style="flex-direction:column;gap:6px"><span class="badge ok">System-Scan geladen</span>' +
+    info.map(([k, v, ok]) => '<div><span class="mono ' + (ok ? 'ok' : 'warn') + '">' + esc(k) + '</span> <span class="muted">' + esc(v) + '</span></div>').join('') +
+    '<div class="muted">Felder unten wurden automatisch ausgefüllt. Prüf sie kurz und passe sie bei Bedarf an.</div></div>';
+  saveHw(); renderFiles();
+  const slim = JSON.parse(JSON.stringify(sc)); if (slim.iracing) slim.iracing.files = (slim.iracing.files || []).map(f => ({name:f.name, size:f.size}));
+  store.set('scan', slim);
+}
+$('#loadScan').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    let t = await f.text(); t = t.replace(/^﻿/, '');
+    const d = JSON.parse(t);
+    if (d.rigtool !== 'system-scan') throw 0;
+    applyScan(d); toast('System-Scan übernommen');
+  } catch(err){ toast('Das ist keine rigtool-system.json'); }
+  e.target.value = '';
+});
+$('#copyCmd').addEventListener('click', () => copyText($('#scanCmd').textContent));
+
 /* ---------- Grafik-Logik ---------- */
 const LV = ['Sehr niedrig','Niedrig','Mittel','Hoch','Ultra'];
 /* kind: gpu = Grafikkarte, cpu = Prozessor, eye = Optik (bei "Rennen" gedrosselt) */
@@ -490,6 +582,15 @@ function renderGfx(){
   if (r.mode !== 'vr') tips.push('<b>Sichtfeld (FOV)</b> mit dem FOV-Rechner in iRacing passend zu Monitorgröße und Sitzabstand einstellen. Ein falsches FOV verfälscht das Tempogefühl.');
   if (+$('#ram').value <= 8) tips.push('8 GB Arbeitsspeicher sind für iRacing knapp. 16 GB, besser 32 GB, verhindern Nachladeruckler.');
   if (vram) tips.push('Deine Karte hat vermutlich wenig Grafikspeicher. Texturen auf Mittel lassen, sonst ruckelt es beim Laden neuer Streckenabschnitte.');
+  if (scan){
+    const w = scan.windows || {};
+    if (w.powerPlan && !/höchst|hoch|high|ultimat/i.test(w.powerPlan)) tips.push('Dein Energiesparplan ist <b>' + esc(w.powerPlan) + '</b>. Für iRacing auf „Höchstleistung“ stellen, das verhindert Taktsprünge der CPU.');
+    if (w.gameMode === 'aus') tips.push('Der <b>Windows-Spielmodus</b> ist aus. Einschalten (Einstellungen → Spielen → Spielmodus).');
+    const g = mainGpu(scan);
+    if (g && g.driverDate){ const age = (Date.now() - new Date(g.driverDate)) / 864e5; if (age > 180) tips.push('Dein Grafiktreiber ist vom <b>' + esc(g.driverDate) + '</b>. Ein aktueller Treiber bringt oft mehr FPS und weniger Fehler.'); }
+    if (g && g.vramGB && g.vramGB < 8) tips.push('Deine Grafikkarte hat ' + g.vramGB + ' GB Speicher. Texturen höchstens auf Mittel stellen.');
+    if (scan.vr && scan.vr.openxrRuntime && r.mode !== 'vr') tips.push('Auf deinem PC ist eine VR-Umgebung installiert (' + esc(scan.vr.openxrRuntime) + '). Fährst du auch in VR, wähle unter Hardware „VR-Brille“ für eine eigene Empfehlung.');
+  }
   tips.push('Test immer im <b>vollen Feld</b> (z. B. KI-Rennen mit maximaler Fahrzeuganzahl am Start). Das ist der härteste Moment für CPU und Grafikkarte.');
   tips.push('Grafiktreiber aktuell halten und im Windows-Energiesparplan „Höchstleistung“ wählen.');
   $('#tips').innerHTML = tips.map(t => '<li>' + t + '</li>').join('');
@@ -693,6 +794,7 @@ $('#makeReport').addEventListener('click', () => {
   L.push('RAM (gewählt): ' + $('#ram').value + ' GB');
   L.push('Bildschirm (Browser): ' + screen.width + 'x' + screen.height + ' @ Skalierung ' + window.devicePixelRatio);
   L.push('Setup: ' + $('#mode').selectedOptions[0].text + ' | ' + $('#res').selectedOptions[0].text + ' | ' + $('#hz').value + ' Hz | Ziel: ' + $('#goal').selectedOptions[0].text);
+  if (scan){ const sl = JSON.parse(JSON.stringify(scan)); if (sl.iracing) delete sl.iracing.files; L.push('', '--- System-Scan ---', JSON.stringify(sl, null, 1)); }
   L.push('', '--- Geräte ---');
   const ps = pads();
   if (!ps.length) L.push('keine erkannt (vorher im Tab „Tasten“ eine Taste am Gerät drücken)');
@@ -713,6 +815,8 @@ $('#makeReport').addEventListener('click', () => {
 });
 
 /* Start */
+const savedScan = store.get('scan', null);
+if (savedScan && savedScan.rigtool === 'system-scan'){ scan = savedScan; $('#scanInfo').innerHTML = '<div class="detect"><span class="badge ok">gespeichert</span><div class="muted">System-Scan vom ' + esc(new Date(savedScan.created).toLocaleString('de-DE')) + ' ist geladen. Für frische Daten das Skript erneut ausführen.</div></div>'; }
 const startTab = store.get('tab', 'hw');
 if (document.getElementById('p-' + startTab)) showTab(startTab);
 })();
