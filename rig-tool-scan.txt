@@ -1,0 +1,195 @@
+# ============================================================
+#  Rig-Tool System-Scan fuer iRacing  (mcsmug.github.io/rig-tool.html)
+#  Liest nur aus. Aendert nichts, installiert nichts, sendet nichts.
+#  Ergebnis: rigtool-system.json auf dem Desktop + in der Zwischenablage.
+#  Start in PowerShell:
+#    irm https://mcsmug.github.io/rig-tool-scan.txt | iex
+# ============================================================
+
+$ErrorActionPreference = 'SilentlyContinue'
+$r = [ordered]@{ rigtool = 'system-scan'; version = 1; created = (Get-Date).ToString('s') }
+function Step($t){ Write-Host ('  - ' + $t) -ForegroundColor DarkCyan }
+Write-Host ''
+Write-Host 'Rig-Tool System-Scan laeuft (nur lesen) ...' -ForegroundColor Cyan
+
+# ---------- Windows ----------
+Step 'Windows'
+try {
+  $os = Get-CimInstance Win32_OperatingSystem
+  $r.os = [ordered]@{ name = $os.Caption; version = $os.Version; build = $os.BuildNumber }
+} catch {}
+
+# ---------- CPU ----------
+Step 'Prozessor'
+try {
+  $r.cpu = @(Get-CimInstance Win32_Processor | ForEach-Object {
+    [ordered]@{ name = ($_.Name -replace '\s+',' ').Trim(); cores = $_.NumberOfCores; threads = $_.NumberOfLogicalProcessors; maxMHz = $_.MaxClockSpeed }
+  })
+} catch {}
+
+# ---------- RAM ----------
+Step 'Arbeitsspeicher'
+try {
+  $mods = @(Get-CimInstance Win32_PhysicalMemory)
+  $r.ram = [ordered]@{
+    totalGB = [math]::Round((($mods | Measure-Object Capacity -Sum).Sum) / 1GB)
+    modules = @($mods | ForEach-Object { [ordered]@{ sizeGB = [math]::Round($_.Capacity / 1GB); speedMHz = $_.Speed; configuredMHz = $_.ConfiguredClockSpeed; maker = ($_.Manufacturer + '').Trim() } })
+  }
+} catch {}
+
+# ---------- GPU ----------
+Step 'Grafikkarte'
+try {
+  $vram = @{}
+  Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}' | ForEach-Object {
+    $p = Get-ItemProperty $_.PSPath
+    if ($p.DriverDesc -and $p.'HardwareInformation.qwMemorySize') { $vram[$p.DriverDesc] = [math]::Round([double]$p.'HardwareInformation.qwMemorySize' / 1GB, 1) }
+  }
+  $r.gpu = @(Get-CimInstance Win32_VideoController | ForEach-Object {
+    $v = $vram[$_.Name]
+    if (-not $v -and $_.AdapterRAM) { $v = [math]::Round($_.AdapterRAM / 1GB, 1) }
+    [ordered]@{ name = $_.Name; vramGB = $v; driver = $_.DriverVersion; driverDate = $(if ($_.DriverDate) { $_.DriverDate.ToString('yyyy-MM-dd') } else { $null }) }
+  })
+} catch {}
+
+# ---------- Monitore (Aufloesung + Hz pro Bildschirm) ----------
+Step 'Monitore'
+try {
+  if (-not ('RtDisp' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System; using System.Runtime.InteropServices;
+public class RtDisp {
+  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+  public struct DISPLAY_DEVICE { public int cb;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string DeviceName;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)] public string DeviceString;
+    public int StateFlags;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)] public string DeviceID;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)] public string DeviceKey; }
+  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+  public struct DEVMODE {
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmDeviceName;
+    public short dmSpecVersion; public short dmDriverVersion; public short dmSize; public short dmDriverExtra; public int dmFields;
+    public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation; public int dmDisplayFixedOutput;
+    public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmFormName;
+    public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth; public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency;
+    public int dmICMMethod; public int dmICMIntent; public int dmMediaType; public int dmDitherType; public int dmReserved1; public int dmReserved2; public int dmPanningWidth; public int dmPanningHeight; }
+  [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
+  [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+}
+'@
+  }
+  $mons = @()
+  $i = 0
+  while ($true) {
+    $d = New-Object RtDisp+DISPLAY_DEVICE; $d.cb = [Runtime.InteropServices.Marshal]::SizeOf($d)
+    if (-not [RtDisp]::EnumDisplayDevices($null, [uint32]$i, [ref]$d, 0)) { break }
+    $i++
+    if (($d.StateFlags -band 1) -eq 0) { continue }   # nicht am Desktop aktiv
+    $m = New-Object RtDisp+DEVMODE; $m.dmSize = [int16][Runtime.InteropServices.Marshal]::SizeOf($m)
+    if ([RtDisp]::EnumDisplaySettings($d.DeviceName, -1, [ref]$m)) {
+      $mons += [ordered]@{ width = $m.dmPelsWidth; height = $m.dmPelsHeight; hz = $m.dmDisplayFrequency; x = $m.dmPositionX; y = $m.dmPositionY; primary = (($d.StateFlags -band 4) -ne 0); adapter = $d.DeviceString }
+    }
+  }
+  $names = @(Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorID | ForEach-Object {
+    $n = ($_.UserFriendlyName | Where-Object { $_ -ne 0 } | ForEach-Object { [char]$_ }) -join ''
+    $mf = ($_.ManufacturerName | Where-Object { $_ -ne 0 } | ForEach-Object { [char]$_ }) -join ''
+    ($mf + ' ' + $n).Trim()
+  })
+  $r.monitors = [ordered]@{ active = $mons; models = $names }
+} catch {}
+
+# ---------- Eingabegeraete (Lenkrad, Pedale, Button-Boxen) ----------
+Step 'Lenkrad, Pedale, Button-Boxen'
+try {
+  $vendors = @{ '0EB7'='Fanatec'; '346E'='Moza'; '046D'='Logitech'; '044F'='Thrustmaster'; '16D0'='Simucube / Open-Source'; '2433'='Asetek'; '3670'='Simagic'; '0483'='STM-basiert (z.B. Simagic, VRS, Eigenbau)'; '1209'='Open-Source (z.B. Heusinkveld, Eigenbau)'; '30B7'='Heusinkveld'; '1DD2'='Leo Bodnar'; '3416'='Cammus'; '0738'='Mad Catz'; '045E'='Microsoft'; '054C'='Sony'; '28DE'='Valve' }
+  $oem = @{}
+  Get-ChildItem 'HKCU:\System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM' | ForEach-Object {
+    $p = Get-ItemProperty $_.PSPath
+    if ($p.OEMName) { $oem[$_.PSChildName.ToUpper()] = $p.OEMName }
+  }
+  $simVendors = @('0EB7','346E','044F','16D0','2433','3670','0483','1209','30B7','1DD2','3416')
+  $gamePat = 'game ?controller|gamecontroller|joystick|gamepad|wheel|pedal|lenkrad'
+  $found = @{}
+  Get-PnpDevice -PresentOnly | Where-Object { ($_.Class -eq 'HIDClass' -or $_.Class -eq 'USB') -and $_.InstanceId -match 'VID_([0-9A-F]{4})&PID_([0-9A-F]{4})' } | ForEach-Object {
+    $null = $_.InstanceId -match 'VID_([0-9A-F]{4})&PID_([0-9A-F]{4})'
+    $vid = $Matches[1].ToUpper(); $pid2 = $Matches[2].ToUpper(); $key = "VID_$vid&PID_$pid2"
+    $isGame = ($_.FriendlyName -match $gamePat) -or $oem.ContainsKey($key) -or ($simVendors -contains $vid)
+    if (-not $isGame) { return }
+    if (-not $found.ContainsKey($key)) { $found[$key] = [ordered]@{ name = $_.FriendlyName; vendor = $vendors[$vid]; vid = $vid; pid = $pid2 } }
+    elseif ($_.FriendlyName -match $gamePat) { $found[$key].name = $_.FriendlyName }
+    if ($oem[$key]) { $found[$key].name = $oem[$key] }
+  }
+  $devs = @($found.Values)
+  $r.inputDevices = $devs
+} catch {}
+
+# ---------- VR ----------
+Step 'VR'
+try {
+  $xr = (Get-ItemProperty 'HKLM:\SOFTWARE\Khronos\OpenXR\1').ActiveRuntime
+  $r.vr = [ordered]@{ openxrRuntime = $(if ($xr) { Split-Path $xr -Leaf } else { $null }) }
+} catch {}
+
+# ---------- Windows-Einstellungen, die FPS beeinflussen ----------
+Step 'Windows-Einstellungen'
+try {
+  $plan = (powercfg /getactivescheme) -replace '.*\((.*)\).*','$1'
+  $gm = (Get-ItemProperty 'HKCU:\Software\Microsoft\GameBar').AutoGameModeEnabled
+  $hags = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers').HwSchMode
+  $r.windows = [ordered]@{
+    powerPlan = "$plan".Trim()
+    gameMode = $(if ($gm -eq 0) { 'aus' } else { 'an' })
+    hags = $(switch ($hags) { 2 { 'an' } 1 { 'aus' } default { 'unbekannt' } })
+  }
+} catch {}
+
+# ---------- Laufwerke ----------
+Step 'Laufwerke'
+try {
+  $r.disks = @(Get-PhysicalDisk | ForEach-Object { [ordered]@{ name = $_.FriendlyName; type = "$($_.MediaType)"; bus = "$($_.BusType)"; sizeGB = [math]::Round($_.Size / 1GB) } })
+} catch {}
+
+# ---------- iRacing-Dateien ----------
+Step 'iRacing-Dateien'
+try {
+  $doc = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'iRacing'
+  $files = @()
+  if (Test-Path $doc) {
+    Get-ChildItem $doc -File | Where-Object { $_.Name -match '^(renderer.*\.ini|app\.ini|core\.ini|controls\.cfg|joyCalib\.yaml)$' } | ForEach-Object {
+      $f = [ordered]@{ name = $_.Name; size = $_.Length; modified = $_.LastWriteTime.ToString('s') }
+      if ($_.Extension -eq '.cfg') {
+        $b = [IO.File]::ReadAllBytes($_.FullName)
+        $f.isText = $false
+        $f.hex = (($b | Select-Object -First 512) | ForEach-Object { $_.ToString('x2') }) -join ' '
+      } else {
+        $f.isText = $true
+        $f.text = [IO.File]::ReadAllText($_.FullName)
+      }
+      $files += $f
+    }
+    $setups = Join-Path $doc 'setups'
+    if (Test-Path $setups) { $r.carsWithSetups = @(Get-ChildItem $setups -Directory | Select-Object -ExpandProperty Name) }
+  }
+  $r.iracing = [ordered]@{ documentsFound = (Test-Path $doc); installFound = (Test-Path 'C:\Program Files (x86)\iRacing'); files = $files }
+} catch {}
+
+# ---------- Speichern ----------
+$json = $r | ConvertTo-Json -Depth 8
+$out = Join-Path ([Environment]::GetFolderPath('Desktop')) 'rigtool-system.json'
+[IO.File]::WriteAllText($out, $json, (New-Object Text.UTF8Encoding $false))
+try { Set-Clipboard -Value $json } catch {}
+
+Write-Host ''
+Write-Host 'Fertig.' -ForegroundColor Green
+Write-Host ('Gespeichert: ' + $out)
+Write-Host 'Der Bericht ist auch in der Zwischenablage.'
+Write-Host 'Im Rig-Tool unter Hardware auf "System-Scan laden" klicken und die Datei waehlen.'
+Write-Host ''
+if ($r.cpu) { Write-Host ('CPU:      ' + $r.cpu[0].name) }
+if ($r.gpu) { $r.gpu | ForEach-Object { Write-Host ('GPU:      ' + $_.name + '  (' + $_.vramGB + ' GB, Treiber ' + $_.driver + ')') } }
+if ($r.ram) { Write-Host ('RAM:      ' + $r.ram.totalGB + ' GB') }
+if ($r.monitors) { $r.monitors.active | ForEach-Object { Write-Host ('Monitor:  ' + $_.width + 'x' + $_.height + ' @ ' + $_.hz + ' Hz') } }
+if ($r.inputDevices) { $r.inputDevices | ForEach-Object { Write-Host ('Geraet:   ' + $_.name) } }
+Write-Host ''
