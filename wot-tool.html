@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>WoT-Setup-Tool</title>
+<meta name="description" content="Kostenlose Empfehlungen für World of Tanks: Grafik nach Hardware, Spieleinstellungen und Panzer-Ausrüstung nach Klasse und Spielweise.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wot-tool/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="wot-tool.html">WoT-Setup</a>
+    <div class="tabs" role="tablist" aria-label="Bereiche">
+      <button role="tab" data-view="gfx">Grafik</button>
+      <button role="tab" data-view="game">Spiel</button>
+      <button role="tab" data-view="tank">Panzer</button>
+      <button role="tab" data-view="money">Sparen</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- GRAFIK -->
+  <section class="view" id="v-gfx">
+    <header>
+      <h1>Grafik</h1>
+      <p>Wähle deine Hardware und was dir wichtiger ist. Die Tabelle zeigt, was du im Spiel unter Einstellungen → Grafik → Erweitert eintragen solltest.</p>
+    </header>
+    <div class="panel">
+      <div class="fields">
+        <label class="f">Grafikkarte<select id="gpu">
+          <option value="0">Einsteiger / Laptop (GTX 1050–1650, RX 570, Intel/AMD integriert)</option>
+          <option value="1" selected>Mittelklasse (GTX 1070–1080, RTX 2060–3060, RX 5600–6600)</option>
+          <option value="2">Oberklasse (RTX 3070–4070 Ti, RX 6800–7800 XT)</option>
+          <option value="3">High-End (RTX 4080, 4090, 50er-Serie, RX 7900)</option>
+        </select></label>
+        <label class="f">Prozessor<select id="cpu">
+          <option value="0">Älter (4 Kerne, vor ca. 2018)</option>
+          <option value="1" selected>Aktuell (6 Kerne oder mehr)</option>
+          <option value="2">Stark (Ryzen 7000/9000, Core i5/i7 ab 12. Gen.)</option>
+        </select></label>
+        <label class="f">Auflösung<select id="res">
+          <option value="1080" selected>1920 × 1080 (Full HD)</option>
+          <option value="1440">2560 × 1440 (WQHD)</option>
+          <option value="uw">3440 × 1440 (Ultrawide)</option>
+          <option value="2160">3840 × 2160 (4K)</option>
+        </select></label>
+        <label class="f">Bildwiederholrate<select id="hz">
+          <option value="60">60 Hz</option>
+          <option value="75">75 Hz</option>
+          <option value="144" selected>144 Hz</option>
+          <option value="165">165 Hz</option>
+          <option value="240">240 Hz oder mehr</option>
+        </select></label>
+        <label class="f">Ziel<select id="goal">
+          <option value="comp" selected>Gewinnen: klare Sicht, viele FPS</option>
+          <option value="bal">Ausgewogen</option>
+          <option value="pretty">Schön: Optik vor FPS</option>
+        </select></label>
+        <label class="f">Bildsynchronisation<select id="sync">
+          <option value="vrr" selected>G-Sync / FreeSync vorhanden</option>
+          <option value="none">Keine / weiß nicht</option>
+        </select></label>
+      </div>
+    </div>
+
+    <div class="summary" id="gfxSummary"></div>
+
+    <div class="panel">
+      <div class="actions" style="margin-top:0;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Einstellungen</h3>
+        <button class="btn" id="copyGfx">Als Text kopieren</button>
+      </div>
+      <div id="gfxTable"></div>
+      <p class="muted" style="font-size:.85rem;margin-top:14px">Die Bezeichnungen können je nach Spielversion leicht abweichen. Mit <span class="tag key">wichtig</span> markierte Punkte bringen im Gefecht am meisten.</p>
+    </div>
+    <div class="panel"><h3>Passend zu deiner Hardware</h3><ul class="tips" id="gfxTips"></ul></div>
+  </section>
+
+  <!-- SPIEL -->
+  <section class="view" id="v-game">
+    <header>
+      <h2>Spiel &amp; Steuerung</h2>
+      <p>Diese Einstellungen kosten nichts und bringen oft mehr als jede Ausrüstung. Zu finden unter Einstellungen → Spiel, Steuerung, Markierungen und Ton.</p>
+    </header>
+    <div id="gameGroups"></div>
+  </section>
+
+  <!-- PANZER -->
+  <section class="view" id="v-tank">
+    <header>
+      <h2>Panzer-Setup</h2>
+      <p>Entscheide vor dem Kauf, was auf deinen Panzer kommt. Ausrüstung wieder auszubauen kostet in der Regel Gold oder Demontage-Kits, deshalb lohnt es sich, gleich das Richtige zu montieren.</p>
+    </header>
+    <div class="panel">
+      <div class="fields">
+        <label class="f">Klasse<select id="cls">
+          <option value="lt">Leichter Panzer</option>
+          <option value="mt" selected>Mittlerer Panzer</option>
+          <option value="ht">Schwerer Panzer</option>
+          <option value="td">Jagdpanzer</option>
+          <option value="spg">Artillerie</option>
+        </select></label>
+        <label class="f">Stufe<select id="tier">
+          <option value="3">II–IV</option>
+          <option value="2">V–VII</option>
+          <option value="1" selected>VIII–X</option>
+        </select></label>
+        <label class="f">Spielweise<select id="style"></select></label>
+        <label class="f">Kanone<select id="gun">
+          <option value="single" selected>Normale Kanone (ein Schuss)</option>
+          <option value="clip">Magazin / Autolader / Autoreloader</option>
+          <option value="dual">Doppelrohr</option>
+        </select></label>
+      </div>
+      <div class="fields" style="margin-top:6px">
+        <label class="chk"><input type="checkbox" id="badAim"> Kanone zielt langsam / ungenau</label>
+        <label class="chk"><input type="checkbox" id="lowView"> Sichtweite unter 380 m</label>
+        <label class="chk"><input type="checkbox" id="slow"> Panzer ist langsam (unter 35 km/h)</label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Ausrüstung</h3>
+      <p class="muted" id="eqIntro"></p>
+      <div class="slots" id="eqSlots"></div>
+      <div id="eqWarn"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Verbrauchsgüter</h3>
+      <div class="slots" id="consSlots"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Munition</h3>
+      <ul class="tips" id="ammo"></ul>
+    </div>
+
+    <div class="panel">
+      <h3>Besatzung</h3>
+      <p>Das Crew-System wurde mit den Updates 1.26 und 2.2 umgebaut: neue Fähigkeiten und höchstens sechs pro Besatzungsmitglied. Damit du keine veraltete Liste bekommst, stehen hier nur die Grundregeln.</p>
+      <ul class="tips" id="crew"></ul>
+      <p class="muted" style="font-size:.88rem;margin-top:12px">Empfohlene Fähigkeiten pro Panzer, kostenlos und aktuell: die offiziellen <a href="https://worldoftanks.eu/de/content/guide/tank-manuals/" target="_blank" rel="noopener">Panzer-Handbücher von Wargaming</a>.</p>
+    </div>
+  </section>
+
+  <!-- SPAREN -->
+  <section class="view" id="v-money">
+    <header>
+      <h2>Geld sparen</h2>
+      <p>Wo Silber und Gold in WoT meistens verloren gehen und wie du das vermeidest.</p>
+    </header>
+    <div id="moneyGroups"></div>
+  </section>
+
+  <p class="foot">Inoffizielles Fan-Tool, nicht mit Wargaming verbunden. Empfehlungen sind Erfahrungswerte und ersetzen nicht den Test im eigenen Gefecht. Läuft komplett im Browser, nichts wird gespeichert oder gesendet.</p>
+</main>
+<script src="wot-tool/app.js"></script>
+</body>
+</html>
